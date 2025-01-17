@@ -1,0 +1,29 @@
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+export const metadata = {
+  title: "Kitchen Companion",
+  description: "Your kitchen companion",
+};
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} min-w-[350px] bg-white text-[#333] antialiased`}
+      >
+        {children}
+      </body>
+    </html>
+  );
+}
