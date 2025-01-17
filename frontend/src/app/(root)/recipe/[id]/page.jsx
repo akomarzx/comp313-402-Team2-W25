@@ -31,7 +31,7 @@ const Recipe = () => {
 
   return (
     <div>
-      <div className="bg-gray-50 min-h-screen py-8">
+      <div className=" min-h-screen py-8">
         <div className="container mx-auto px-4 max-w-4xl">
           {/* Recipe Header */}
           <div className="mb-8 text-center">
@@ -80,7 +80,6 @@ const Recipe = () => {
           </div>
         </div>
       </div>
-      );
     </div>
   );
 };
