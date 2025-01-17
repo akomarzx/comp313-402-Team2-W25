@@ -13,8 +13,8 @@ const Navbar = () => {
   const currentPath = usePathname();
 
   return (
-    <nav className="w-full h-fit mx-auto border-b bg-white">
-      <div className="container flex justify-between h-[8vh] items-center mx-auto px-4">
+    <nav className="w-full h-fit mx-0 border-b bg-white">
+      <div className="container flex justify-between h-[8vh] items-center mx-auto min-w-[80%] px-4">
         {/* Logo */}
         <div className="text-xl font-bold text-green-500">
           <Link href="/">Kitchen Companion</Link>
@@ -31,12 +31,12 @@ const Navbar = () => {
             HOME
           </Link>
           <Link
-            href="/recipies"
+            href="/recipes"
             className={
-              currentPath === "/recipies" ? "text-green-500" : "text-slate-600"
+              currentPath === "/recipes" ? "text-green-500" : "text-slate-600"
             }
           >
-            RECIPIES
+            RECIPES
           </Link>
           <Link
             href="/ai"
@@ -103,15 +103,13 @@ const Navbar = () => {
               HOME
             </Link>
             <Link
-              href="/recipies"
+              href="/recipes"
               className={
-                currentPath === "/recipies"
-                  ? "text-green-500"
-                  : "text-slate-600"
+                currentPath === "/recipes" ? "text-green-500" : "text-slate-600"
               }
               onClick={() => setIsOpen(false)}
             >
-              RECIPIES
+              RECIPES
             </Link>
             <Link
               href="/ai"

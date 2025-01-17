@@ -9,6 +9,13 @@ const nextConfig = {
         pathname: "**",
         search: "",
       },
+      {
+        protocol: "https",
+        hostname: "fakeimg.pl",
+        port: "",
+        pathname: "**",
+        search: "",
+      },
     ],
   },
 };

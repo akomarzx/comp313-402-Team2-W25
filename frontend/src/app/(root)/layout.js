@@ -2,9 +2,11 @@ import Navbar from "@/components/Navbar";
 
 export default function RootLayout({ children }) {
   return (
-    <main className="bg-white">
+    <>
       <Navbar />
-      {children}
-    </main>
+      <main className="w-[80%] mx-auto max-w-[1200px] bg-white min-h-screen py-10">
+        {children}
+      </main>
+    </>
   );
 }
