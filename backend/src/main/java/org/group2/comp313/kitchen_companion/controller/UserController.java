@@ -26,13 +26,13 @@ public class UserController extends BaseController{
         this.keycloakClientService = service;
     }
 
-
-    @PostMapping
-    @Operation(description = "Create new user under an existing company")
+    @GetMapping
+    @Operation(description = "Create new user")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<ObjectUtils.Null> addNewUserForTenant(@Valid @RequestBody UserRegistrationDto userRegistrationDto,
-                                                                @AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) {
-        this.keycloakClientService.registerNewUser(userRegistrationDto, Long.parseLong(tenantId), false);
+    public ResponseEntity<ObjectUtils.Null> addNewUserForTenant(
+                                                                //@AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId
+                                                                ) {
+        //this.keycloakClientService.registerNewUser(userRegistrationDto, Long.parseLong(tenantId), false);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
