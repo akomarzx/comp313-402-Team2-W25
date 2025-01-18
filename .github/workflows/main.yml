@@ -1,4 +1,4 @@
-name: Build and Push to ecr
+name: Build and Push Backend to ecr
 on:
   workflow_dispatch:
 jobs:
@@ -27,7 +27,7 @@ jobs:
         ECR_REPOSITORY: ${{ secrets.APPS_ECR_REPO }}
         IMAGE_TAG: api_latest
       run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker build backend/ -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
     - name: Clean-up of ECR untagged images
       id: ecr-cleanup
