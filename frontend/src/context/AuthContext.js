@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }) => {
   // Function to log out
   const logout = async () => {
     try {
-      await axios.get("http://localhost:8081/logout", {
+      const res = await axios.get("http://localhost:8081/logout", {
         withCredentials: true,
       });
       setUser(null);
@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
   };
   const fetchSession = async () => {
     try {
-      const response = await axios.get("http://localhost:8081/api/session", {
+      const response = await axios.get("http://localhost:8081/session", {
         withCredentials: true,
       });
       if (response.data.authenticated) {

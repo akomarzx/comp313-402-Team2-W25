@@ -2,10 +2,12 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false); // For Profile Dropdown
+  const { user, logout, login } = useAuth();
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
@@ -15,43 +17,108 @@ const Navbar = () => {
   return (
     <nav className="w-full h-fit mx-0 border-b bg-white">
       <div className="container flex justify-between h-[8vh] items-center mx-auto min-w-[80%] px-4">
-        {/* Logo */}
-        <div className="text-xl font-bold text-green-500">
-          <Link href="/">Kitchen Companion</Link>
+        <div className="text-xl font-bold text-green-600">
+          <Link href="/recipes">Kitchen Companion</Link>
         </div>
 
-        {/* Desktop Links */}
         <div className="hidden md:flex gap-10 text-slate-600 font-bold font-sans">
           <Link
-            href="/"
+            href="/recipes"
             className={
-              currentPath === "/" ? "text-green-500" : "text-slate-600"
+              currentPath === "/recipes" ? "text-green-600" : "text-slate-600"
             }
           >
             HOME
           </Link>
-          <Link
-            href="/recipes"
-            className={
-              currentPath === "/recipes" ? "text-green-500" : "text-slate-600"
-            }
-          >
-            RECIPES
-          </Link>
+          {user && (
+            <Link
+              href="/my-kitchen"
+              className={
+                currentPath === "/my-kitchen"
+                  ? "text-green-600"
+                  : "text-slate-600"
+              }
+            >
+              MY KITCHEN
+            </Link>
+          )}
           <Link
             href="/ai"
             className={
-              currentPath === "/ai" ? "text-green-500" : "text-slate-600"
+              currentPath === "/ai" ? "text-green-600" : "text-slate-600"
             }
           >
             AI RECOMMENDATIONS
           </Link>
+
+          {/* Profile Dropdown */}
+          {user ? (
+            <div className="relative">
+              <button
+                onClick={() => setIsProfileDropdownOpen((prev) => !prev)}
+                onBlur={() =>
+                  setTimeout(() => {
+                    setIsProfileDropdownOpen(false);
+                  }, 20)
+                }
+                className="flex items-center gap-2 hover:text-green-600 focus:outline-none"
+              >
+                <span>PROFILE</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </button>
+
+              {isProfileDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg">
+                  <Link
+                    href="/profile"
+                    className="block px-4 py-2 hover:bg-gray-100 text-slate-600"
+                    onClick={() => setIsProfileDropdownOpen(false)}
+                  >
+                    MY PROFILE
+                  </Link>
+                  <button
+                    onClick={() => {
+                      logout(); // Logout function from useAuth
+                      setIsProfileDropdownOpen(false);
+                    }}
+                    className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-slate-600"
+                  >
+                    LOG OUT
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link
+              href="/"
+              onClick={() => {
+                login();
+                setIsOpen(false);
+              }}
+              className="hover:text-green-600"
+            >
+              LOGIN
+            </Link>
+          )}
         </div>
 
+        {/* Mobile Menu Button */}
         <div className="md:hidden">
           <button
             onClick={toggleMenu}
-            onBlur={() => setTimeout(() => setIsOpen(false), 20)}
             className="text-slate-600 focus:outline-none"
           >
             {isOpen ? (
@@ -94,32 +161,84 @@ const Navbar = () => {
         <div className="md:hidden bg-white border-t">
           <div className="flex flex-col gap-4 py-4 px-4 text-slate-600 font-bold font-sans">
             <Link
-              href="/"
+              href="/recipes"
               className={
-                currentPath === "/" ? "text-green-500" : "text-slate-600"
+                currentPath === "/recipes" ? "text-green-600" : "text-slate-600"
               }
               onClick={() => setIsOpen(false)}
             >
               HOME
             </Link>
-            <Link
-              href="/recipes"
-              className={
-                currentPath === "/recipes" ? "text-green-500" : "text-slate-600"
-              }
-              onClick={() => setIsOpen(false)}
-            >
-              RECIPES
-            </Link>
+            {user && (
+              <Link
+                href="/my-kitchen"
+                className={
+                  currentPath === "/my-kitchen"
+                    ? "text-green-600"
+                    : "text-slate-600"
+                }
+                onClick={() => setIsOpen(false)}
+              >
+                MY KITCHEN
+              </Link>
+            )}
             <Link
               href="/ai"
               className={
-                currentPath === "/ai" ? "text-green-500" : "text-slate-600"
+                currentPath === "/ai" ? "text-green-600" : "text-slate-600"
               }
               onClick={() => setIsOpen(false)}
             >
               AI RECOMMENDATIONS
             </Link>
+
+            {/* Mobile Profile Dropdown */}
+            {user ? (
+              <div>
+                <button
+                  onClick={() => setIsProfileDropdownOpen((prev) => !prev)}
+                  onBlur={() =>
+                    setTimeout(() => {
+                      setIsProfileDropdownOpen(false);
+                    }, 20)
+                  }
+                  className="block w-full text-left py-2 hover:text-green-600 focus:outline-none"
+                >
+                  PROFILE
+                </button>
+                {isProfileDropdownOpen && (
+                  <div className="ml-4 border-l pl-4 flex flex-col gap-2">
+                    <Link
+                      href="/profile"
+                      onClick={() => setIsOpen(false)}
+                      className="hover:text-green-600"
+                    >
+                      MY PROFILE
+                    </Link>
+                    <button
+                      onClick={() => {
+                        logout();
+                        setIsOpen(false);
+                      }}
+                      className="hover:text-green-600"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => {
+                  login();
+                  setIsOpen(false);
+                }}
+                className="hover:text-green-600"
+              >
+                LOGIN
+              </Link>
+            )}
           </div>
         </div>
       )}

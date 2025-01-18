@@ -1,8 +1,6 @@
 "use client";
-import React, { useState } from "react";
-import axios from "axios";
+import React from "react";
 import { useAuth } from "../../context/AuthContext";
-import { redirect } from "next/navigation";
 const Home = () => {
   const { user, login, logout, loading } = useAuth();
 
@@ -14,10 +12,6 @@ const Home = () => {
     await logout();
   };
 
-  if (!user) {
-    redirect("/login");
-  }
-
   if (loading) return <p>Loading...</p>;
 
   return (
@@ -25,7 +19,7 @@ const Home = () => {
       <h1>React OAuth BFF</h1>
       {user ? (
         <>
-          <p>Welcome, {user.profile.name || "User"}!</p>
+          <p>Welcome, {user.name || "User"}!</p>
           <button onClick={handleLogout}>Logout</button>
         </>
       ) : (
