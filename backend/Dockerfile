@@ -1,6 +1,6 @@
 FROM maven:3.9.4-amazoncorretto-21 AS build_step
 RUN mkdir /project
-COPY . /project
+COPY ./backend /project
 WORKDIR /project
 RUN mvn clean package -DskipTests
 
