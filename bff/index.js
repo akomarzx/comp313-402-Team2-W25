@@ -1,16 +1,19 @@
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
+
 const express = require("express");
 const passport = require("passport");
 const OAuth2Strategy = require("passport-oauth2");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const axios = require("axios");
-
-require("dotenv").config();
+const cors = require('cors')
+const jwt = require("jsonwebtoken");
 
 const app = express();
 const PORT = process.env.PORT;
 
-// OAuth Configuration
 // OAuth Configuration
 const OAUTH_CONFIG = {
   authorizationURL: process.env.OAUTH_AUTHORIZATION_URL,
@@ -30,10 +33,21 @@ passport.use(
       clientID: OAUTH_CONFIG.clientID,
       clientSecret: OAUTH_CONFIG.clientSecret,
       callbackURL: OAUTH_CONFIG.callbackURL,
+      scope: ["openid", "profile", "email"]
     },
-    (accessToken, refreshToken, profile, done) => {
-      const user = { accessToken, refreshToken, profile };
-      return done(null, user);
+    async (accessToken, refreshToken, params, done) => {
+      try {
+        const profile = jwt.decode(params.id_token || accessToken);
+        const user = {
+          accessToken,
+          refreshToken,
+          profile,
+        };
+        return done(null, user);
+      } catch (error) {
+        console.error("Error decoding token:", error.message);
+        return done(error);
+      }
     }
   )
 );
@@ -46,21 +60,39 @@ passport.deserializeUser((user, done) => {
   done(null, user);
 });
 
+app.use(cors())
+app.use(cookieParser());
+
+// CORS configuration
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL, 
+    credentials: true, 
+  })
+);
+
+// Middleware
 app.use(cookieParser());
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
+    cookie: {
+      secure: process.env.SECURE_COOKIE, // true for https
+      httpOnly: true, 
+      sameSite: "lax", 
+    },
   })
 );
+
 app.use(passport.initialize());
 app.use(passport.session());
 
 app.get(
   "/login",
   passport.authenticate("oauth2", {
-    scope: ["profile"],
+    scope: ["openid", "profile", "email"],
   })
 );
 
@@ -68,13 +100,27 @@ app.get(
   "/callback",
   passport.authenticate("oauth2", { failureRedirect: "/login" }),
   (req, res) => {
-    // Redirect to the frontend after successful login
-    res.redirect(process.env.FRONTEND_URL); // Update with your Vite frontend URL
+    res.redirect(process.env.FRONTEND_URL); 
   }
 );
 
+app.get("/session", (req, res) => {
+  if (req.isAuthenticated()) {
+    const { profile } = req.user;
+
+    const safeUserData = {
+      id: profile.sub,
+      name: profile.name,
+      email: profile.email,
+    };
+
+    res.json({ authenticated: true, user: safeUserData });
+  } else {
+    res.json({ authenticated: false });
+  }
+});
 // Proxy Middleware for All API Calls
-app.use("/api", async (req, res) => {
+app.use("/api/**", async (req, res) => {
   if (!req.isAuthenticated()) {
     return res.status(401).send("Unauthorized");
   }
