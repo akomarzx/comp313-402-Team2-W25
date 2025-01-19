@@ -3,7 +3,7 @@ import React from "react";
 import RecipeCard from "@/components/RecipeCard";
 import { useAuth } from "@/context/AuthContext";
 import { redirect } from "next/navigation";
-const MyKitchen = () => {
+const MyCookBook = () => {
   const { user, loading } = useAuth();
   if (loading) return <p>Loading...</p>;
   if (!user) {
@@ -13,9 +13,26 @@ const MyKitchen = () => {
   const myRecipes = [];
   return (
     <div>
-      <button className="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded">
-        <a href="/recipe/create">New Recipe</a>
-      </button>
+      <h2 className="mx-2 font-bold text-2xl">MY COOK BOOK</h2>
+      <div className="text-right">
+        <button className="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 mx-2 rounded">
+          <a href="recipe/create">New Recipe</a>
+        </button>
+      </div>
+
+      <div>
+        <fieldset className="border mx-2 my-5 border-gray-200 rounded-lg p-4">
+          <legend>
+            <h2 className="font-semibold">MY RECIPIES</h2>
+          </legend>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 xl:px-4 py-4  mx-auto max-w-[1200px]">
+            {myRecipes.map((recipe, index) => (
+              <RecipeCard key={index} data={recipe} />
+            ))}
+          </div>
+        </fieldset>
+      </div>
       <div>
         <fieldset className="border m-2 border-gray-200 rounded-lg p-4">
           <legend>
@@ -28,21 +45,8 @@ const MyKitchen = () => {
           </div>
         </fieldset>
       </div>
-      <div>
-        <fieldset className="border m-2 border-gray-200 rounded-lg p-4">
-          <legend>
-            <h2 className="font-semibold">MY RECIPIES</h2>
-          </legend>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 xl:px-4 py-4  mx-auto max-w-[1200px]">
-            {myRecipes.map((recipe, index) => (
-              <RecipeCard key={index} data={recipe} />
-            ))}
-          </div>
-        </fieldset>
-      </div>
     </div>
   );
 };
 
-export default MyKitchen;
+export default MyCookBook;
