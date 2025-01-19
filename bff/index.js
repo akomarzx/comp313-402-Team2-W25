@@ -79,7 +79,7 @@ app.use(
     resave: false,
     saveUninitialized: true,
     cookie: {
-      secure: false, // true for https
+      secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
       sameSite: "lax",
     },
@@ -152,15 +152,68 @@ app.use("/api/**", async (req, res) => {
   }
 });
 
-// Route: Logout
-app.get("/logout", (req, res) => {
-  req.logout((err) => {
-    if (err) {
-      return res.status(500).send("Error logging out");
+app.get("/logout", async (req, res) => {
+  const tokenRevocationURL = "https://ronaldjro.dev/auth/realms/KitchenCompanion/protocol/openid-connect/revoke";
+
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ error: "User not authenticated" });
+  }
+
+  const { accessToken, refreshToken } = req.user;
+
+  console.log(process.env)
+
+  try {
+    // Revoke access token
+    await axios.post(
+      tokenRevocationURL,
+      new URLSearchParams({
+        token: accessToken,
+        client_id: OAUTH_CONFIG.clientID,
+        client_secret: OAUTH_CONFIG.clientSecret,
+      }),
+      { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+    );
+
+    if (refreshToken) {
+      await axios.post(
+        tokenRevocationURL,
+        new URLSearchParams({
+          token: refreshToken,
+          client_id: OAUTH_CONFIG.clientID,
+          client_secret: OAUTH_CONFIG.clientSecret,
+        }),
+        { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+      );
     }
-    res.clearCookie("connect.sid");
-    res.send("Logged out");
-  });
+
+    // Destroy session and clear cookies
+    req.logout((err) => {
+      if (err) {
+        console.error("Error logging out:", err);
+        return res.status(500).json({ error: "Failed to log out" });
+      }
+
+      req.session.destroy((err) => {
+        if (err) {
+          console.error("Error destroying session:", err);
+          return res.status(500).json({ error: "Failed to destroy session" });
+        }
+
+        res.clearCookie("connect.sid", {
+          path: "/",
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "Lax",
+        });
+
+        res.status(200).json({ message: "Logged out successfully" });
+      });
+    });
+  } catch (error) {
+    console.error("Error revoking tokens:", error.response?.data || error.message);
+    res.status(500).json({ error: "Failed to revoke tokens" });
+  }
 });
 
 // Start the server
