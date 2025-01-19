@@ -53,14 +53,16 @@ const Navbar = () => {
 
           {/* Profile Dropdown */}
           {user ? (
-            <div className="relative">
+            <div
+              className="relative"
+              onBlur={() =>
+                setTimeout(() => {
+                  setIsProfileDropdownOpen(false);
+                }, 100)
+              }
+            >
               <button
                 onClick={() => setIsProfileDropdownOpen((prev) => !prev)}
-                onBlur={() =>
-                  setTimeout(() => {
-                    setIsProfileDropdownOpen(false);
-                  }, 20)
-                }
                 className="flex items-center gap-2 hover:text-green-600 focus:outline-none"
               >
                 <span>PROFILE</span>
@@ -85,14 +87,12 @@ const Navbar = () => {
                   <Link
                     href="/profile"
                     className="block px-4 py-2 hover:bg-gray-100 text-slate-600"
-                    onClick={() => setIsProfileDropdownOpen(false)}
                   >
                     MY PROFILE
                   </Link>
                   <button
                     onClick={() => {
-                      logout(); // Logout function from useAuth
-                      setIsProfileDropdownOpen(false);
+                      logout();
                     }}
                     className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-slate-600"
                   >
@@ -197,11 +197,6 @@ const Navbar = () => {
               <div>
                 <button
                   onClick={() => setIsProfileDropdownOpen((prev) => !prev)}
-                  onBlur={() =>
-                    setTimeout(() => {
-                      setIsProfileDropdownOpen(false);
-                    }, 20)
-                  }
                   className="block w-full text-left py-2 hover:text-green-600 focus:outline-none"
                 >
                   PROFILE
@@ -229,7 +224,7 @@ const Navbar = () => {
               </div>
             ) : (
               <Link
-                href="/login"
+                href="/"
                 onClick={() => {
                   login();
                   setIsOpen(false);

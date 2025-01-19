@@ -10,7 +10,7 @@ const cookieParser = require("cookie-parser");
 const axios = require("axios");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
-const morgan = require('morgan')
+const morgan = require("morgan");
 
 const app = express();
 const PORT = process.env.PORT;
@@ -25,8 +25,8 @@ const OAUTH_CONFIG = {
 };
 
 const RESOURCE_SERVER_URL = process.env.RESOURCE_SERVER_URL;
-console.log(process.env)
-app.use(morgan('combined'));
+console.log(process.env);
+app.use(morgan("combined"));
 
 passport.use(
   new OAuth2Strategy(
@@ -103,7 +103,7 @@ app.get(
   "/callback",
   passport.authenticate("oauth2", { failureRedirect: "/login" }),
   (req, res) => {
-    res.redirect(process.env.FRONTEND_URL);
+    res.redirect(process.env.FRONTEND_URL + "/recipe");
   }
 );
 
@@ -156,7 +156,8 @@ app.use("/api/**", async (req, res) => {
 });
 
 app.get("/logout", async (req, res) => {
-  const tokenRevocationURL = "https://ronaldjro.dev/auth/realms/KitchenCompanion/protocol/openid-connect/revoke";
+  const tokenRevocationURL =
+    "https://ronaldjro.dev/auth/realms/KitchenCompanion/protocol/openid-connect/revoke";
 
   if (!req.isAuthenticated()) {
     return res.status(401).json({ error: "User not authenticated" });
@@ -164,7 +165,7 @@ app.get("/logout", async (req, res) => {
 
   const { accessToken, refreshToken } = req.user;
 
-  console.log(process.env)
+  console.log(process.env);
 
   try {
     // Revoke access token
@@ -214,7 +215,10 @@ app.get("/logout", async (req, res) => {
       });
     });
   } catch (error) {
-    console.error("Error revoking tokens:", error.response?.data || error.message);
+    console.error(
+      "Error revoking tokens:",
+      error.response?.data || error.message
+    );
     res.status(500).json({ error: "Failed to revoke tokens" });
   }
 });
