@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 
 import axios from "axios";
+
 // Create Auth Context
 const AuthContext = createContext();
 
@@ -10,18 +11,20 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-
   // Function to log in
   const login = async () => {
-    window.location.href = "https://ronaldjro.dev/bff/login";
+    window.location.href = `${process.env.NEXT_PUBLIC_NODE_API}/login`;
   };
 
   // Function to log out
   const logout = async () => {
     try {
-      const res = await axios.get("https://ronaldjro.dev/bff/logout", {
-        withCredentials: true,
-      });
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_NODE_API}/logout`,
+        {
+          withCredentials: true,
+        }
+      );
       setUser(null);
     } catch (error) {
       console.error("Error logging out:", error);
@@ -29,9 +32,12 @@ export const AuthProvider = ({ children }) => {
   };
   const fetchSession = async () => {
     try {
-      const response = await axios.get("https://ronaldjro.dev/bff/session", {
-        withCredentials: true,
-      });
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_NODE_API}/session`,
+        {
+          withCredentials: true,
+        }
+      );
       if (response.data.authenticated) {
         setUser(response.data.user);
       } else {
