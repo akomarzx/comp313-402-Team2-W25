@@ -6,7 +6,6 @@ import axios from "axios";
 
 // Create Auth Context
 const AuthContext = createContext();
-// const bffUrl = "https://ronaldjro.dev/bff"
 
 const bffUrl = process.env.NEXT_PUBLIC_NODE_API;
 // Auth Provider Component
