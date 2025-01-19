@@ -33,3 +33,13 @@ jobs:
       id: ecr-cleanup
       run: |
         bash ./build/cleanup_ecr.sh
+    - name: AWS SSM Send-Command
+      uses: peterkimzz/aws-ssm-send-command@v1.1.1
+      id: ssm
+      with:
+        aws-region: us-east-1
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        instance-ids: ${{ secrets.INSTANCE_ID }}
+        working-directory: /home/ec2-user
+        command: /bin/bash ./kitchen-comp/deployment-bff.sh 
