@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense } from "react";
+import React from "react";
 
 import { useSearchParams } from "next/navigation";
 import RecipesResult from "@/components/RecipesResult";
@@ -11,11 +11,9 @@ const AIRecipies = () => {
 
   return (
     <div>
-      <Suspense>
-        <div className="border-t-2">
-          <RecipesResult isSearching="" recipeCardData={data} />
-        </div>
-      </Suspense>
+      <div className="border-t-2">
+        <RecipesResult isSearching="" recipeCardData={data} />
+      </div>
     </div>
   );
 };
