@@ -13,7 +13,6 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   // Function to log in
   const login = async () => {
-    console.log(process.env)
     window.location.href = `${process.env.NEXT_PUBLIC_NODE_API}/login`;
   };
 
