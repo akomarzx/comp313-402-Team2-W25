@@ -13,13 +13,13 @@ export const AuthProvider = ({ children }) => {
 
   // Function to log in
   const login = async () => {
-    window.location.href = "http://localhost:8081/login";
+    window.location.href = "https://ronaldjro.dev/bff/login";
   };
 
   // Function to log out
   const logout = async () => {
     try {
-      const res = await axios.get("http://localhost:8081/logout", {
+      const res = await axios.get("https://ronaldjro.dev/bff/logout", {
         withCredentials: true,
       });
       setUser(null);
@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
   };
   const fetchSession = async () => {
     try {
-      const response = await axios.get("http://localhost:8081/session", {
+      const response = await axios.get("https://ronaldjro.dev/bff/session", {
         withCredentials: true,
       });
       if (response.data.authenticated) {
