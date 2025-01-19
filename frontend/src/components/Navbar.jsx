@@ -32,20 +32,20 @@ const Navbar = () => {
           </Link>
           {user && (
             <Link
-              href="/my-kitchen"
+              href="/cook-book"
               className={
-                currentPath === "/my-kitchen"
+                currentPath === "/cook-book"
                   ? "text-green-600"
                   : "text-slate-600"
               }
             >
-              MY KITCHEN
+              MY COOK BOOK
             </Link>
           )}
           <Link
-            href="/ai"
+            href="/ai-rcmd"
             className={
-              currentPath === "/ai" ? "text-green-600" : "text-slate-600"
+              currentPath === "/ai-rcmd" ? "text-green-600" : "text-slate-600"
             }
           >
             AI RECOMMENDATIONS
@@ -183,9 +183,9 @@ const Navbar = () => {
               </Link>
             )}
             <Link
-              href="/ai"
+              href="/ai-rcmd"
               className={
-                currentPath === "/ai" ? "text-green-600" : "text-slate-600"
+                currentPath === "/ai-rcmd" ? "text-green-600" : "text-slate-600"
               }
               onClick={() => setIsOpen(false)}
             >
