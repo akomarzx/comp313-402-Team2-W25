@@ -10,6 +10,7 @@ const cookieParser = require("cookie-parser");
 const axios = require("axios");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
+const morgan = require('morgan')
 
 const app = express();
 const PORT = process.env.PORT;
@@ -24,6 +25,8 @@ const OAUTH_CONFIG = {
 };
 
 const RESOURCE_SERVER_URL = process.env.RESOURCE_SERVER_URL;
+console.log(process.env)
+app.use(morgan('combined'));
 
 passport.use(
   new OAuth2Strategy(
@@ -79,7 +82,7 @@ app.use(
     resave: false,
     saveUninitialized: true,
     cookie: {
-      secure: process.env.NODE_ENV === 'production',
+      secure: false,
       httpOnly: true,
       sameSite: "lax",
     },
