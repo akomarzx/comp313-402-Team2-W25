@@ -28,22 +28,22 @@ const AIReccommend = () => {
       id: "1",
       imgUrl:
         "https://www.themealdb.com/images/media/meals/58oia61564916529.jpg",
-      title: "Beef and Mustard Pie",
-      description: "A delicious beef and mustard pie",
+      title: "Not Beef and Mustard Pie",
+      description: "Not A delicious beef and mustard pie",
     },
     {
       id: "2",
       imgUrl:
         "https://www.themealdb.com/images/media/meals/58oia61564916529.jpg",
-      title: "Beef and Mustard Pie",
-      description: "A delicious beef and mustard pie",
+      title: "Not Beef and Mustard Pie",
+      description: "Not A delicious beef and mustard pie",
     },
     {
       id: "3",
       imgUrl:
         "https://www.themealdb.com/images/media/meals/58oia61564916529.jpg",
-      title: "Beef and Mustard Pie",
-      description: "A delicious beef and mustard pie",
+      title: "Not Beef and Mustard Pie",
+      description: "Not A delicious beef and mustard pie",
     },
   ];
   const handleGenerateRecipes = async () => {
