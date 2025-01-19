@@ -33,7 +33,7 @@ jobs:
       id: ecr-cleanup
       run: |
         bash ./build/cleanup_ecr.sh
-        - name: AWS SSM Send-Command
+    - name: AWS SSM Send-Command
       uses: peterkimzz/aws-ssm-send-command@v1.1.1
       id: ssm
       with:
