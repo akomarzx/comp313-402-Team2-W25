@@ -6,21 +6,21 @@ import axios from "axios";
 
 // Create Auth Context
 const AuthContext = createContext();
-
+const bffUrl = "https://ronaldjro.dev/bff"
 // Auth Provider Component
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   // Function to log in
   const login = async () => {
-    window.location.href = `${process.env.NEXT_PUBLIC_NODE_API}/login`;
+    window.location.href = `${bffUrl}/login`;
   };
 
   // Function to log out
   const logout = async () => {
     try {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_NODE_API}/logout`,
+        `${bffUrl}/logout`,
         {
           withCredentials: true,
         }
@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }) => {
   const fetchSession = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_NODE_API}/session`,
+        `${bffUrl}/session`,
         {
           withCredentials: true,
         }
