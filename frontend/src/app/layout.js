@@ -21,15 +21,13 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <AuthProvider>
-      <Suspense>
-        <html lang="en">
-          <body
-            className={`${geistSans.variable} ${geistMono.variable} min-w-[350px] bg-slate-100 text-[#333] antialiased`}
-          >
-            {children}
-          </body>
-        </html>
-      </Suspense>
+      <html lang="en">
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} min-w-[350px] bg-slate-100 text-[#333] antialiased`}
+        >
+          <Suspense>{children}</Suspense>
+        </body>
+      </html>
     </AuthProvider>
   );
 }

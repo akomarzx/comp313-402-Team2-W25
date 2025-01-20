@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  basePath: '/kitchen',  // Set the base path to /recipe
+  basePath: "", // Set the base path to /recipe
   images: {
     remotePatterns: [
       {

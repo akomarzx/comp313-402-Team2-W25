@@ -6,7 +6,8 @@ import axios from "axios";
 
 // Create Auth Context
 const AuthContext = createContext();
-const bffUrl = "https://ronaldjro.dev/bff"
+
+const bffUrl = process.env.NEXT_PUBLIC_NODE_API;
 // Auth Provider Component
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -19,12 +20,9 @@ export const AuthProvider = ({ children }) => {
   // Function to log out
   const logout = async () => {
     try {
-      const res = await axios.get(
-        `${bffUrl}/logout`,
-        {
-          withCredentials: true,
-        }
-      );
+      const res = await axios.get(`${bffUrl}/logout`, {
+        withCredentials: true,
+      });
       setUser(null);
     } catch (error) {
       console.error("Error logging out:", error);
@@ -32,12 +30,9 @@ export const AuthProvider = ({ children }) => {
   };
   const fetchSession = async () => {
     try {
-      const response = await axios.get(
-        `${bffUrl}/session`,
-        {
-          withCredentials: true,
-        }
-      );
+      const response = await axios.get(`${bffUrl}/session`, {
+        withCredentials: true,
+      });
       if (response.data.authenticated) {
         setUser(response.data.user);
       } else {

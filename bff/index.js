@@ -103,7 +103,7 @@ app.get(
   "/callback",
   passport.authenticate("oauth2", { failureRedirect: "/login" }),
   (req, res) => {
-    res.redirect(process.env.FRONTEND_URL + "/kitchen");
+    res.redirect(process.env.FRONTEND_URL);
   }
 );
 
