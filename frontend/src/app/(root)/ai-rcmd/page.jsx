@@ -13,52 +13,39 @@ import { Checkbox } from "@/components/ui/checkbox";
 import IngredientInput from "@/components/IngredientInput";
 import { toast } from "sonner";
 import { ChefHat, Sparkles, UtensilsCrossed, Apple } from "lucide-react";
-import { redirect } from "next/navigation";
-
-import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+import { redirect, useRouter } from "next/navigation";
 const AIReccommend = () => {
   const [ingredients, setIngredients] = useState([]);
   const [dietary, setDietary] = useState("");
   const [allergies, setAllergies] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-
-  const recipeCardData = [
-    {
-      id: "1",
-      imgUrl:
-        "https://www.themealdb.com/images/media/meals/58oia61564916529.jpg",
-      title: "Not Beef and Mustard Pie",
-      description: "Not A delicious beef and mustard pie",
-    },
-    {
-      id: "2",
-      imgUrl:
-        "https://www.themealdb.com/images/media/meals/58oia61564916529.jpg",
-      title: "Not Beef and Mustard Pie",
-      description: "Not A delicious beef and mustard pie",
-    },
-    {
-      id: "3",
-      imgUrl:
-        "https://www.themealdb.com/images/media/meals/58oia61564916529.jpg",
-      title: "Not Beef and Mustard Pie",
-      description: "Not A delicious beef and mustard pie",
-    },
-  ];
+  const { user } = useAuth();
   const handleGenerateRecipes = async () => {
-    console.log(ingredients);
     if (ingredients.length === 0) {
       toast.error("Please add at least one ingredient");
       return;
     }
 
     setIsLoading(true);
+    if (!user) {
+      toast.error("Please login to generate recipes");
+      setIsLoading(false);
+      setTimeout(() => {
+        router.push("/");
+      }, 1500);
+    }
     try {
+      const requestBody = {
+        ingredients,
+        dietary,
+        allergies,
+      };
       await new Promise((resolve) => setTimeout(resolve, 1500));
       router.push(
         `/ai-rcmd/recipes?data=${encodeURIComponent(
-          JSON.stringify(recipeCardData)
+          JSON.stringify(requestBody)
         )}`
       );
     } catch (error) {

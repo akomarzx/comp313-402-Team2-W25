@@ -12,8 +12,8 @@ const MyCookBook = () => {
   const favoriteRecipes = [];
   const myRecipes = [];
   return (
-    <div>
-      <h2 className="mx-2 font-bold text-2xl">MY COOK BOOK</h2>
+    <div className="py-10">
+      <h2 className="mx-2 font-bold text-2xl ">MY COOK BOOK</h2>
       <div className="text-right">
         <button className="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 mx-2 rounded">
           <a href="recipe/create">New Recipe</a>
