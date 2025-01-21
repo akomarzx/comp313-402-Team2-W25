@@ -57,11 +57,10 @@ const AIReccommend = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50">
+    <div className="min-h-screen ">
       <div className="container max-w-4xl mx-auto px-4 py-12 md:py-20">
         <div className="text-center space-y-6 mb-16">
           <div className="relative inline-flex">
-            <div className="absolute inset-0 bg-green-200 rounded-full blur-2xl opacity-30"></div>
             <div className="relative bg-white shadow-xl rounded-full p-6">
               <ChefHat className="w-12 h-12 text-green-600" />
             </div>
