@@ -89,4 +89,8 @@ public class Recipe {
     @Column(name = "updated_by", length = 256)
     private String updatedBy;
 
+    @Size(max = 500)
+    @Column(name = "thumbnail_url", length = 500)
+    private String thumbnailUrl;
+
 }

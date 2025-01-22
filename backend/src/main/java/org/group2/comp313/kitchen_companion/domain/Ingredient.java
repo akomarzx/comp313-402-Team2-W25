@@ -31,10 +31,6 @@ public class Ingredient {
     @Column(name = "image_url", length = 500)
     private String imageUrl;
 
-    @Size(max = 500)
-    @Column(name = "thumbnail_url", length = 500)
-    private String thumbnailUrl;
-
     @Size(max = 255)
     @NotNull
     @Column(name = "label", nullable = false)

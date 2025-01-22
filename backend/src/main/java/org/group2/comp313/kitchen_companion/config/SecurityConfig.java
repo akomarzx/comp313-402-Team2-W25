@@ -39,7 +39,7 @@ public class SecurityConfig {
                         .requestMatchers(new AntPathRequestMatcher("/actuator/**")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/public/**")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/error")).permitAll()
-                        .requestMatchers("/swagger-ui/**","/v3/api-docs/**", "/docs").permitAll()
+                        .requestMatchers("/swagger-ui/**","/v3/api-docs/**", "/docs", "/api-docs/**").permitAll()
                         .anyRequest()
                         .authenticated()
                 )

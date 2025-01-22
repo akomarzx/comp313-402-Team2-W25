@@ -41,7 +41,8 @@ public class CodeBook {
     @Column(name = "updated_by", length = 256)
     private String updatedBy;
 
-    @OneToMany(mappedBy = "codeBook")
+    @OneToMany(mappedBy = "codeBook", fetch = FetchType.EAGER)
+    @OrderBy(value = "code_value_id asc")
     private Set<CodeValue> codeValues = new LinkedHashSet<>();
 
 }

@@ -69,6 +69,7 @@ create table
         `servings` int not null,
         `yield` varchar(255) null,
         `image_url` varchar(500),
+        `thumbnail_url` varchar(500),
         `calories` decimal(10,2) not null,
         `carbs_g` decimal(10,2) not null,
         `sugars_g` decimal(10,2) not null,
@@ -111,7 +112,8 @@ create table
         `created_at` timestamp default current_timestamp,
         `updated_at` timestamp on update current_timestamp,
         `updated_by` varchar(256),
-        foreign key (`recipe_id`) references `recipe` (`recipe_id`) on delete cascade
+        foreign key (`recipe_id`) references `recipe` (`recipe_id`) on delete cascade,
+        unique index `uidx_ingredient_group_ingredient_group_order_recipe_id` (`ingredient_group_order`, recipe_id)
     );
 
 create index `idx_step_recipe_id` on `ingredient_group` (`recipe_id`);
@@ -122,13 +124,13 @@ create table
         `ingredient_group_id` int not null,
         `ingredient_order` int not null,
         `image_url` varchar(500),
-        `thumbnail_url` varchar(500),
         `label` varchar(255) not null unique,
         `created_by` varchar(256) not null,
         `created_at` timestamp default current_timestamp,
         `updated_at` timestamp on update current_timestamp,
         `updated_by` varchar(256),
-        foreign key (`ingredient_group_id`) references `ingredient_group` (`ingredient_group_id`) on delete cascade
+        foreign key (`ingredient_group_id`) references `ingredient_group` (`ingredient_group_id`) on delete cascade,
+        unique index `uidx_ingredient_ingredient_id_ingredient_order` (`ingredient_id`, `ingredient_order`)
     );
 
 create index `idx_ingredient_i_ingredient_group_id` on `ingredient` (`ingredient_group_id`);
@@ -143,7 +145,8 @@ create table
         `created_at` timestamp default current_timestamp,
         `updated_at` timestamp on update current_timestamp,
         `updated_by` varchar(256),
-        foreign key (`recipe_id`) references `recipe` (`recipe_id`) on delete cascade
+        foreign key (`recipe_id`) references `recipe` (`recipe_id`) on delete cascade,
+        unique index `uidx_step_group_step_group_order_recipe_id` (`step_group_order`, recipe_id)
     );
 
 create index `idx_step_recipe_id` on `step_group` (`recipe_id`);
@@ -159,7 +162,8 @@ create table
         `created_at` timestamp default current_timestamp,
         `updated_at` timestamp on update current_timestamp,
         `updated_by` varchar(256),
-        foreign key (`step_group_id`) references `step_group` (`step_group_id`) on delete cascade
+        foreign key (`step_group_id`) references `step_group` (`step_group_id`) on delete cascade,
+        unique index `uidx_step_step_id_step_order` (`step_id`, `step_order`)
     );
 
 create index `idx_step_step_group_id` on `step` (`step_group_id`);
