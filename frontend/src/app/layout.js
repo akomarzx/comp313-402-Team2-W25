@@ -20,14 +20,14 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <AuthProvider>
-      <html lang="en">
+    <html lang="en">
+      <AuthProvider>
         <body
           className={`${geistSans.variable} ${geistMono.variable} min-w-[350px] bg-slate-100 text-[#333] antialiased`}
         >
-          <Suspense>{children}</Suspense>
+          <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
         </body>
-      </html>
-    </AuthProvider>
+      </AuthProvider>
+    </html>
   );
 }

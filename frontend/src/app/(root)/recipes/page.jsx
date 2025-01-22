@@ -36,7 +36,7 @@ const Recipes = () => {
   };
 
   return (
-    <div>
+    <div className="py-10">
       <div className="mx-auto max-w-[600px] mb-5">
         <h3 className="font-semibold text-normal p-2">
           What are you craving for today?
