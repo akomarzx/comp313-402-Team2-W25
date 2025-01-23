@@ -17,9 +17,11 @@ import java.util.Optional;
 @Service
 public class StaticCodeService extends BaseService {
 
+    public static final Integer TIME_UNIT_CODE_BOOK_ID = 100;
+
     private final CodeBookRepository codeBookRepository;
     private final CodeValueRepository codeValueRepository;
-    public final Integer TIME_UNIT_CODE_BOOK_ID = 100;
+
     private List<CodeBook> codeBook;
 
     public StaticCodeService(CodeBookRepository codeBookRepository, CodeValueRepository codeValueRepository) {

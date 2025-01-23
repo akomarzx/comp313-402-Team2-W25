@@ -1,6 +1,9 @@
 package org.group2.comp313.kitchen_companion.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -15,16 +18,6 @@ import java.time.Instant;
 public class RecipeCategory {
     @EmbeddedId
     private RecipeCategoryId id;
-
-    @MapsId("categoryId")
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
-
-    @MapsId("recipeId")
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "recipe_id", nullable = false)
-    private Recipe recipe;
 
     @NotNull
     @Column(name = "created_at", nullable = false)

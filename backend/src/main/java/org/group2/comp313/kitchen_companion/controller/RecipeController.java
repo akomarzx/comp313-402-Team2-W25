@@ -27,7 +27,8 @@ public class RecipeController extends BaseController {
 
     @PostMapping
     public ResponseEntity<Void> createRecipe( @RequestBody @Valid() RecipeDTO createRecipeDto) {
-        this.log.info("Request to create recipe: " + createRecipeDto.toString());
+        this.log.info("Request to create recipe: {}", createRecipeDto.toString());
+        this.recipeService.createRecipe(createRecipeDto, "sysadmin@gmail.com");
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

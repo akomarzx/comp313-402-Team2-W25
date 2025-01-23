@@ -24,6 +24,7 @@ public class CodeValueValidator implements ConstraintValidator<ValidateCodeID, I
     public void initialize(ValidateCodeID constraintAnnotation) {
         ConstraintValidator.super.initialize(constraintAnnotation);
         this.codeBookID = this.getCodeBookID(constraintAnnotation.codeTypeName());
+        log.info("Code book ID: " + this.codeBookID);
     }
 
     @Override
@@ -37,7 +38,7 @@ public class CodeValueValidator implements ConstraintValidator<ValidateCodeID, I
 
     private Integer getCodeBookID(String parameter) {
         if (parameter.equalsIgnoreCase("TIME_UNIT")) {
-            return this.staticCodeService.TIME_UNIT_CODE_BOOK_ID;
+            return StaticCodeService.TIME_UNIT_CODE_BOOK_ID;
         } else {
             return null;
         }

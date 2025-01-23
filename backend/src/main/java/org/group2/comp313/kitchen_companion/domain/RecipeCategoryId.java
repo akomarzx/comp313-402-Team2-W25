@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.Hibernate;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -15,11 +14,7 @@ import java.util.Objects;
 @Setter
 @Embeddable
 public class RecipeCategoryId implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = -3811494142772614207L;
-
-
+    private static final long serialVersionUID = 2188635647327066798L;
     @NotNull
     @Column(name = "category_id", nullable = false)
     private Integer categoryId;
