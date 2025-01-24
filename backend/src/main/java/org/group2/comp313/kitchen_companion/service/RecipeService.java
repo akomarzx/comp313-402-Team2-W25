@@ -5,9 +5,13 @@ import jakarta.validation.constraints.NotNull;
 import org.group2.comp313.kitchen_companion.domain.Recipe;
 import org.group2.comp313.kitchen_companion.domain.RecipeCategory;
 import org.group2.comp313.kitchen_companion.domain.RecipeCategoryId;
+import org.group2.comp313.kitchen_companion.domain.projection.RecipeSummaryForCards;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeDTO;
 import org.group2.comp313.kitchen_companion.repository.RecipeCategoryRepository;
 import org.group2.comp313.kitchen_companion.repository.RecipeRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -29,6 +33,16 @@ public class RecipeService extends BaseService {
         this.ingredientGroupService = ingredientGroupService;
         this.stepGroupService = stepGroupService;
         this.recipeCategoryRepository = recipeCategoryRepository;
+    }
+
+    @Transactional
+    public Recipe getRecipeById(@NotNull Integer id) {
+        return recipeRepository.findById(id).orElse(null);
+    }
+
+    public Page<RecipeSummaryForCards> getRecipes(Integer page, Integer size) {
+        Pageable pageRequest = PageRequest.of(page, size);
+        return this.recipeRepository.findAllBy(pageRequest);
     }
 
     @Transactional
@@ -56,8 +70,8 @@ public class RecipeService extends BaseService {
                 this.recipeCategoryRepository.save(newRecipeCategory);
             }
 
-            this.ingredientGroupService.createIngredientGroups(dto.ingredientGroups(), newRecipe.getId(), createdByEmail);
-            this.stepGroupService.createStepGroup(dto.stepGroups(), newRecipe.getId(), createdByEmail);
+            newRecipe.setIngredientGroups(this.ingredientGroupService.createIngredientGroups(dto.ingredientGroups(), newRecipe.getId(), createdByEmail));
+            newRecipe.setStepGroups(this.stepGroupService.createStepGroup(dto.stepGroups(), newRecipe.getId(), createdByEmail));
 
             return newRecipe;
 

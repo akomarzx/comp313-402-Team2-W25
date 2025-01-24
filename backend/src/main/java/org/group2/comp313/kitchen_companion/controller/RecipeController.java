@@ -4,9 +4,15 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.group2.comp313.kitchen_companion.domain.CodeBook;
+import org.group2.comp313.kitchen_companion.domain.Recipe;
+import org.group2.comp313.kitchen_companion.domain.projection.RecipeSummaryForCards;
+import org.group2.comp313.kitchen_companion.dto.recipe.RecipeCardsDto;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeDTO;
 import org.group2.comp313.kitchen_companion.service.RecipeService;
 import org.group2.comp313.kitchen_companion.service.StaticCodeService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +29,17 @@ public class RecipeController extends BaseController {
 
     public RecipeController(RecipeService recipeService) {
         this.recipeService = recipeService;
+    }
+
+    @GetMapping("{id}")
+    public ResponseEntity<Recipe> getRecipe(@PathVariable Integer id) {
+        Recipe r = this.recipeService.getRecipeById(id);
+        return new ResponseEntity<>(r, HttpStatus.OK);
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<RecipeSummaryForCards>> getAllRecipes(@RequestParam Integer page, @RequestParam Integer size) {
+        return ResponseEntity.ok(this.recipeService.getRecipes(page, size));
     }
 
     @PostMapping

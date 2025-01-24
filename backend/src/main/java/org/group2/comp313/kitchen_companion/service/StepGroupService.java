@@ -11,21 +11,22 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class StepGroupService extends BaseService {
 
     private final StepGroupRepository stepGroupRepository;
-    private final StepRepository stepRepository;
     private final StepService stepService;
 
-    public StepGroupService(StepGroupRepository stepGroupRepository, StepRepository stepRepository, StepService stepService) {
+    public StepGroupService(StepGroupRepository stepGroupRepository, StepService stepService) {
         this.stepGroupRepository = stepGroupRepository;
-        this.stepRepository = stepRepository;
         this.stepService = stepService;
     }
 
-    public void createStepGroup(List<StepGroupDTO> newStepGroupList, Integer recipeId, String createdBy) {
+    public Set<StepGroup> createStepGroup(List<StepGroupDTO> newStepGroupList, Integer recipeId, String createdBy) {
+
+        Set<StepGroup> stepGroups = new HashSet<>();
 
         for(StepGroupDTO stepGroupDto: newStepGroupList){
 
@@ -46,6 +47,10 @@ public class StepGroupService extends BaseService {
             for(StepDTO stepDto: stepGroupDto.steps()) {
                 this.stepService.createStep(stepDto, newStepGroupId, createdBy);
             }
+
+            stepGroups.add(newStepGroup);
         }
+
+        return stepGroups;
     }
 }

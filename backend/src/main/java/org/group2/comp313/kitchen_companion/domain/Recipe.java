@@ -5,10 +5,11 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -33,7 +34,7 @@ public class Recipe {
     @Column(name = "prep_time", nullable = false)
     private Integer prepTime;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "prep_time_unit_cd")
     private CodeValue prepTimeUnitCd;
 
@@ -41,7 +42,7 @@ public class Recipe {
     @Column(name = "cook_time", nullable = false)
     private Integer cookTime;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cook_time_unit_cd")
     private CodeValue cookTimeUnitCd;
 
@@ -56,6 +57,10 @@ public class Recipe {
     @Size(max = 500)
     @Column(name = "image_url", length = 500)
     private String imageUrl;
+
+    @Size(max = 500)
+    @Column(name = "thumbnail_url", length = 500)
+    private String thumbnailUrl;
 
     @NotNull
     @Column(name = "calories", nullable = false, precision = 10, scale = 2)
@@ -78,7 +83,6 @@ public class Recipe {
     @Column(name = "created_by", nullable = false, length = 256)
     private String createdBy;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "created_at")
     private Instant createdAt;
 
@@ -89,8 +93,10 @@ public class Recipe {
     @Column(name = "updated_by", length = 256)
     private String updatedBy;
 
-    @Size(max = 500)
-    @Column(name = "thumbnail_url", length = 500)
-    private String thumbnailUrl;
+    @OneToMany(mappedBy = "recipe", fetch = FetchType.EAGER)
+    private Set<IngredientGroup> ingredientGroups = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "recipe", fetch = FetchType.EAGER)
+    private Set<StepGroup> stepGroups = new LinkedHashSet<>();
 
 }

@@ -1,16 +1,12 @@
 package org.group2.comp313.kitchen_companion.service;
 
-import org.group2.comp313.kitchen_companion.domain.Ingredient;
 import org.group2.comp313.kitchen_companion.domain.IngredientGroup;
-import org.group2.comp313.kitchen_companion.domain.Recipe;
 import org.group2.comp313.kitchen_companion.dto.recipe.IngredientDTO;
 import org.group2.comp313.kitchen_companion.dto.recipe.IngredientGroupDTO;
 import org.group2.comp313.kitchen_companion.repository.IngredientGroupRepository;
-import org.group2.comp313.kitchen_companion.repository.IngredientRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,7 +22,9 @@ public class IngredientGroupService extends BaseService {
         this.ingredientService = ingredientService;
     }
 
-    public void createIngredientGroups(List<IngredientGroupDTO> newIngredientGroupDtoList, Integer recipeId, String createdBy) {
+    public Set<IngredientGroup> createIngredientGroups(List<IngredientGroupDTO> newIngredientGroupDtoList, Integer recipeId, String createdBy) {
+
+        Set<IngredientGroup> ingredientGroups = new HashSet<>();
 
         for(IngredientGroupDTO ingredientGroupDto: newIngredientGroupDtoList){
 
@@ -46,6 +44,10 @@ public class IngredientGroupService extends BaseService {
             for(IngredientDTO ingredientDto : ingredientGroupDto.ingredients()) {
                 this.ingredientService.createIngredient(ingredientDto, ingredientGroupId, createdBy);
             }
+
+            ingredientGroups.add(ingredientGroup);
         }
+
+        return ingredientGroups;
     }
 }

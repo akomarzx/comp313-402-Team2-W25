@@ -124,7 +124,7 @@ create table
         `ingredient_group_id` int not null,
         `ingredient_order` int not null,
         `image_url` varchar(500),
-        `label` varchar(255) not null unique,
+        `label` varchar(255) not null,
         `created_by` varchar(256) not null,
         `created_at` timestamp default current_timestamp,
         `updated_at` timestamp on update current_timestamp,
