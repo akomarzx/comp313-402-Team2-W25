@@ -15,7 +15,7 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const app = express();
 const PORT = process.env.PORT;
-
+app.set('trust proxy', 1) // trust first proxy
 // OAuth Configuration
 const OAUTH_CONFIG = {
   authorizationURL: process.env.OAUTH_AUTHORIZATION_URL,
@@ -80,7 +80,7 @@ app.use(
     resave: false,
     saveUninitialized: true,
     cookie: {
-      secure: true,
+      secure: 'auto',
       httpOnly: true,
       sameSite: "none",
     },
