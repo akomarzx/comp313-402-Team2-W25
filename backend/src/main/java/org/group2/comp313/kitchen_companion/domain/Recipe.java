@@ -26,7 +26,6 @@ public class Recipe {
     @Column(name = "title", nullable = false, length = 256)
     private String title;
 
-    @Size(max = 255)
     @Column(name = "summary")
     private String summary;
 
@@ -62,21 +61,17 @@ public class Recipe {
     @Column(name = "thumbnail_url", length = 500)
     private String thumbnailUrl;
 
-    @NotNull
-    @Column(name = "calories", nullable = false, precision = 10, scale = 2)
-    private BigDecimal calories;
+    @Column(name = "calories", precision = 10, scale = 2)
+    private BigDecimal calories = new BigDecimal("0.0");
 
-    @NotNull
-    @Column(name = "carbs_g", nullable = false, precision = 10, scale = 2)
-    private BigDecimal carbsG;
+    @Column(name = "carbs_g", precision = 10, scale = 2)
+    private BigDecimal carbsG = new BigDecimal("0.0");
 
-    @NotNull
-    @Column(name = "sugars_g", nullable = false, precision = 10, scale = 2)
-    private BigDecimal sugarsG;
+    @Column(name = "sugars_g",  precision = 10, scale = 2)
+    private BigDecimal sugarsG = new BigDecimal("0.0");
 
-    @NotNull
-    @Column(name = "fat_g", nullable = false, precision = 10, scale = 2)
-    private BigDecimal fatG;
+    @Column(name = "fat_g", precision = 10, scale = 2)
+    private BigDecimal fatG = new BigDecimal("0.0");
 
     @Size(max = 256)
     @NotNull

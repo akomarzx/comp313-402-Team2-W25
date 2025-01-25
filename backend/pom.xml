@@ -94,6 +94,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webflux</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.15.0</version>
+		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/org.keycloak/keycloak-admin-client -->
 		<dependency>
 			<groupId>org.keycloak</groupId>
@@ -115,6 +121,11 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-csv</artifactId>
+			<version>2.15.0</version> <!-- Use the version compatible with your project -->
 		</dependency>
 	</dependencies>
 

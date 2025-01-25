@@ -106,6 +106,7 @@ app.get(
 );
 
 app.get("/session", (req, res) => {
+  // TODO: Check if token is valid
   if (req.isAuthenticated()) {
     const { profile } = req.user;
 

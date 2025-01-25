@@ -45,7 +45,7 @@ values
     (101, 100, 'hours', current_timestamp(), 'sysadmin@mail.com', null, null),
     (102, 100, 'days', current_timestamp(), 'sysadmin@mail.com', null, null);
 
-create index `code_value_code_book_id_idx` on `code_value` (`code_book_id`);
+#create index `code_value_code_book_id_idx` on `code_value` (`code_book_id`);
 
 create table
     if not exists `category` (
@@ -61,7 +61,7 @@ create table
     if not exists `recipe` (
         `recipe_id` int auto_increment primary key,
         `title` varchar(256) not null,
-        `summary` varchar(255),
+        `summary` varchar(10000),
         `prep_time` int not null,
         `prep_time_unit_cd` int,
         `cook_time` int not null,
@@ -70,10 +70,10 @@ create table
         `yield` varchar(255) null,
         `image_url` varchar(500),
         `thumbnail_url` varchar(500),
-        `calories` decimal(10,2) not null,
-        `carbs_g` decimal(10,2) not null,
-        `sugars_g` decimal(10,2) not null,
-        `fat_g` decimal(10,2) not null,
+        `calories` decimal(10,2) default 0.0,
+        `carbs_g` decimal(10,2) default 0.0,
+        `sugars_g` decimal(10,2) default 0.0,
+        `fat_g` decimal(10,2) default 0.0,
         `created_by` varchar(256) not null,
         `created_at` timestamp default current_timestamp,
         `updated_at` timestamp on update current_timestamp,
@@ -82,9 +82,9 @@ create table
         foreign key (`cook_time_unit_cd`) references `code_value` (`code_value_id`)
     );
 
-create index `idx_recipe_created_by` on `recipe` (`created_by`);
-create index `idx_recipe_prep_time_unit_cd` on `recipe` (`prep_time_unit_cd`);
-create index `idx_recipe_cook_time_unit_cd` on `recipe` (`cook_time_unit_cd`);
+#create index `idx_recipe_created_by` on `recipe` (`created_by`);
+#create index `idx_recipe_prep_time_unit_cd` on `recipe` (`prep_time_unit_cd`);
+#create index `idx_recipe_cook_time_unit_cd` on `recipe` (`cook_time_unit_cd`);
 
 create table
     if not exists `recipe_category` (
@@ -99,8 +99,8 @@ create table
         primary key (category_id, recipe_id) 
     );
 
-create index `idx_recipe_category_category_id` on `recipe_category` (`category_id`);
-create index `idx_recipe_category_recipe_id` on `recipe_category` (`recipe_id`);
+#create index `idx_recipe_category_category_id` on `recipe_category` (`category_id`);
+#create index `idx_recipe_category_recipe_id` on `recipe_category` (`recipe_id`);
 
 create table
     if not exists `ingredient_group` (
@@ -116,7 +116,7 @@ create table
         unique index `uidx_ingredient_group_ingredient_group_order_recipe_id` (`ingredient_group_order`, recipe_id)
     );
 
-create index `idx_step_recipe_id` on `ingredient_group` (`recipe_id`);
+#create index `idx_step_recipe_id` on `ingredient_group` (`recipe_id`);
 
 create table
     if not exists `ingredient` (
@@ -133,7 +133,7 @@ create table
         unique index `uidx_ingredient_ingredient_id_ingredient_order` (`ingredient_id`, `ingredient_order`)
     );
 
-create index `idx_ingredient_i_ingredient_group_id` on `ingredient` (`ingredient_group_id`);
+#create index `idx_ingredient_i_ingredient_group_id` on `ingredient` (`ingredient_group_id`);
 
 create table
     if not exists `step_group` (
@@ -149,7 +149,7 @@ create table
         unique index `uidx_step_group_step_group_order_recipe_id` (`step_group_order`, recipe_id)
     );
 
-create index `idx_step_recipe_id` on `step_group` (`recipe_id`);
+#create index `idx_step_recipe_id` on `step_group` (`recipe_id`);
 
 create table
     if not exists `step` (
@@ -166,4 +166,4 @@ create table
         unique index `uidx_step_step_id_step_order` (`step_id`, `step_order`)
     );
 
-create index `idx_step_step_group_id` on `step` (`step_group_id`);
+#create index `idx_step_step_group_id` on `step` (`step_group_id`);
