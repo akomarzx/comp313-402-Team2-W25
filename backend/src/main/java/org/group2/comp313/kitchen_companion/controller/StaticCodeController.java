@@ -2,7 +2,7 @@ package org.group2.comp313.kitchen_companion.controller;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.group2.comp313.kitchen_companion.domain.static_code.CodeBook;
+import org.group2.comp313.kitchen_companion.domain.CodeBook;
 import org.group2.comp313.kitchen_companion.service.StaticCodeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,5 +29,4 @@ public class StaticCodeController extends BaseController{
         List<CodeBook> valueList = this.staticCodeService.getAllStaticCode();
         return new ResponseEntity<>(valueList, HttpStatus.OK);
     }
-
 }

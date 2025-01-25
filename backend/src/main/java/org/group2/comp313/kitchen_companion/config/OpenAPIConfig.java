@@ -33,7 +33,7 @@ public class OpenAPIConfig {
 
         Contact contact = new Contact();
         contact.setEmail("rombao@my.centennialcollege.ca");
-        contact.setName("Comp 311 - Group 3");
+        contact.setName("Comp 311 - Group 2");
         contact.setUrl("");
 
         License mitLicense = new License().name("MIT License").url("https://choosealicense.com/licenses/mit/");
