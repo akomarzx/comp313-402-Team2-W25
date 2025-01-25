@@ -11,10 +11,11 @@ const axios = require("axios");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const morgan = require("morgan");
+const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const app = express();
 const PORT = process.env.PORT;
-
+app.set('trust proxy', 1) // trust first proxy
 // OAuth Configuration
 const OAUTH_CONFIG = {
   authorizationURL: process.env.OAUTH_AUTHORIZATION_URL,
@@ -25,7 +26,7 @@ const OAUTH_CONFIG = {
 };
 
 const RESOURCE_SERVER_URL = process.env.RESOURCE_SERVER_URL;
-console.log(process.env);
+
 app.use(morgan("combined"));
 
 passport.use(
@@ -63,9 +64,6 @@ passport.deserializeUser((user, done) => {
   done(null, user);
 });
 
-app.use(cors());
-app.use(cookieParser());
-
 // CORS configuration
 app.use(
   cors({
@@ -74,15 +72,15 @@ app.use(
   })
 );
 
-// Middleware
 app.use(cookieParser());
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: {
-      secure: true,
+      secure: 'auto',
       httpOnly: true,
       sameSite: "none",
     },
@@ -122,38 +120,25 @@ app.get("/session", (req, res) => {
     res.json({ authenticated: false });
   }
 });
-// Proxy Middleware for All API Calls
-app.use("/api/**", async (req, res) => {
-  if (!req.isAuthenticated()) {
-    return res.status(401).send("Unauthorized");
+
+const proxyConfig = createProxyMiddleware({
+  target: RESOURCE_SERVER_URL, // Your resource server
+  changeOrigin: true,
+  logLevel: "debug",
+  pathRewrite: {
+    "^/api": "",
+  },
+  on: {
+    proxyReq: (proxyReq, req, res) => {
+      if (req.isAuthenticated()) {
+        let accessToken = req.user.accessToken
+        proxyReq.setHeader("Authorization", `Bearer ${accessToken}`)
+      }
+    }
   }
+})
 
-  const user = req.user;
-  const accessToken = user.accessToken;
-
-  try {
-    const response = await axios({
-      method: req.method,
-      url: `${RESOURCE_SERVER_URL}${req.originalUrl.replace("/api", "")}`,
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        ...req.headers,
-      },
-      data: req.body,
-    });
-
-    // Send back the response from the resource server
-    res.status(response.status).send(response.data);
-  } catch (error) {
-    console.error(
-      "Error forwarding request to resource server:",
-      error.response?.data || error.message
-    );
-    res
-      .status(error.response?.status || 500)
-      .send(error.response?.data || "Error forwarding request");
-  }
-});
+app.use("/api", proxyConfig);
 
 app.get("/logout", async (req, res) => {
   const tokenRevocationURL =
@@ -164,8 +149,6 @@ app.get("/logout", async (req, res) => {
   }
 
   const { accessToken, refreshToken } = req.user;
-
-  console.log(process.env);
 
   try {
     // Revoke access token
