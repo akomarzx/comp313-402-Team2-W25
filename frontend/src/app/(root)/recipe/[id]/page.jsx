@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import Image from "next/image";
 import { getRecipeById } from "@/api/recipe";
 import { RotateLoader } from "react-spinners";
+
 const Recipe = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { id } = useParams();
@@ -15,8 +16,6 @@ const Recipe = () => {
       console.log(data);
     };
     fetchRecipe().then(() => setIsLoading(false));
-
-    console.log(isLoading);
   }, [id]);
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -43,7 +42,7 @@ const Recipe = () => {
             />
           </div>
           {/* Recipe Meta Information */}
-          <div className="my-8  border-b border-gray-200">
+          <div className="my-4  border-b border-gray-200">
             <div className="flex justify-between text-sm text-gray-600">
               <p className="flex items-center">
                 <span className="font-medium mr-2">Author:</span>{" "}
@@ -62,18 +61,18 @@ const Recipe = () => {
               <h2 className="text-2xl font-semibold text-gray-800 mb-3">
                 Ingredients
               </h2>
-              <ul className="list-disc list-inside text-gray-700">
-                {recipe?.ingredientGroups[0].ingredients.map(
-                  (ingredient, index) => (
+              <ol className="list-disc list-inside text-gray-700">
+                {recipe?.ingredientGroups[0].ingredients
+                  .sort((a, b) => a.ingredientOrder - b.ingredientOrder)
+                  .map((ingredient, index) => (
                     <li
-                      className={`order-${ingredient.ingredientOrder}`}
-                      key={ingredient.id}
+                      value={ingredient.ingredientOrder}
+                      key={ingredient.ingredientOrder}
                     >
                       {ingredient.label}
                     </li>
-                  )
-                )}
-              </ul>
+                  ))}
+              </ol>
             </div>
 
             {/* Instructions */}
@@ -81,12 +80,14 @@ const Recipe = () => {
               <h2 className="text-2xl font-semibold text-gray-800 mb-3">
                 Instructions
               </h2>
-              <ol className="list-decimal list-inside text-gray-700 space-y-2">
-                {recipe?.stepGroups[0].steps.map((step, index) => (
-                  <li className={`order-${step.stepOrder}`} key={index}>
-                    {step.description}
-                  </li>
-                ))}
+              <ol className="list-disc list-inside text-gray-700 space-y-2">
+                {recipe?.stepGroups[0].steps
+                  .sort((a, b) => a.stepOrder - b.stepOrder)
+                  .map((step, index) => (
+                    <li value={step.stepOrder} key={step.stepOrder}>
+                      {step.description}
+                    </li>
+                  ))}
               </ol>
             </div>
           </div>
