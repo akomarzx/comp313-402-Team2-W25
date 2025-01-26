@@ -8,7 +8,10 @@ const RecipeCard = ({ data }) => {
       <Link href={`/recipe/${data?.id}`}>
         <div className="relative w-full h-[200px] rounded-md overflow-hidden ">
           <Image
-            src={data?.imgUrl}
+            src={
+              data?.thumbnailUrl ||
+              "https://www.themealdb.com/images/media/meals/58oia61564916529.jpg"
+            }
             alt={data?.title}
             fill
             className="rounded-t-lg"
@@ -20,7 +23,7 @@ const RecipeCard = ({ data }) => {
             {data?.title}
           </h3>
           <p className="text-sm text-gray-600 mt-2 line-clamp-3">
-            {data?.description}
+            {data?.summary}
           </p>
         </div>
       </Link>{" "}
