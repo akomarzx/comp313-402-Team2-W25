@@ -13,7 +13,8 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { cn } from "@/lib/utils";
-import { redirect, useParams } from "next/navigation";
+import { redirect, useParams, useRouter } from "next/navigation";
+import { BarLoader } from "react-spinners";
 
 const RecipePage = () => {
   let { page } = useParams();
@@ -38,10 +39,12 @@ const RecipePage = () => {
   const [data, setData] = useState({});
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(parseInt(page));
+  const router = useRouter();
 
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
+        setIsLoading(true); // Set loading to true
         const fetchData = await getRecipes(currentPage, 10); // Fetch data
         setData(fetchData); // Set the main data state
         setRecipeCardData(fetchData?.content); // Update the recipe card data
@@ -93,11 +96,17 @@ const RecipePage = () => {
             />
 
             <Pagination>
-              <PaginationContent className="gap-0 border rounded-lg divide-x overflow-hidden">
+              <PaginationContent className="gap-0 border mt-8 rounded-lg divide-x overflow-hidden">
                 <PaginationItem>
                   <PaginationPrevious
-                    href={`/recipes/${currentPage > 1 ? currentPage - 1 : 1}`}
-                    onClick={() => {
+                    href={`/recipes/page/${
+                      currentPage > 1 ? currentPage - 1 : 1
+                    }`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      router.push(
+                        `/recipes/page/${currentPage > 1 ? currentPage - 1 : 1}`
+                      );
                       setCurrentPage((prev) => {
                         if (prev > 1) {
                           return prev - 1;
@@ -126,7 +135,11 @@ const RecipePage = () => {
                           "rounded-none border-none"
                         )}
                         isActive={isActive}
-                        onClick={() => setCurrentPage(page)}
+                        onClick={(e) => {
+                          router.push(`/recipes/page/${page}`);
+                          e.preventDefault();
+                          setCurrentPage(page);
+                        }}
                       >
                         {page}
                       </PaginationLink>
@@ -135,10 +148,18 @@ const RecipePage = () => {
                 })}
                 <PaginationItem>
                   <PaginationNext
-                    href={`/recipes/${
+                    href={`/recipes/page/${
                       currentPage < totalPages ? currentPage + 1 : totalPages
                     }`}
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.preventDefault();
+                      router.push(
+                        `/recipes/page/${
+                          currentPage < totalPages
+                            ? currentPage + 1
+                            : totalPages
+                        }`
+                      );
                       setCurrentPage((prev) => {
                         if (prev < totalPages) {
                           return prev + 1;
@@ -155,7 +176,7 @@ const RecipePage = () => {
           </>
         ) : (
           <div className="mx-auto text-center mt-40">
-            <p> Loading...</p>
+            <BarLoader className="mx-auto" />
           </div>
         )}
       </div>
