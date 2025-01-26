@@ -61,16 +61,16 @@ const Recipe = () => {
                 Ingredients
               </h2>
               <ol className="list-disc list-inside text-gray-700">
-                {recipe?.ingredientGroups[0].ingredients.map(
-                  (ingredient, index) => (
+                {recipe?.ingredientGroups[0].ingredients
+                  .sort((a, b) => a.ingredientOrder - b.ingredientOrder)
+                  .map((ingredient, index) => (
                     <li
                       value={ingredient.ingredientOrder}
                       key={ingredient.ingredientOrder}
                     >
                       {ingredient.label}
                     </li>
-                  )
-                )}
+                  ))}
               </ol>
             </div>
 
@@ -80,11 +80,13 @@ const Recipe = () => {
                 Instructions
               </h2>
               <ol className="list-disc list-inside text-gray-700 space-y-2">
-                {recipe?.stepGroups[0].steps.map((step, index) => (
-                  <li value={step.stepOrder} key={step.stepOrder}>
-                    {step.description}
-                  </li>
-                ))}
+                {recipe?.stepGroups[0].steps
+                  .sort((a, b) => a.stepOrder - b.stepOrder)
+                  .map((step, index) => (
+                    <li value={step.stepOrder} key={step.stepOrder}>
+                      {step.description}
+                    </li>
+                  ))}
               </ol>
             </div>
           </div>
