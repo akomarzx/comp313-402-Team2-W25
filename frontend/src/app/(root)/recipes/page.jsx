@@ -2,17 +2,42 @@
 import React, { useEffect, useState } from "react";
 import RecipesResult from "@/components/RecipesResult";
 import { getRecipes } from "@/api/recipe";
+
+import { buttonVariants } from "@/components/ui/button";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import { cn } from "@/lib/utils";
+
 const Recipes = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [recipeCardData, setRecipeCardData] = useState([]);
+  const [data, setData] = useState({});
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+
   useEffect(() => {
     const fetchRecipes = async () => {
-      const fetchData = await getRecipes(1, 10);
-      setRecipeCardData(fetchData?.content);
+      try {
+        const fetchData = await getRecipes(currentPage, 10); // Fetch data
+        setData(fetchData); // Set the main data state
+        setRecipeCardData(fetchData?.content); // Update the recipe card data
+        setTotalPages(fetchData?.page?.totalPages); // Uncomment if total pages logic is required
+        console.log(fetchData); // Log the fetched data
+      } catch (error) {
+        console.error("Error fetching recipes:", error); // Handle errors gracefully
+      } finally {
+        setIsLoading(false); // Set loading to false regardless of success/failure
+      }
     };
-    fetchRecipes().then(() => setIsLoading(false));
-  }, []);
+    fetchRecipes();
+  }, [currentPage]);
 
   const handleSearch = (e) => {
     e?.key === "Enter" && setIsSearching(true);
@@ -20,6 +45,13 @@ const Recipes = () => {
       setIsSearching(false);
     }, 2000);
   };
+
+  let pages = [1, 2, 3];
+  if (currentPage === 1) {
+    pages = [1, 2, 3];
+  } else {
+    pages = [currentPage - 1, currentPage, currentPage + 1];
+  }
 
   return (
     <div className="py-10">
@@ -37,10 +69,73 @@ const Recipes = () => {
 
       <div className="border-t-2">
         {!isLoading ? (
-          <RecipesResult
-            isSearching={isSearching}
-            recipeCardData={recipeCardData}
-          />
+          <>
+            <RecipesResult
+              isSearching={isSearching}
+              recipeCardData={recipeCardData}
+            />
+
+            <Pagination>
+              <PaginationContent className="gap-0 border rounded-lg divide-x overflow-hidden">
+                <PaginationItem>
+                  <PaginationPrevious
+                    href={`#${currentPage > 1 ? currentPage - 1 : 1}`}
+                    onClick={() => {
+                      setCurrentPage((prev) => {
+                        if (prev > 1) {
+                          return prev - 1;
+                        }
+                        return prev;
+                      });
+                      console.log(totalPages);
+                    }}
+                    className="rounded-none cursor-pointer"
+                  />
+                </PaginationItem>
+                {pages.map((page) => {
+                  const isActive = page === currentPage;
+
+                  return (
+                    <PaginationItem key={page}>
+                      <PaginationLink
+                        href={`#${page}`}
+                        className={cn(
+                          {
+                            [buttonVariants({
+                              variant: "default",
+                              className: "hover:!text-primary-foreground",
+                            })]: isActive,
+                          },
+                          "rounded-none border-none"
+                        )}
+                        isActive={isActive}
+                        onClick={() => setCurrentPage(page)}
+                      >
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
+                })}
+                <PaginationItem>
+                  <PaginationNext
+                    href={`#${
+                      currentPage < totalPages ? currentPage + 1 : totalPages
+                    }`}
+                    onClick={() => {
+                      setCurrentPage((prev) => {
+                        if (prev < totalPages) {
+                          return prev + 1;
+                        }
+                        return prev;
+                      });
+                      console.log(totalPages);
+                    }}
+                    className="rounded-none cursor-pointer"
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </>
         ) : (
           <div className="mx-auto text-center mt-40">
             <p> Loading...</p>

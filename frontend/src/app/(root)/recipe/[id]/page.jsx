@@ -43,7 +43,7 @@ const Recipe = () => {
             />
           </div>
           {/* Recipe Meta Information */}
-          <div className="my-8  border-b border-gray-200">
+          <div className="my-4  border-b border-gray-200">
             <div className="flex justify-between text-sm text-gray-600">
               <p className="flex items-center">
                 <span className="font-medium mr-2">Author:</span>{" "}
