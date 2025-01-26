@@ -4,7 +4,7 @@ import Link from "next/link";
 
 const RecipeCard = ({ data }) => {
   return (
-    <div className="hover:scale-105 border w-[300px] min-h-[300px] max-h-[500px] p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 mx-auto">
+    <div className="hover:scale-[101%] border w-[300px] min-h-[300px] max-h-[500px] p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-700 mx-auto">
       <Link href={`/recipe/${data?.id}`}>
         <div className="relative w-full h-[200px] rounded-md overflow-hidden ">
           <Image
@@ -14,6 +14,7 @@ const RecipeCard = ({ data }) => {
             }
             alt={data?.title}
             fill
+            sizes="100%"
             className="rounded-t-lg"
           />
         </div>

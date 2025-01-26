@@ -68,7 +68,7 @@ const AIReccommend = () => {
           </div>
 
           <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-green-600 to-blue-300 text-transparent bg-clip-text tracking-tight">
-            AI Recipe Reccomendation
+            AI Recipe Recommendation
           </h1>
 
           <p className="text-gray-600 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
