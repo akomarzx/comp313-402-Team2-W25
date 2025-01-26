@@ -19,7 +19,7 @@ import static org.springframework.data.web.config.EnableSpringDataWebSupport.Pag
 		in = SecuritySchemeIn.HEADER
 )
 @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO)
-@EnableAsync
+//@EnableAsync
 public class KitchenCompanionServiceApplication {
 
 	public static void main(String[] args) {

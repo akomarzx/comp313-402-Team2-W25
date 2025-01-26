@@ -12,6 +12,7 @@ import org.group2.comp313.kitchen_companion.service.AWSS3Service;
 import org.group2.comp313.kitchen_companion.service.CsvImportService;
 import org.group2.comp313.kitchen_companion.service.RecipeService;
 import org.group2.comp313.kitchen_companion.service.StaticCodeService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -35,13 +36,13 @@ public class RecipeController extends BaseController {
 
     private final RecipeService recipeService;
     private final AWSS3Service awss3Service;
-    private final CsvImportService csvImportService;
 
+    //@Autowired
+    //private final CsvImportService csvImportService;
 
-    public RecipeController(RecipeService recipeService, AWSS3Service awss3Service, CsvImportService csvImportService) {
+    public RecipeController(RecipeService recipeService, AWSS3Service awss3Service) {
         this.recipeService = recipeService;
         this.awss3Service = awss3Service;
-        this.csvImportService = csvImportService;
     }
 
     @GetMapping("{id}")
@@ -67,10 +68,10 @@ public class RecipeController extends BaseController {
         return awss3Service.uploadFile(file.getOriginalFilename(), file);
     }
 
-    @PostMapping("/etl")
-    public ResponseEntity<String> recipeEtl() {
-        log.info("Request to etl recipe");
-        this.csvImportService.importCsv();
-        return ResponseEntity.ok("job Started!");
-    }
+//    @PostMapping("/etl")
+//    public ResponseEntity<String> recipeEtl() {
+//        log.info("Request to etl recipe");
+//        this.csvImportService.importCsv();
+//        return ResponseEntity.ok("job Started!");
+//    }
 }
