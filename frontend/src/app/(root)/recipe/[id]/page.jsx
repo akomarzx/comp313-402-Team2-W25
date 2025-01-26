@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import Image from "next/image";
 import { getRecipeById } from "@/api/recipe";
 import { RotateLoader } from "react-spinners";
+
 const Recipe = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { id } = useParams();
