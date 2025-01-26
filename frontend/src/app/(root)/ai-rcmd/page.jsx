@@ -35,24 +35,25 @@ const AIReccommend = () => {
       setTimeout(() => {
         router.push("/");
       }, 1500);
-    }
-    try {
-      const requestBody = {
-        ingredients,
-        dietary,
-        allergies,
-      };
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      router.push(
-        `/ai-rcmd/recipes?data=${encodeURIComponent(
-          JSON.stringify(requestBody)
-        )}`
-      );
-    } catch (error) {
-      console.log(error);
-      toast.error("Failed to generate recipes");
-    } finally {
-      setIsLoading(false);
+    } else {
+      try {
+        const requestBody = {
+          ingredients,
+          dietary,
+          allergies,
+        };
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+        router.push(
+          `/ai-rcmd/recipes?data=${encodeURIComponent(
+            JSON.stringify(requestBody)
+          )}`
+        );
+      } catch (error) {
+        console.log(error);
+        toast.error("Failed to generate recipes");
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
