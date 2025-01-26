@@ -1,0 +1,10 @@
+create index `code_value_code_book_id_idx` on `code_value` (`code_book_id`);
+create index `idx_recipe_created_by` on `recipe` (`created_by`);
+create index `idx_recipe_prep_time_unit_cd` on `recipe` (`prep_time_unit_cd`);
+create index `idx_recipe_cook_time_unit_cd` on `recipe` (`cook_time_unit_cd`);
+create index `idx_recipe_category_category_id` on `recipe_category` (`category_id`);
+create index `idx_recipe_category_recipe_id` on `recipe_category` (`recipe_id`);
+create index `idx_step_recipe_id` on `ingredient_group` (`recipe_id`);
+create index `idx_ingredient_i_ingredient_group_id` on `ingredient` (`ingredient_group_id`);
+create index `idx_step_recipe_id` on `step_group` (`recipe_id`);
+create index `idx_step_step_group_id` on `step` (`step_group_id`);
