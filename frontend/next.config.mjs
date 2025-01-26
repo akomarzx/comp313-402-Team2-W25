@@ -17,6 +17,13 @@ const nextConfig = {
         pathname: "**",
         search: "",
       },
+      {
+        protocol: "https",
+        hostname: "ronaldjro.dev",
+        port: "",
+        pathname: "**",
+        search: "",
+      },
     ],
   },
 };

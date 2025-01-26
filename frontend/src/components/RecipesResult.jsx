@@ -8,7 +8,7 @@ const RecipesResult = ({ isSearching = false, recipeCardData = [] }) => {
     <div>
       <h2 className="font-bold text-2xl text-center mt-10 ">All Recipies</h2>{" "}
       {!isSearching ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 xl:px-4 py-4  mx-auto max-w-[1200px]">
+        <div className="grid grid-cols-1  lg:grid-cols-2   2xl:grid-cols-3 gap-6 xl:px-4 py-4  mx-auto max-w-[1200px] ">
           {recipeCardData.map((recipe, index) => (
             <RecipeCard key={index} data={recipe} />
           ))}

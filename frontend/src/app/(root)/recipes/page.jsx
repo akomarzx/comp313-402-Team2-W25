@@ -1,32 +1,18 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import RecipesResult from "@/components/RecipesResult";
+import { getRecipes } from "@/api/recipe";
 const Recipes = () => {
   const [isSearching, setIsSearching] = useState(false);
-
-  const recipeCardData = [
-    {
-      id: "1",
-      imgUrl:
-        "https://www.themealdb.com/images/media/meals/58oia61564916529.jpg",
-      title: "Beef and Mustard Pie",
-      description: "A delicious beef and mustard pie",
-    },
-    {
-      id: "2",
-      imgUrl:
-        "https://www.themealdb.com/images/media/meals/58oia61564916529.jpg",
-      title: "Beef and Mustard Pie",
-      description: "A delicious beef and mustard pie",
-    },
-    {
-      id: "3",
-      imgUrl:
-        "https://www.themealdb.com/images/media/meals/58oia61564916529.jpg",
-      title: "Beef and Mustard Pie",
-      description: "A delicious beef and mustard pie",
-    },
-  ];
+  const [isLoading, setIsLoading] = useState(true);
+  const [recipeCardData, setRecipeCardData] = useState([]);
+  useEffect(() => {
+    const fetchRecipes = async () => {
+      const fetchData = await getRecipes(1, 10);
+      setRecipeCardData(fetchData?.content);
+    };
+    fetchRecipes().then(() => setIsLoading(false));
+  }, []);
 
   const handleSearch = (e) => {
     e?.key === "Enter" && setIsSearching(true);
@@ -50,10 +36,16 @@ const Recipes = () => {
       </div>
 
       <div className="border-t-2">
-        <RecipesResult
-          isSearching={isSearching}
-          recipeCardData={recipeCardData}
-        />
+        {!isLoading ? (
+          <RecipesResult
+            isSearching={isSearching}
+            recipeCardData={recipeCardData}
+          />
+        ) : (
+          <div className="mx-auto text-center mt-40">
+            <p> Loading...</p>
+          </div>
+        )}
       </div>
     </div>
   );
