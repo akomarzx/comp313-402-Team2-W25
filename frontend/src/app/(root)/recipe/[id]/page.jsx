@@ -15,8 +15,6 @@ const Recipe = () => {
       console.log(data);
     };
     fetchRecipe().then(() => setIsLoading(false));
-
-    console.log(isLoading);
   }, [id]);
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -62,18 +60,18 @@ const Recipe = () => {
               <h2 className="text-2xl font-semibold text-gray-800 mb-3">
                 Ingredients
               </h2>
-              <ul className="list-disc list-inside text-gray-700">
+              <ol className="list-disc list-inside text-gray-700">
                 {recipe?.ingredientGroups[0].ingredients.map(
                   (ingredient, index) => (
                     <li
-                      className={`order-${ingredient.ingredientOrder}`}
-                      key={ingredient.id}
+                      value={ingredient.ingredientOrder}
+                      key={ingredient.ingredientOrder}
                     >
                       {ingredient.label}
                     </li>
                   )
                 )}
-              </ul>
+              </ol>
             </div>
 
             {/* Instructions */}
@@ -81,9 +79,9 @@ const Recipe = () => {
               <h2 className="text-2xl font-semibold text-gray-800 mb-3">
                 Instructions
               </h2>
-              <ol className="list-decimal list-inside text-gray-700 space-y-2">
+              <ol className="list-disc list-inside text-gray-700 space-y-2">
                 {recipe?.stepGroups[0].steps.map((step, index) => (
-                  <li className={`order-${step.stepOrder}`} key={index}>
+                  <li value={step.stepOrder} key={step.stepOrder}>
                     {step.description}
                   </li>
                 ))}
