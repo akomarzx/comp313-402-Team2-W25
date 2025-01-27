@@ -16,8 +16,10 @@ import { cn } from "@/lib/utils";
 import { redirect, useParams, useRouter } from "next/navigation";
 import { BarLoader } from "react-spinners";
 import RecipeCarousel from "@/components/RecipeCarousel";
+import { useAuth } from "@/context/AuthContext";
 
 const RecipePage = () => {
+  const { user, logout } = useAuth();
   let { page } = useParams();
   if (page === undefined) {
     page = 1;
@@ -47,6 +49,11 @@ const RecipePage = () => {
       try {
         setIsLoading(true); // Set loading to true
         const fetchData = await getRecipes(currentPage, 10); // Fetch data
+        if (fetchData === 401) {
+          logout();
+          router.push("/");
+          return;
+        }
         setData(fetchData); // Set the main data state
         setRecipeCardData(fetchData?.content); // Update the recipe card data
         setTotalPages(fetchData?.page?.totalPages); // Uncomment if total pages logic is required
