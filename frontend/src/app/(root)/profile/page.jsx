@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useAuth } from "@/context/AuthContext";
+import { redirect } from "next/navigation";
 const Profile = () => {
   const { user, loading } = useAuth();
   if (loading) return <p>Loading...</p>;

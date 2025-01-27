@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { CirclePlus, CircleMinus, CopyPlus, Trash2 } from "lucide-react";
 
 export default function RecipeForm() {
   const [formData, setFormData] = useState({
@@ -9,8 +10,8 @@ export default function RecipeForm() {
     cookTime: "",
     servings: "",
     yield: "",
-    ingredients: [],
-    instructions: [],
+    ingredientGroups: [],
+    stepGroups: [],
     calories: "",
     carbs: "",
     sugars: "",
@@ -33,63 +34,77 @@ export default function RecipeForm() {
     }));
   };
 
-  const handleDynamicChange = (e, index, field) => {
+  const handleGroupChange = (e, groupIndex, field, subIndex = null) => {
     const value = e.target.value;
     setFormData((prev) => {
-      const updatedField = [...prev[field]];
-      updatedField[index] = value;
-      return { ...prev, [field]: updatedField };
+      const updatedGroups = [...prev[field]];
+      if (subIndex === null) {
+        updatedGroups[groupIndex] = {
+          ...updatedGroups[groupIndex],
+          [e.target.name]: value,
+        };
+      } else {
+        updatedGroups[groupIndex].ingredients[subIndex] = value;
+      }
+      return { ...prev, [field]: updatedGroups };
     });
   };
 
-  const addDynamicField = (field) => {
+  const addGroup = (field) => {
     setFormData((prev) => ({
       ...prev,
-      [field]: [...prev[field], ""],
+      [field]: [
+        ...prev[field],
+        field === "ingredientGroups"
+          ? { label: "", ingredients: [] }
+          : { label: "", steps: [] },
+      ],
     }));
   };
 
-  const removeDynamicField = (index, field) => {
+  const addSubField = (groupIndex, field) => {
     setFormData((prev) => {
-      const updatedField = [...prev[field]];
-      updatedField.splice(index, 1);
-      return { ...prev, [field]: updatedField };
+      const updatedGroups = [...prev[field]];
+      if (field === "ingredientGroups") {
+        updatedGroups[groupIndex] = {
+          ...updatedGroups[groupIndex],
+          ingredients: [...updatedGroups[groupIndex].ingredients, ""],
+        };
+      } else {
+        updatedGroups[groupIndex] = {
+          ...updatedGroups[groupIndex],
+          steps: [...updatedGroups[groupIndex].steps, ""],
+        };
+      }
+      return { ...prev, [field]: updatedGroups };
     });
   };
+
+  const removeGroup = (groupIndex, field) => {
+    setFormData((prev) => {
+      const updatedGroups = [...prev[field]];
+      updatedGroups.splice(groupIndex, 1);
+      return { ...prev, [field]: updatedGroups };
+    });
+  };
+
+  const removeSubField = (groupIndex, subIndex, field) => {
+    setFormData((prev) => {
+      const updatedGroups = [...prev[field]];
+      if (field === "ingredientGroups") {
+        updatedGroups[groupIndex].ingredients.splice(subIndex, 1);
+      } else {
+        updatedGroups[groupIndex].steps.splice(subIndex, 1);
+      }
+      return { ...prev, [field]: updatedGroups };
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formDataToSend = new FormData();
-    Object.entries(formData).forEach(([key, value]) => {
-      formDataToSend.append(key, value);
-    });
-
     try {
       console.log(formData);
-      // const response = await fetch("/api/recipes", {
-      //   method: "POST",
-      //   body: formDataToSend,
-      // });
-
-      // if (response.ok) {
-      //   console.log("Recipe created successfully!");
-      //   setFormData({
-      //     title: "",
-      //     summary: "",
-      //     prepTime: "",
-      //     cookTime: "",
-      //     servings: "",
-      //     yield: "",
-      //     ingredients: "",
-      //     instructions: "",
-      //     calories: "",
-      //     carbs: "",
-      //     sugars: "",
-      //     fat: "",
-      //     image: null,
-      //   });
-      // } else {
-      //   console.error("Failed to create recipe");
-      // }
+      // Handle API submission here
     } catch (error) {
       console.error("Error:", error);
     }
@@ -98,12 +113,11 @@ export default function RecipeForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white p-6 rounded-lg shadow-md "
+      className="bg-white p-6 rounded-lg max-w-[800px] mx-auto"
     >
       <h2 className="text-2xl font-bold text-gray-800 my-6 text-center">
         Create Recipe
       </h2>
-      {/* Basic Info */}
       <div className="mb-6">
         <label
           className="block text-gray-700 text-sm font-bold mb-2"
@@ -121,7 +135,6 @@ export default function RecipeForm() {
           required
         />
       </div>
-
       <div className="mb-6">
         <label
           className="block text-gray-700 text-sm font-bold mb-2"
@@ -136,9 +149,9 @@ export default function RecipeForm() {
           rows="3"
           value={formData.summary}
           onChange={handleChange}
+          required
         />
       </div>
-
       {/* Image Upload */}
       <div className="mb-6">
         <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -149,10 +162,8 @@ export default function RecipeForm() {
           accept="image/*"
           className="w-full p-2 border rounded-lg"
           onChange={handleFileChange}
-          required
         />
       </div>
-
       {/* Times and Servings */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {["prepTime", "cookTime", "servings", "yield"].map((field, idx) => (
@@ -177,71 +188,6 @@ export default function RecipeForm() {
           </div>
         ))}
       </div>
-
-      {/* Ingredients */}
-      <div className="mb-6">
-        <label className="block text-gray-700 text-sm font-bold mb-2">
-          Ingredients
-        </label>
-        {formData.ingredients.map((ingredient, index) => (
-          <div key={index} className="flex items-center mb-2">
-            <input
-              type="text"
-              className="w-full p-2 border rounded-lg"
-              placeholder={`Ingredient ${index + 1}`}
-              value={ingredient}
-              onChange={(e) => handleDynamicChange(e, index, "ingredients")}
-            />
-            <button
-              type="button"
-              className="ml-2 bg-red-500 text-white px-2 py-1 rounded"
-              onClick={() => removeDynamicField(index, "ingredients")}
-            >
-              Remove
-            </button>
-          </div>
-        ))}
-        <button
-          type="button"
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          onClick={() => addDynamicField("ingredients")}
-        >
-          Add Ingredient
-        </button>
-      </div>
-
-      {/* Instructions */}
-      <div className="mb-6">
-        <label className="block text-gray-700 text-sm font-bold mb-2">
-          Instructions
-        </label>
-        {formData.instructions.map((instruction, index) => (
-          <div key={index} className="flex items-center mb-2">
-            <input
-              type="text"
-              className="w-full p-2 border rounded-lg"
-              placeholder={`Step ${index + 1}`}
-              value={instruction}
-              onChange={(e) => handleDynamicChange(e, index, "instructions")}
-            />
-            <button
-              type="button"
-              className="ml-2 bg-red-500 text-white px-2 py-1 rounded"
-              onClick={() => removeDynamicField(index, "instructions")}
-            >
-              Remove
-            </button>
-          </div>
-        ))}
-        <button
-          type="button"
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          onClick={() => addDynamicField("instructions")}
-        >
-          Add Step
-        </button>
-      </div>
-
       {/* Nutrition Info */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {["calories", "carbs", "sugars", "fat"].map((field, idx) => (
@@ -261,10 +207,156 @@ export default function RecipeForm() {
           </div>
         ))}
       </div>
-
+      {/* Ingredient Groups */}
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold">Ingredient Groups</h3>
+        {formData.ingredientGroups.map((group, groupIndex) => (
+          <div key={groupIndex} className="mb-4 p-4 border rounded">
+            <input
+              type="text"
+              name="label"
+              className="w-full p-2 mb-2 border font-semibold rounded-lg"
+              placeholder={`Group ${groupIndex + 1} Label`}
+              value={group.label}
+              onChange={(e) =>
+                handleGroupChange(e, groupIndex, "ingredientGroups")
+              }
+              required
+            />
+            {group.ingredients.map((ingredient, subIndex) => (
+              <div key={subIndex} className="flex items-center mb-2">
+                <input
+                  type="text"
+                  className="w-full p-2 border rounded-lg"
+                  placeholder={`Ingredient ${subIndex + 1}`}
+                  value={ingredient}
+                  onChange={(e) =>
+                    handleGroupChange(
+                      e,
+                      groupIndex,
+                      "ingredientGroups",
+                      subIndex
+                    )
+                  }
+                  required
+                />
+                <button
+                  type="button"
+                  className="ml-2 px-2 text-gray-500 py-1 rounded"
+                  onClick={() =>
+                    removeSubField(groupIndex, subIndex, "ingredientGroups")
+                  }
+                >
+                  <CircleMinus size={20} />
+                </button>
+              </div>
+            ))}
+            <div className="flex justify-between">
+              {" "}
+              <button
+                type="button"
+                className=" text-gray-600 px-4 py-2 rounded flex border-2 hover:shadow-sm"
+                onClick={() => addSubField(groupIndex, "ingredientGroups")}
+              >
+                <CirclePlus size={20} />
+                <span className="px-2 font-semibold text-gray-600">
+                  Add Ingredient
+                </span>
+              </button>
+              <button
+                type="button"
+                className="ml-4 text-gray-600 px-4 py-2 rounded flex border-2 hover:shadow-sm"
+                onClick={() => removeGroup(groupIndex, "ingredientGroups")}
+              >
+                <Trash2 size={20} />
+                <span className="px-2 font-semibold text-gray-600">
+                  Delete Group
+                </span>
+              </button>
+            </div>
+          </div>
+        ))}
+        <button
+          type="button"
+          className=" text-green-700 hover:text-green-500 font-semibold p-2 rounded border-2 flex"
+          onClick={() => addGroup("ingredientGroups")}
+        >
+          <CopyPlus size={20} />
+          <span className="px-2">Add Ingredient Group</span>
+        </button>
+      </div>
+      {/* Step Groups */}
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold">Step Groups</h3>
+        {formData.stepGroups.map((group, groupIndex) => (
+          <div key={groupIndex} className="mb-4 p-4 border rounded">
+            <input
+              type="text"
+              name="label"
+              className="w-full p-2 mb-2 border font-semibold rounded-lg"
+              placeholder={`Group ${groupIndex + 1} Label`}
+              value={group.label}
+              onChange={(e) => handleGroupChange(e, groupIndex, "stepGroups")}
+              required
+            />
+            {group.steps.map((step, subIndex) => (
+              <div key={subIndex} className="flex items-center mb-2">
+                <textarea
+                  className="w-full p-2 border rounded-lg"
+                  placeholder={`Step ${subIndex + 1}`}
+                  value={step}
+                  onChange={(e) =>
+                    handleGroupChange(e, groupIndex, "stepGroups", subIndex)
+                  }
+                  required
+                />
+                <button
+                  type="button"
+                  className="ml-2 text-gray-500 px-2 py-1 rounded"
+                  onClick={() =>
+                    removeSubField(groupIndex, subIndex, "stepGroups")
+                  }
+                >
+                  <CircleMinus size={20} />
+                </button>
+              </div>
+            ))}
+            <div className="flex justify-between">
+              <button
+                type="button"
+                className=" text-gray-600 px-4 py-2 rounded flex border-2 hover:shadow-sm"
+                onClick={() => addSubField(groupIndex, "stepGroups")}
+              >
+                <CirclePlus size={20} />
+                <span className="px-2 font-semibold text-gray-600">
+                  Add Step
+                </span>
+              </button>
+              <button
+                type="button"
+                className="ml-4 text-gray-600 px-4 py-2 rounded flex border-2 hover:shadow-sm"
+                onClick={() => removeGroup(groupIndex, "stepGroups")}
+              >
+                <Trash2 size={20} />
+                <span className="px-2 font-semibold text-gray-600">
+                  Delete Group
+                </span>
+              </button>
+            </div>
+          </div>
+        ))}
+        <button
+          type="button"
+          className=" text-green-700 hover:text-green-500 border-2 font-semibold p-2 rounded flex"
+          onClick={() => addGroup("stepGroups")}
+        >
+          <CopyPlus size={20} />
+          <span className="px-2">Add Step Group</span>
+        </button>
+      </div>
       <button
         type="submit"
-        className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors"
+        className="w-1/2 bg-green-600 hover:bg-green-500 text-white py-2 px-4 rounded-lg font-semibold transition-colors"
       >
         Create Recipe
       </button>

@@ -12,7 +12,7 @@ export async function getRecipeById(recipeId) {
         return error.response.status;
       }
     } else {
-      console.log("Error fetching recipe:", error.status);
+      console.log("Error fetching recipe:", error);
     }
   }
 }

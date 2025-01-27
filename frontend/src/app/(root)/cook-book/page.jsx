@@ -3,9 +3,10 @@ import React from "react";
 import RecipeCard from "@/components/RecipeCard";
 import { useAuth } from "@/context/AuthContext";
 import { redirect } from "next/navigation";
+import { LoaderIcon } from "lucide-react";
 const MyCookBook = () => {
   const { user, loading } = useAuth();
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <LoaderIcon className="animate-spin m-auto" />;
   if (!user) {
     redirect("/");
   }
