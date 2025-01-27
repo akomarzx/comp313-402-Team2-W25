@@ -11,12 +11,12 @@ const axios = require("axios");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const morgan = require("morgan");
-const { createProxyMiddleware } = require('http-proxy-middleware');
+const { createProxyMiddleware } = require("http-proxy-middleware");
 
 const app = express();
 const PORT = process.env.PORT;
-app.set('trust proxy', 1) // trust first proxy
-// OAuth Configuration
+app.set("trust proxy", 1);
+
 const OAUTH_CONFIG = {
   authorizationURL: process.env.OAUTH_AUTHORIZATION_URL,
   tokenURL: process.env.OAUTH_TOKEN_URL,
@@ -64,7 +64,120 @@ passport.deserializeUser((user, done) => {
   done(null, user);
 });
 
-// CORS configuration
+let destroySession = async (req, res) => {
+  const tokenRevocationURL =
+    "https://ronaldjro.dev/auth/realms/KitchenCompanion/protocol/openid-connect/revoke";
+
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ error: "User not authenticated" });
+  }
+
+  const { accessToken, refreshToken } = req.user;
+
+  try {
+    await axios.post(
+      tokenRevocationURL,
+      new URLSearchParams({
+        token: accessToken,
+        client_id: OAUTH_CONFIG.clientID,
+        client_secret: OAUTH_CONFIG.clientSecret,
+      }),
+      { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+    );
+
+    if (refreshToken) {
+      await axios.post(
+        tokenRevocationURL,
+        new URLSearchParams({
+          token: refreshToken,
+          client_id: OAUTH_CONFIG.clientID,
+          client_secret: OAUTH_CONFIG.clientSecret,
+        }),
+        { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+      );
+    }
+
+    req.logout((err) => {
+      if (err) {
+        console.error("Error logging out:", err);
+        return res.status(500).json({ error: "Failed to log out" });
+      }
+
+      req.session.destroy((err) => {
+        if (err) {
+          console.error("Error destroying session:", err);
+          return res.status(500).json({ error: "Failed to destroy session" });
+        }
+
+        res.clearCookie("connect.sid", {
+          path: "/",
+          httpOnly: true,
+          secure: "auto",
+          sameSite: "lax",
+        });
+
+        res.status(200).json({ message: "Logged out successfully" });
+
+      });
+    });
+  } catch (error) {
+    console.error(
+      "Error revoking tokens:",
+      error.response?.data || error.message
+    );
+    res.status(500).json({ error: "Failed to revoke tokens" });
+  }
+};
+
+const introspectToken = async (token) => {
+  try {
+    const response = await axios.post(
+      `https://ronaldjro.dev/auth/realms/KitchenCompanion/protocol/openid-connect/token/introspect`,
+      new URLSearchParams({
+        token: token,
+        client_id: process.env.OAUTH_CLIENT_ID,
+        client_secret: process.env.OAUTH_CLIENT_SECRET,
+      }),
+      { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+    );
+
+    return response.data.active;
+
+  } catch (error) {
+    console.error(
+      "Error during token introspection:",
+      error.response?.data || error.message
+    );
+    return false;
+  }
+};
+
+const refreshAccessToken = async (refreshToken) => {
+  try {
+    const response = await axios.post(
+      `https://ronaldjro.dev/auth/realms/KitchenCompanion/protocol/openid-connect/token`,
+      new URLSearchParams({
+        grant_type: "refresh_token",
+        refresh_token: refreshToken,
+        client_id: process.env.OAUTH_CLIENT_ID,
+        client_secret: process.env.OAUTH_CLIENT_SECRET,
+      }),
+      { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+    );
+
+    return {
+      accessToken: response.data.access_token,
+      refreshToken: response.data.refresh_token
+    };
+  } catch (error) {
+    console.error(
+      "Error refreshing token:",
+      error.response?.data || error.message
+    );
+    return null;
+  }
+};
+
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
@@ -80,15 +193,52 @@ app.use(
     resave: false,
     saveUninitialized: true,
     cookie: {
-      secure: 'auto',
+      secure: "auto",
       httpOnly: true,
-      sameSite: "none",
+      sameSite: "lax",
     },
   })
 );
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.use(async (req, res, next) => {
+
+  if (req.isAuthenticated() && req.user?.accessToken) {
+    try {
+
+      const isValid = await introspectToken(req.user.accessToken);
+
+      if (!isValid) {
+
+        const newTokens = await refreshAccessToken(req.user.refreshToken);
+
+        if (!newTokens) {
+          req.logout((err) => {
+            if (err) {
+              console.error("Error logging out:", err);
+            }
+            res
+              .status(401)
+              .json({ error: "Session expired. Please log in again." });
+          });
+          return;
+        }
+
+        req.user.accessToken = newTokens.accessToken;
+        req.user.refreshToken = newTokens.refreshToken || req.user.refreshToken;
+        req.session.passport.user = req.user;
+      }
+      next();
+    } catch (error) {
+      console.error("Error validating or refreshing token:", error.message);
+      res.status(500).json({ error: "Internal server error." });
+    }
+  } else {
+    next();
+  }
+});
 
 app.get(
   "/login",
@@ -106,7 +256,7 @@ app.get(
 );
 
 app.get("/session", (req, res) => {
-  // TODO: Check if token is valid
+
   if (req.isAuthenticated()) {
     const { profile } = req.user;
 
@@ -132,80 +282,16 @@ const proxyConfig = createProxyMiddleware({
   on: {
     proxyReq: (proxyReq, req, res) => {
       if (req.isAuthenticated()) {
-        let accessToken = req.user.accessToken
-        proxyReq.setHeader("Authorization", `Bearer ${accessToken}`)
+        let accessToken = req.user.accessToken;
+        proxyReq.setHeader("Authorization", `Bearer ${accessToken}`);
       }
-    }
-  }
-})
+    },
+  },
+});
 
 app.use("/api", proxyConfig);
 
-app.get("/logout", async (req, res) => {
-  const tokenRevocationURL =
-    "https://ronaldjro.dev/auth/realms/KitchenCompanion/protocol/openid-connect/revoke";
-
-  if (!req.isAuthenticated()) {
-    return res.status(401).json({ error: "User not authenticated" });
-  }
-
-  const { accessToken, refreshToken } = req.user;
-
-  try {
-    // Revoke access token
-    await axios.post(
-      tokenRevocationURL,
-      new URLSearchParams({
-        token: accessToken,
-        client_id: OAUTH_CONFIG.clientID,
-        client_secret: OAUTH_CONFIG.clientSecret,
-      }),
-      { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
-    );
-
-    if (refreshToken) {
-      await axios.post(
-        tokenRevocationURL,
-        new URLSearchParams({
-          token: refreshToken,
-          client_id: OAUTH_CONFIG.clientID,
-          client_secret: OAUTH_CONFIG.clientSecret,
-        }),
-        { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
-      );
-    }
-
-    // Destroy session and clear cookies
-    req.logout((err) => {
-      if (err) {
-        console.error("Error logging out:", err);
-        return res.status(500).json({ error: "Failed to log out" });
-      }
-
-      req.session.destroy((err) => {
-        if (err) {
-          console.error("Error destroying session:", err);
-          return res.status(500).json({ error: "Failed to destroy session" });
-        }
-
-        res.clearCookie("connect.sid", {
-          path: "/",
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "Lax",
-        });
-
-        res.status(200).json({ message: "Logged out successfully" });
-      });
-    });
-  } catch (error) {
-    console.error(
-      "Error revoking tokens:",
-      error.response?.data || error.message
-    );
-    res.status(500).json({ error: "Failed to revoke tokens" });
-  }
-});
+app.get("/logout", destroySession);
 
 // Start the server
 app.listen(PORT, () => {
