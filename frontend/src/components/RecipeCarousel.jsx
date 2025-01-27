@@ -22,15 +22,15 @@ const RecipeCarousel = ({ data }) => {
         opts={{
           align: "start",
         }}
-        className="w-full max-w-4xl mx-auto"
+        className=" max-w-sm md:max-w-xl  lg:max-w-3xl  2xl:max-w-4xl mx-auto"
       >
         <CarouselContent>
           {data?.map((item, index) => (
             <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
               <div className="">
-                <Card>
-                  <CardContent className="flex aspect-square items-center justify-center p-4">
-                    <div className="relative w-[300px] h-[300px] rounded-md overflow-hidden">
+                <Card className="border-none ">
+                  <CardContent className="flex aspect-square items-center justify-center p-2">
+                    <div className="relative w-[300px] h-[200px] rounded-md overflow-hidden">
                       {" "}
                       <Image
                         src={
@@ -40,7 +40,7 @@ const RecipeCarousel = ({ data }) => {
                         alt={item?.title}
                         fill
                         sizes="100%"
-                        className="rounded-t-lg"
+                        className="rounded-t-lg cursor-pointer"
                         onClick={() => router.push(`/recipe/${item.id}`)}
                       />
                     </div>
