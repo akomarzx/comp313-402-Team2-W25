@@ -15,6 +15,7 @@ import {
 import { cn } from "@/lib/utils";
 import { redirect, useParams, useRouter } from "next/navigation";
 import { BarLoader } from "react-spinners";
+import RecipeCarousel from "@/components/RecipeCarousel";
 
 const RecipePage = () => {
   let { page } = useParams();
@@ -75,8 +76,11 @@ const RecipePage = () => {
 
   return (
     <div className="py-10">
+      <div>
+        {!isLoading && <RecipeCarousel data={recipeCardData.slice(0, 5)} />}
+      </div>
       <div className="mx-auto max-w-[600px] mb-5">
-        <h3 className="font-semibold text-normal p-2">
+        <h3 className="font-semibold text-normal p-2 mt-6">
           What are you craving for today?
         </h3>
         <input
