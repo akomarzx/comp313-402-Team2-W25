@@ -1,44 +1,37 @@
 import axios from "axios";
 const recipeUrl = process.env.NEXT_PUBLIC_RECIPE_API;
-import { useAuth } from "@/context/AuthContext";
 export async function getRecipeById(recipeId) {
-  const { logout } = useAuth();
   try {
     const recipe = await axios.get(`${recipeUrl}/kc/v1/recipe/${recipeId}`);
     console.log(recipe.data);
     return recipe.data;
   } catch (error) {
     if (error.response) {
-      console.error("Error fetching recipe:", error.response.data);
+      console.log("Error fetching recipe:", error.response.data);
       if (error.response.status === 401) {
-        logout();
-
-        return null;
+        return error.response.status;
       }
     } else {
-      console.error("Error fetching recipe:", error.message);
+      console.log("Error fetching recipe:", error.status);
     }
   }
 }
 
 export async function getRecipes(page, size) {
-  const { logout } = useAuth();
   try {
     const recipes = await axios.get(
       `${recipeUrl}/kc/v1/recipe?size=${size}&page=${page}`
     );
-    console.log(recipe.data);
+    console.log(recipes.data);
     return recipes.data;
   } catch (error) {
     if (error.response) {
-      console.error("Error fetching recipes:", error.response.data);
+      console.log("Error fetching recipes:", error.response.data);
       if (error.response.status === 401) {
-        logout();
-
-        return null;
+        return error.response.status;
       }
     } else {
-      console.error("Error fetching recipes:", error.message);
+      console.log("Error fetching recipes:", error);
     }
   }
 }
