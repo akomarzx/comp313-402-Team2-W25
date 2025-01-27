@@ -17,6 +17,19 @@ const app = express();
 const PORT = process.env.PORT;
 app.set("trust proxy", 1);
 
+const MySQLStore = require('express-mysql-session')(session);
+
+const options = {
+	host: process.env.SESSION_STORE_DB_HOST,
+	port: process.env.SESSION_STORE_DB_PORT,
+	user: process.env.SESSION_STORE_DB_USER,
+	password: process.env.SESSION_STORE_DB_PASSWORD,
+	database: process.env.SESSION_STORE_DB_DATABASE
+};
+
+const sessionStore = new MySQLStore(options);
+
+
 const OAUTH_CONFIG = {
   authorizationURL: process.env.OAUTH_AUTHORIZATION_URL,
   tokenURL: process.env.OAUTH_TOKEN_URL,
@@ -192,6 +205,7 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
+    store: sessionStore,
     cookie: {
       secure: "auto",
       httpOnly: true,
