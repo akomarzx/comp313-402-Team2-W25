@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { CirclePlus, CircleMinus, CopyPlus, Trash2 } from "lucide-react";
+import { createRecipe } from "@/api/recipe";
 
 export default function RecipeForm() {
   const [formData, setFormData] = useState({
@@ -18,6 +19,8 @@ export default function RecipeForm() {
     fat: "",
     image: null,
   });
+
+  const [newFormData, setNewFormData] = useState(new FormData());
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -44,7 +47,11 @@ export default function RecipeForm() {
           [e.target.name]: value,
         };
       } else {
-        updatedGroups[groupIndex].ingredients[subIndex] = value;
+        if (field === "stepGroups") {
+          updatedGroups[groupIndex].steps[subIndex] = value;
+        } else {
+          updatedGroups[groupIndex].ingredients[subIndex] = value;
+        }
       }
       return { ...prev, [field]: updatedGroups };
     });
@@ -105,6 +112,92 @@ export default function RecipeForm() {
     try {
       console.log(formData);
       // Handle API submission here
+      // newFormData.append("title", formData.title);
+      // newFormData.append("summary", formData.summary);
+      // newFormData.append("prepTime", formData.prepTime);
+      // newFormData.append("prepTimeUnitCd", 100);
+      // newFormData.append("cookTime", formData.cookTime);
+      // newFormData.append("cookTimeUnitCd", 100);
+      // newFormData.append("servings", formData.servings);
+      // newFormData.append("yield", formData.yield);
+      // newFormData.append("calories", formData.calories);
+      // newFormData.append("carbsG", formData.carbs);
+      // newFormData.append("sugarsG", formData.sugars);
+      // newFormData.append("fatG", formData.fat);
+      // newFormData.append("categoryIds", 1);
+      // formData.ingredientGroups.forEach((group, idx) => {
+      //   newFormData.append(`ingredientGroups[${idx}].label`, group.label);
+
+      //   newFormData.append(
+      //     `ingredientGroups[${idx}].ingredientGroupOrder`,
+      //     idx + 1
+      //   );
+      //   group.ingredients.forEach((ingredient, subIdx) => {
+      //     newFormData.append(
+      //       `ingredientGroups[${idx}].ingredients[${subIdx}].label`,
+      //       ingredient
+      //     );
+      //     newFormData.append(
+      //       `ingredientGroups[${idx}].ingredients[${subIdx}].ingredientOrder`,
+      //       subIdx + 1
+      //     );
+      //   });
+      // });
+      // formData.stepGroups.forEach((group, idx) => {
+      //   newFormData.append(`stepGroups[${idx}].label`, group.label);
+      //   newFormData.append(`stepGroups[${idx}].stepGroupOrder`, idx + 1);
+      //   group.steps.forEach((step, subIdx) => {
+      //     newFormData.append(`stepGroups[${idx}].steps[${subIdx}].label`, step);
+      //     newFormData.append(
+      //       `stepGroups[${idx}].steps[${subIdx}].stepOrder`,
+      //       subIdx + 1
+      //     );
+      //   });
+      // });
+
+      setNewFormData({
+        title: formData.title,
+        summary: formData.summary,
+        prepTime: formData.prepTime,
+        prepTimeUnitCd: 100,
+        cookTime: formData.cookTime,
+        cookTimeUnitCd: 100,
+        servings: formData.servings,
+        yield: formData.yield,
+        calories: formData.calories,
+        carbsG: formData.carbs,
+        sugarsG: formData.sugars,
+        fatG: formData.fat,
+        categoryIds: 1,
+        ingredientGroups: formData.ingredientGroups.map((group, idx) => {
+          return {
+            label: group.label,
+            ingredientGroupOrder: idx + 1,
+            ingredients: group.ingredients.map((ingredient, subIdx) => {
+              return {
+                label: ingredient,
+                ingredientOrder: subIdx + 1,
+              };
+            }),
+          };
+        }),
+        stepGroups: formData.stepGroups.map((group, idx) => {
+          return {
+            label: group.label,
+            stepGroupOrder: idx + 1,
+            steps: group.steps.map((step, subIdx) => {
+              return {
+                label: step,
+                stepOrder: subIdx + 1,
+              };
+            }),
+          };
+        }),
+      });
+
+      console.log(newFormData);
+      const res = createRecipe(newFormData);
+      console.log(res);
     } catch (error) {
       console.error("Error:", error);
     }

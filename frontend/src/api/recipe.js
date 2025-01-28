@@ -37,7 +37,11 @@ export async function getRecipes(page, size) {
 }
 
 export async function createRecipe(data) {
-  const recipe = await axios.post(`${recipeUrl}/kc/v1/recipe`, data);
+  console.log(data);
+  const recipe = await axios.post(
+    `${recipeUrl}/kc/v1/recipe`,
+    JSON.stringify(data)
+  );
 
   return recipe.data;
 }
