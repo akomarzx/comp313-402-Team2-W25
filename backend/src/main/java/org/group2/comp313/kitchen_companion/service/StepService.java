@@ -23,7 +23,7 @@ public class StepService extends BaseService {
         newStep.setStepGroup(stepGroupId);
         newStep.setStepOrder(newStepDto.stepOrder());
         newStep.setImageUrl(newStepDto.imageUrl());
-        newStep.setDescription(newStepDto.description());
+        newStep.setDescription(newStepDto.label());
         newStep.setCreatedBy(createdBy);
         newStep.setCreatedAt(Instant.now());
         newStep.setUpdatedAt(null);
