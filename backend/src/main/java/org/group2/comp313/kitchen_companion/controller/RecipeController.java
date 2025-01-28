@@ -69,14 +69,14 @@ public class RecipeController extends BaseController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createRecipe( @RequestBody @Valid() RecipeDTO createRecipeDto,
+    public ResponseEntity<Recipe> createRecipe( @RequestBody @Valid() RecipeDTO createRecipeDto,
                                               @AuthenticationPrincipal(expression = "claims['email']") String createdByEmail) {
 
         this.log.info("Request to create recipe: {}", createRecipeDto.toString());
         this.log.info("Request By {}", createdByEmail);
 
-        this.recipeService.createRecipe(createRecipeDto, createdByEmail);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+         Recipe newRecipe = this.recipeService.createRecipe(createRecipeDto, createdByEmail);
+        return new ResponseEntity<Recipe>(newRecipe,HttpStatus.OK);
     }
 
     @PostMapping(path = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})

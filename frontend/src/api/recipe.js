@@ -37,13 +37,12 @@ export async function getRecipes(page, size) {
 
 export async function createRecipe(data) {
   console.log(data);
-  const recipe = await axios.post(
-    `${recipeUrl}/kc/v1/recipe`,
-    data,
-    {
+  try {
+    const recipeResponse = await axios.post(`${recipeUrl}/kc/v1/recipe`, data, {
       withCredentials: true,
-    }
-  );
-
-  return recipe.data;
+    });
+    return recipeResponse;
+  } catch (error) {
+    console.log("Error creating recipe:", error);
+  }
 }
