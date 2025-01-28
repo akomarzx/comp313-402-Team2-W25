@@ -3,30 +3,20 @@ package org.group2.comp313.kitchen_companion.controller;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.group2.comp313.kitchen_companion.domain.CodeBook;
 import org.group2.comp313.kitchen_companion.domain.Recipe;
 import org.group2.comp313.kitchen_companion.domain.projection.RecipeSummaryForCards;
-import org.group2.comp313.kitchen_companion.dto.recipe.RecipeCardsDto;
+import org.group2.comp313.kitchen_companion.dto.recipe.ApiResult;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeDTO;
 import org.group2.comp313.kitchen_companion.service.AWSS3Service;
-import org.group2.comp313.kitchen_companion.service.CsvImportService;
 import org.group2.comp313.kitchen_companion.service.RecipeService;
-import org.group2.comp313.kitchen_companion.service.StaticCodeService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
+
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
-import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/recipe")
@@ -46,20 +36,46 @@ public class RecipeController extends BaseController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Recipe> getRecipe(@PathVariable Integer id) {
-        Recipe r = this.recipeService.getRecipeById(id);
-        return new ResponseEntity<>(r, HttpStatus.OK);
+    public ResponseEntity<ApiResult<Recipe>> getRecipe(@PathVariable Integer id) {
+
+        ApiResult<Recipe> apiResult;
+        HttpStatus status;
+
+        try {
+            Recipe recipe = this.recipeService.getRecipeById(id);
+
+            if(recipe == null) {
+                status = HttpStatus.NOT_FOUND;
+                apiResult = new ApiResult<>("Recipe not found.", null);
+            } else {
+                status = HttpStatus.OK;
+                apiResult = new ApiResult<>("", recipe);
+            }
+
+            return new ResponseEntity<>(apiResult, status);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ApiResult<>(e.getLocalizedMessage(), null), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping
-    public ResponseEntity<Page<RecipeSummaryForCards>> getAllRecipes(@RequestParam Integer page, @RequestParam Integer size) {
-        return ResponseEntity.ok(this.recipeService.getRecipes(page, size));
+    public ResponseEntity<ApiResult<Page<RecipeSummaryForCards>>>getAllRecipes(@RequestParam Integer page, @RequestParam Integer size) {
+        try {
+            return ResponseEntity.ok(new ApiResult<>("" ,this.recipeService.getRecipes(page, size)));
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ApiResult<>(e.getLocalizedMessage(), null), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping
-    public ResponseEntity<Void> createRecipe( @RequestBody @Valid() RecipeDTO createRecipeDto) {
+    public ResponseEntity<Void> createRecipe( @RequestBody @Valid() RecipeDTO createRecipeDto,
+                                              @AuthenticationPrincipal(expression = "claims['email']") String createdByEmail) {
+
         this.log.info("Request to create recipe: {}", createRecipeDto.toString());
-        this.recipeService.createRecipe(createRecipeDto, "sysadmin@gmail.com");
+        this.log.info("Request By {}", createdByEmail);
+
+        this.recipeService.createRecipe(createRecipeDto, createdByEmail);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

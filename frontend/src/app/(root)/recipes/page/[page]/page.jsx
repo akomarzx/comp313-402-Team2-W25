@@ -59,7 +59,7 @@ const RecipePage = () => {
           return;
         }
         setData(fetchData); // Set the main data state
-        setRecipeCardData(fetchData?.content); // Update the recipe card data
+        setRecipeCardData(fetchData?.result.content); // Update the recipe card data
         setTotalPages(fetchData?.page?.totalPages); // Uncomment if total pages logic is required
         console.log(fetchData); // Log the fetched data
       } catch (error) {
