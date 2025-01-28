@@ -168,7 +168,7 @@ export default function RecipeForm() {
         carbsG: formData.carbs,
         sugarsG: formData.sugars,
         fatG: formData.fat,
-        categoryIds: 1,
+        categoryIds: [1],
         ingredientGroups: formData.ingredientGroups.map((group, idx) => {
           return {
             label: group.label,
