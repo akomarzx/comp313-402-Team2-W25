@@ -17,6 +17,7 @@ import { redirect, useParams, useRouter } from "next/navigation";
 import { BarLoader } from "react-spinners";
 import RecipeCarousel from "@/components/RecipeCarousel";
 import { useAuth } from "@/context/AuthContext";
+import { toast } from "sonner";
 
 const RecipePage = () => {
   const { user, logout } = useAuth();
@@ -51,7 +52,10 @@ const RecipePage = () => {
         const fetchData = await getRecipes(currentPage, 10); // Fetch data
         if (fetchData === 401) {
           logout();
-          router.push("/");
+          toast("Session expired. Please login again.");
+          setTimeout(() => {
+            router.push("/");
+          }, 2000);
           return;
         }
         setData(fetchData); // Set the main data state
