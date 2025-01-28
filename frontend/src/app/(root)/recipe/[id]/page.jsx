@@ -32,7 +32,7 @@ const Recipe = () => {
           <div className="relative w-full h-[300px] md:h-[400px] rounded-lg overflow-hidden mb-8">
             <Image
               src={
-                recipe?.imageUrl ||
+                (recipe?.imageUrl !== "x" && recipe?.imageUrl) ||
                 "https://www.themealdb.com/images/media/meals/58oia61564916529.jpg"
               }
               alt={recipe?.title || "image"}
@@ -61,15 +61,23 @@ const Recipe = () => {
               <h2 className="text-2xl font-semibold text-gray-800 mb-3">
                 Ingredients
               </h2>
-              <ol className="list-disc list-inside text-gray-700">
-                {recipe?.ingredientGroups[0].ingredients
-                  .sort((a, b) => a.ingredientOrder - b.ingredientOrder)
-                  .map((ingredient, index) => (
-                    <li
-                      value={ingredient.ingredientOrder}
-                      key={ingredient.ingredientOrder}
-                    >
-                      {ingredient.label}
+              <ol className="list list-inside text-gray-700">
+                {recipe?.ingredientGroups
+                  .sort(
+                    (a, b) => a.ingredientGroupOrder - b.ingredientGroupOrder
+                  )
+                  .map((ingredientGroup, index) => (
+                    <li key={index} className="mb-4">
+                      <h3 className="font-semibold text-lg">
+                        {ingredientGroup.label}
+                      </h3>
+                      <ul className="list-disc list-inside text-gray-700">
+                        {ingredientGroup.ingredients
+                          .sort((a, b) => a.ingredientOrder - b.ingredientOrder)
+                          .map((ingredient, index) => (
+                            <li key={index}>{ingredient.label}</li>
+                          ))}
+                      </ul>
                     </li>
                   ))}
               </ol>
@@ -80,12 +88,21 @@ const Recipe = () => {
               <h2 className="text-2xl font-semibold text-gray-800 mb-3">
                 Instructions
               </h2>
-              <ol className="list-disc list-inside text-gray-700 space-y-2">
-                {recipe?.stepGroups[0].steps
-                  .sort((a, b) => a.stepOrder - b.stepOrder)
-                  .map((step, index) => (
-                    <li value={step.stepOrder} key={step.stepOrder}>
-                      {step.description}
+              <ol className="list list-inside text-gray-700 space-y-2">
+                {recipe?.stepGroups
+                  .sort((a, b) => a.stepGroupOrder - b.stepGroupOrder)
+                  .map((stepGroup, index) => (
+                    <li key={index} className="mb-4">
+                      <h3 className="font-semibold text-lg">
+                        {stepGroup.label}
+                      </h3>
+                      <ol className="list-decimal list-inside text-gray-700">
+                        {stepGroup.steps
+                          .sort((a, b) => a.stepOrder - b.stepOrder)
+                          .map((step, index) => (
+                            <li key={index}>{step.description}</li>
+                          ))}
+                      </ol>
                     </li>
                   ))}
               </ol>
