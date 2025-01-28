@@ -22,8 +22,8 @@ export async function getRecipes(page, size) {
     const recipes = await axios.get(
       `${recipeUrl}/kc/v1/recipe?size=${size}&page=${page}`
     );
-    console.log(recipes.data);
-    return recipes.data;
+    console.log(recipes.data.result);
+    return recipes.data.result;
   } catch (error) {
     if (error.response) {
       console.log("Error fetching recipes:", error.response.data);
@@ -40,7 +40,10 @@ export async function createRecipe(data) {
   console.log(data);
   const recipe = await axios.post(
     `${recipeUrl}/kc/v1/recipe`,
-    JSON.stringify(data)
+    data,
+    {
+      withCredentials: true,
+    }
   );
 
   return recipe.data;
