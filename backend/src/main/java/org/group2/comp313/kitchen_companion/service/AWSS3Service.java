@@ -15,7 +15,6 @@ import java.util.UUID;
 @Service
 public class AWSS3Service extends BaseService {
 
-    private static final Log log = LogFactory.getLog(AWSS3Service.class);
     private final AmazonS3 s3client;
 
     @Value("${aws.s3.bucket}")
@@ -36,10 +35,11 @@ public class AWSS3Service extends BaseService {
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentLength(file.getBytes().length);
             metadata.setContentType(file.getContentType());
-            String objectName = Date.from(Instant.now()) + UUID.randomUUID().toString().replace("-", "");
+            String objectName = UUID.randomUUID().toString().replace("-", "");
             s3client.putObject(bucketName, objectName, file.getInputStream(), metadata);
             return String.valueOf(s3client.getUrl(bucketName, objectName));
         } catch (Exception e) {
+            this.log.error(e.getMessage());
             return "";
         }
     }
