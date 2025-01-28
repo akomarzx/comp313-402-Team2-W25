@@ -3,8 +3,7 @@ const recipeUrl = process.env.NEXT_PUBLIC_RECIPE_API;
 export async function getRecipeById(recipeId) {
   try {
     const recipe = await axios.get(`${recipeUrl}/kc/v1/recipe/${recipeId}`);
-    console.log(recipe.data);
-    return recipe.data;
+    return recipe.data.result;
   } catch (error) {
     if (error.response) {
       console.log("Error fetching recipe:", error.response.data);

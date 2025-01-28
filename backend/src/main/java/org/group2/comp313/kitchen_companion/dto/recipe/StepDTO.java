@@ -6,6 +6,6 @@ import jakarta.validation.constraints.Size;
 
 public record StepDTO(
         @NotNull @Min(0) int stepOrder,
-        @NotNull @Size(min = 1, max = 255) String description,
+        @NotNull @Size(min = 1, max = 255) String label,
         @Size(max = 500) String imageUrl
 ) {}

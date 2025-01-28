@@ -17,7 +17,7 @@ export default function RecipeForm() {
     carbs: "",
     sugars: "",
     fat: "",
-    image: null,
+    imageUrl: "",
   });
 
   const [newFormData, setNewFormData] = useState(new FormData());
@@ -169,6 +169,7 @@ export default function RecipeForm() {
         sugarsG: formData.sugars,
         fatG: formData.fat,
         categoryIds: [1],
+        imageUrl: "x",
         ingredientGroups: formData.ingredientGroups.map((group, idx) => {
           return {
             label: group.label,
@@ -195,7 +196,7 @@ export default function RecipeForm() {
         }),
       });
 
-      console.log(newFormData);
+      //console.log(newFormData);
       const res = createRecipe(newFormData);
       console.log(res);
     } catch (error) {
@@ -246,7 +247,7 @@ export default function RecipeForm() {
         />
       </div>
       {/* Image Upload */}
-      <div className="mb-6">
+      {/* <div className="mb-6">
         <label className="block text-gray-700 text-sm font-bold mb-2">
           Recipe Image
         </label>
@@ -256,7 +257,7 @@ export default function RecipeForm() {
           className="w-full p-2 border rounded-lg"
           onChange={handleFileChange}
         />
-      </div>
+      </div> */}
       {/* Times and Servings */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {["prepTime", "cookTime", "servings", "yield"].map((field, idx) => (
