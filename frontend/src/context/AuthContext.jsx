@@ -1,20 +1,21 @@
 "use client";
 // context/AuthContext.js
 import { createContext, useContext, useState, useEffect } from "react";
-
+import { useRouter } from "next/navigation";
 import axios from "axios";
 
 // Create Auth Context
 const AuthContext = createContext();
-
 const bffUrl = process.env.NEXT_PUBLIC_NODE_API;
 // Auth Provider Component
 export const AuthProvider = ({ children }) => {
+  const router = useRouter();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   // Function to log in
-  const login = async () => {
-    window.location.href = `${bffUrl}/login`;
+  const login = async (currentUrl = "") => {
+    localStorage.setItem("lastUrl", currentUrl);
+    router.push(`${bffUrl}/login`);
   };
 
   // Function to log out
@@ -28,6 +29,7 @@ export const AuthProvider = ({ children }) => {
       console.error("Error logging out:", error);
     }
   };
+
   const fetchSession = async () => {
     try {
       const response = await axios.get(`${bffUrl}/session`, {

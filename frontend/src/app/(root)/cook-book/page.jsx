@@ -2,13 +2,14 @@
 import React from "react";
 import RecipeCard from "@/components/RecipeCard";
 import { useAuth } from "@/context/AuthContext";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { LoaderIcon } from "lucide-react";
 const MyCookBook = () => {
   const { user, loading } = useAuth();
+  const router = useRouter();
   if (loading) return <LoaderIcon className="animate-spin m-auto" />;
   if (!user) {
-    redirect("/");
+    router.push("/");
   }
   const favoriteRecipes = [];
   const myRecipes = [];
@@ -16,11 +17,12 @@ const MyCookBook = () => {
     <div className="py-10 px-6">
       <h2 className="mx-2 font-bold text-2xl ">MY COOK BOOK</h2>
       <div className="text-right">
-        <a href="recipe/create">
-          <button className="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 mx-2 rounded">
-            New Recipe
-          </button>
-        </a>
+        <button
+          onClick={() => router.push("/recipe/create")}
+          className="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 mx-2 rounded"
+        >
+          New Recipe
+        </button>
       </div>
 
       <div>

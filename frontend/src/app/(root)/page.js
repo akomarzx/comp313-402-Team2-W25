@@ -1,9 +1,9 @@
 "use client";
 import React from "react";
 import { useAuth } from "../../context/AuthContext";
+import { redirect } from "next/navigation";
 const Home = () => {
   const { user, login, logout, loading } = useAuth();
-
   const handleLogin = async () => {
     await login();
   };
@@ -13,6 +13,13 @@ const Home = () => {
   };
 
   if (loading) return <p>Loading...</p>;
+
+  if (user && localStorage.getItem("lastUrl")) {
+    const redirectUrl = localStorage.getItem("lastUrl");
+    localStorage.removeItem("lastUrl");
+    console.log("Redirecting to:", redirectUrl);
+    redirect(redirectUrl);
+  }
 
   return (
     <div className="text-center py-12">

@@ -91,8 +91,8 @@ const Navbar = () => {
                     MY PROFILE
                   </Link>
                   <button
-                    onClick={() => {
-                      logout();
+                    onClick={async () => {
+                      await logout();
                     }}
                     className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-slate-600"
                   >
@@ -104,8 +104,9 @@ const Navbar = () => {
           ) : (
             <Link
               href="/"
-              onClick={() => {
-                login();
+              onClick={async (e) => {
+                e.preventDefault();
+                await login();
                 setIsOpen(false);
               }}
               className="hover:text-green-600"
@@ -225,8 +226,9 @@ const Navbar = () => {
             ) : (
               <Link
                 href="/"
-                onClick={() => {
-                  login();
+                onClick={async (e) => {
+                  e.preventDefault();
+                  await login();
                   setIsOpen(false);
                 }}
                 className="hover:text-green-600"

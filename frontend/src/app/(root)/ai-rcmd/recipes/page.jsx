@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-import { redirect, useSearchParams } from "next/navigation";
+import { redirect, useSearchParams, useRouter } from "next/navigation";
 
 import { RotateLoader } from "react-spinners";
-import { useRouter } from "next/navigation";
 import RecipeList from "@/components/RecipeList";
 import { useAuth } from "@/context/AuthContext";
 
@@ -20,7 +19,7 @@ const AIRecipies = () => {
 
   const [isQuerying, setIsQuerying] = useState(true);
   const [recipeCardData, setRecipeCardData] = useState([]);
-  React.useEffect(() => {
+  useEffect(() => {
     console.log(data);
     router.push("/ai-rcmd/recipes");
     const timer = setTimeout(() => {
