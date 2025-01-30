@@ -7,20 +7,15 @@ import {
   Trash2,
   Loader2Icon,
 } from "lucide-react";
-import { createRecipe } from "@/api/recipe";
+import { createRecipe, uploadImg } from "@/api/recipe";
 import { useRouter, redirect } from "next/navigation";
 import { toast } from "sonner";
 import { LoaderIcon } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const RecipeForm = () => {
   const router = useRouter();
-  const { user, loading } = useAuth();
-  if (loading) return <Loader2Icon className="animate-spin m-auto" />;
-  if (!user) {
-    redirect("/");
-  }
   const [formData, setFormData] = useState({
     title: "",
     summary: "",
@@ -28,8 +23,8 @@ const RecipeForm = () => {
     cookTime: "",
     servings: "",
     yield: "",
-    ingredientGroups: [],
-    stepGroups: [],
+    ingredientGroups: [{ label: "", ingredients: [[]] }],
+    stepGroups: [{ label: "", steps: [[]] }],
     calories: "",
     carbs: "",
     sugars: "",
@@ -38,6 +33,14 @@ const RecipeForm = () => {
   });
 
   const [isCreating, setIsCreating] = useState(false);
+  const [imgFile, setImgFile] = useState(null);
+
+  const { user, loading } = useAuth();
+  if (loading) return <Loader2Icon className="animate-spin m-auto" />;
+  if (!user) {
+    redirect("/");
+  }
+
   const handleChange = (e) => {
     const { id, value } = e.target;
     setFormData((prev) => ({
@@ -47,9 +50,19 @@ const RecipeForm = () => {
   };
 
   const handleFileChange = (e) => {
+    console.log(e.target.files[0]);
+    setImgFile(() => e.target.files[0]);
+  };
+
+  const addGroup = (field) => {
     setFormData((prev) => ({
       ...prev,
-      image: e.target.files[0],
+      [field]: [
+        ...prev[field],
+        field === "ingredientGroups"
+          ? { label: "", ingredients: [[]] }
+          : { label: "", steps: [[]] },
+      ],
     }));
   };
 
@@ -73,21 +86,6 @@ const RecipeForm = () => {
     });
   };
 
-  const addGroup = (field) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: [
-        ...prev[field],
-        field === "ingredientGroups"
-          ? { label: "", ingredients: [[]] }
-          : { label: "", steps: [[]] },
-      ],
-    }));
-  };
-  useEffect(() => {
-    addGroup("ingredientGroups");
-    addGroup("stepGroups");
-  }, []);
   const addSubField = (groupIndex, field) => {
     setFormData((prev) => {
       const updatedGroups = [...prev[field]];
@@ -172,12 +170,14 @@ const RecipeForm = () => {
       }),
     };
     try {
+      // const imgRes = await uploadImg({ file: imgFile });
+      console.log(imgRes);
       const res = await createRecipe(newFormData);
       console.log(res);
       if (res.status === 200 || 201) {
         toast("Recipe created successfully!");
         setTimeout(() => {
-          router.push(`/recipe/${res.data.id}`);
+          router.replace(`/recipe/${res.data.id}`);
         }, 1500);
       }
     } catch (error) {
@@ -238,17 +238,17 @@ const RecipeForm = () => {
           />
         </div>
         {/* Image Upload */}
-        {/* <div className="mb-6">
-        <label className="block text-gray-700 text-sm font-bold mb-2">
-          Recipe Image
-        </label>
-        <input
-          type="file"
-          accept="image/*"
-          className="w-full p-2 border rounded-lg"
-          onChange={handleFileChange}
-        />
-      </div> */}
+        <div className="mb-6">
+          <label className="block text-gray-700 text-sm font-bold mb-2">
+            Recipe Image
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            className="w-full p-2 border rounded-lg"
+            onChange={handleFileChange}
+          />
+        </div>
         {/* Times and Servings */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           {["prepTime", "cookTime", "servings", "yield"].map((field, idx) => (

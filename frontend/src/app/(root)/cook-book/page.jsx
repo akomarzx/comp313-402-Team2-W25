@@ -18,7 +18,7 @@ const MyCookBook = () => {
       <h2 className="mx-2 font-bold text-2xl ">MY COOK BOOK</h2>
       <div className="text-right">
         <button
-          onClick={() => router.push("/recipe/create")}
+          onClick={() => router.replace("/cook-book/create")}
           className="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 mx-2 rounded"
         >
           New Recipe

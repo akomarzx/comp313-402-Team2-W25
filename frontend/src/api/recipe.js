@@ -46,3 +46,37 @@ export async function createRecipe(data) {
     console.log("Error creating recipe:", error);
   }
 }
+
+export async function generateRecipe(data) {
+  console.log(data);
+  try {
+    const recipeResponse = await axios.post(
+      `${recipeUrl}/kc/v1/recipe/ai-recipe-recommend`,
+      data,
+      {
+        withCredentials: true,
+      }
+    );
+    return recipeResponse;
+  } catch (error) {
+    console.log("Error generating recipe:", error);
+  }
+}
+
+export async function uploadImg(data) {
+  try {
+    const imgResponse = await axios.post(
+      `${recipeUrl}/kc/v1/recipe/upload`,
+      data,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      }
+    );
+    return imgResponse;
+  } catch (error) {
+    console.log("Error uploading image:", error);
+  }
+}
