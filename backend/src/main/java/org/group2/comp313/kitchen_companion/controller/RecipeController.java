@@ -3,8 +3,11 @@ package org.group2.comp313.kitchen_companion.controller;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.group2.comp313.kitchen_companion.domain.Recipe;
 import org.group2.comp313.kitchen_companion.domain.projection.RecipeSummaryForCards;
+import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationResult;
+import org.group2.comp313.kitchen_companion.dto.recipe.AIRecipeRecommendationRequest;
 import org.group2.comp313.kitchen_companion.dto.recipe.ApiResult;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeDTO;
 import org.group2.comp313.kitchen_companion.service.AWSS3Service;
@@ -69,7 +72,7 @@ public class RecipeController extends BaseController {
     }
 
     @PostMapping
-    public ResponseEntity<Recipe> createRecipe( @RequestBody @Valid() RecipeDTO createRecipeDto,
+    public ResponseEntity<Recipe> createRecipe(@RequestBody @Valid() RecipeDTO createRecipeDto,
                                               @AuthenticationPrincipal(expression = "claims['email']") String createdByEmail) {
 
         this.log.info("Request to create recipe: {}", createRecipeDto.toString());
@@ -82,6 +85,18 @@ public class RecipeController extends BaseController {
     @PostMapping(path = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public String uploadFile(@RequestParam("file") MultipartFile file) {
         return awss3Service.uploadFile(file.getOriginalFilename(), file);
+    }
+
+    @PostMapping("/ai-recipe-recommend")
+    public ResponseEntity<ApiResult<AIRecipeRecommendationResult>> getAIRecipeRecommendation(@Valid @NotNull AIRecipeRecommendationRequest request) {
+
+        log.debug("Request to get ai recipe recommendation: {}", request);
+        try {
+            AIRecipeRecommendationResult result = this.recipeService.getAiRecipeRecommendation(request);
+            return new ResponseEntity<>(new ApiResult<>("Successful Generation.", result), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ApiResult<>(e.getLocalizedMessage(), null), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 //    @PostMapping("/etl")

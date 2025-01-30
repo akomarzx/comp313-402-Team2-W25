@@ -45,4 +45,8 @@ public class CodeValue {
     @Column(name = "updated_by", length = 256)
     private String updatedBy;
 
+    @Override
+    public String toString() {
+        return String.format("code_value_id: %s, label: %s", id, label);
+    }
 }
