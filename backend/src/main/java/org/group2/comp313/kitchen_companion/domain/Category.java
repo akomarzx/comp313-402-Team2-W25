@@ -39,4 +39,8 @@ public class Category {
     @Column(name = "updated_by", length = 256)
     private String updatedBy;
 
+    @Override
+    public String toString() {
+        return String.format("category_id: %s, category_label: %s", id, label);
+    }
 }
