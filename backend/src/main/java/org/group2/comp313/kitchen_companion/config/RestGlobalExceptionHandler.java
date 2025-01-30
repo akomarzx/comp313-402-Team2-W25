@@ -28,10 +28,10 @@ public class RestGlobalExceptionHandler {
     @ExceptionHandler(value = {Exception.class})
     public ResponseEntity<ErrorMessage> invalidRequestBody(Exception ex, WebRequest request) {
         ErrorMessage message = new ErrorMessage(
-                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 LocalDateTime.now(),
                 ex.getMessage());
 
-        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

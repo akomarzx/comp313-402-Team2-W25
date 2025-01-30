@@ -1,13 +1,17 @@
 package org.group2.comp313.kitchen_companion.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import org.group2.comp313.kitchen_companion.domain.Recipe;
-import org.group2.comp313.kitchen_companion.domain.RecipeCategory;
-import org.group2.comp313.kitchen_companion.domain.RecipeCategoryId;
 import org.group2.comp313.kitchen_companion.domain.projection.RecipeSummaryForCards;
+import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationResult;
+import org.group2.comp313.kitchen_companion.dto.ai.ChatCompletionResponse;
+import org.group2.comp313.kitchen_companion.dto.recipe.AIRecipeRecommendationRequest;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeDTO;
-import org.group2.comp313.kitchen_companion.repository.RecipeCategoryRepository;
 import org.group2.comp313.kitchen_companion.repository.RecipeRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,16 +27,16 @@ public class RecipeService extends BaseService {
     private final StaticCodeService staticCodeService;
     private final IngredientGroupService ingredientGroupService;
     private final StepGroupService stepGroupService;
+    private final RecipeCategoryService recipeCategoryService;
+    private final ChatGptClientService chatGptClientService;
 
-    // TODO: Moved into into its own service
-    private final RecipeCategoryRepository recipeCategoryRepository;
-
-    public RecipeService(RecipeRepository recipeRepository, StaticCodeService staticCodeService, IngredientGroupService ingredientGroupService, StepGroupService stepGroupService, RecipeCategoryRepository recipeCategoryRepository) {
+    public RecipeService(RecipeRepository recipeRepository, StaticCodeService staticCodeService, IngredientGroupService ingredientGroupService, StepGroupService stepGroupService, RecipeCategoryService recipeCategoryService, ChatGptClientService chatGptClientService) {
         this.recipeRepository = recipeRepository;
         this.staticCodeService = staticCodeService;
         this.ingredientGroupService = ingredientGroupService;
         this.stepGroupService = stepGroupService;
-        this.recipeCategoryRepository = recipeCategoryRepository;
+        this.recipeCategoryService = recipeCategoryService;
+        this.chatGptClientService = chatGptClientService;
     }
 
     @Transactional
@@ -57,17 +61,7 @@ public class RecipeService extends BaseService {
             newRecipe = this.recipeRepository.save(newRecipe);
 
             for(Integer categoryId : dto.categoryIds()) {
-                RecipeCategoryId recipeCategoryId = new RecipeCategoryId();
-                recipeCategoryId.setCategoryId(categoryId);
-                recipeCategoryId.setRecipeId(newRecipe.getId());
-
-                RecipeCategory newRecipeCategory = new RecipeCategory();
-                newRecipeCategory.setId(recipeCategoryId);
-                newRecipeCategory.setCreatedBy(createdByEmail);
-                newRecipeCategory.setCreatedAt(Instant.now());
-                newRecipeCategory.setUpdatedBy(null);
-                newRecipeCategory.setUpdatedAt(null);
-                this.recipeCategoryRepository.save(newRecipeCategory);
+                this.recipeCategoryService.createRecipeCategory(categoryId, newRecipe.getId(), createdByEmail);
             }
 
             newRecipe.setIngredientGroups(this.ingredientGroupService.createIngredientGroups(dto.ingredientGroups(), newRecipe.getId(), createdByEmail));
@@ -78,6 +72,24 @@ public class RecipeService extends BaseService {
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
             return null;
+        }
+    }
+
+    public AIRecipeRecommendationResult getAiRecipeRecommendation(AIRecipeRecommendationRequest aiRecipeRecommendationRequest) throws JsonProcessingException {
+
+        ChatCompletionResponse response = this.chatGptClientService.getRecipeRecommendations(aiRecipeRecommendationRequest);
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        String jsonDirty = response.choices().getFirst().message().content();
+        String cleanedJson = jsonDirty.replaceAll("^```json\\s*", "").replaceAll("```$", "");
+
+        try {
+            return mapper.readValue(cleanedJson, AIRecipeRecommendationResult.class);
+        }
+        catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw e;
         }
     }
 
