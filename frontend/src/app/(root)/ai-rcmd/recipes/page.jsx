@@ -5,8 +5,9 @@ import React, { useState, useEffect } from "react";
 import { redirect, useSearchParams, useRouter } from "next/navigation";
 
 import { RotateLoader } from "react-spinners";
-import RecipeList from "@/components/RecipeList";
 import { useAuth } from "@/context/AuthContext";
+import { generateRecipe } from "@/api/recipe";
+import DisplayRecipe from "@/components/DisplayRecipe";
 
 const AIRecipies = () => {
   const router = useRouter();
@@ -15,78 +16,31 @@ const AIRecipies = () => {
     redirect("/");
   }
   const searchParams = useSearchParams();
-  const data = JSON.parse(searchParams.get("data") || "{}");
 
   const [isQuerying, setIsQuerying] = useState(true);
-  const [recipeCardData, setRecipeCardData] = useState([]);
+  const [recipe, setRecipe] = useState(null);
   useEffect(() => {
-    console.log(data);
+    const data = JSON.parse(searchParams.get("data") || "{}");
+    const request = {
+      mealPreferences: [data.dietary],
+      ingredientList: data.ingredients,
+      allergiesAndRestrictions: data.allergies,
+    };
     router.push("/ai-rcmd/recipes");
-    const timer = setTimeout(() => {
-      setRecipeCardData([
-        {
-          id: "1",
-          title: "Creamy Mushroom Pasta",
-          description:
-            "A delicious vegetarian pasta dish with sautéed mushrooms in a creamy sauce.",
-          cookingTime: "30 mins",
-          difficulty: "Easy",
-          image:
-            "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
-        },
-        {
-          id: "2",
-          title: "Grilled Chicken Salad",
-          description:
-            "Fresh and healthy salad with grilled chicken breast and mixed greens.",
-          cookingTime: "25 mins",
-          difficulty: "Easy",
-          image:
-            "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
-        },
-        {
-          id: "3",
-          title: "Vegetable Stir-Fry",
-          description:
-            "Quick and easy vegetable stir-fry with your choice of protein.",
-          cookingTime: "20 mins",
-          difficulty: "Medium",
-          image:
-            "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
-        },
-        {
-          id: "4",
-          title: "Mediterranean Quinoa Bowl",
-          description:
-            "Healthy quinoa bowl with fresh vegetables and feta cheese.",
-          cookingTime: "35 mins",
-          difficulty: "Easy",
-          image:
-            "https://images.unsplash.com/photo-1505576399279-565b52d4ac71?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
-        },
-        {
-          id: "5",
-          title: "Spicy Thai Curry",
-          description:
-            "Aromatic Thai curry with coconut milk and fresh vegetables.",
-          cookingTime: "45 mins",
-          difficulty: "Medium",
-          image:
-            "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
-        },
-        {
-          id: "6",
-          title: "Classic Beef Burger",
-          description: "Juicy homemade beef burger with all the trimmings.",
-          cookingTime: "30 mins",
-          difficulty: "Medium",
-          image:
-            "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
-        },
-      ]);
-      setIsQuerying(false);
-    }, 3000);
-    return () => clearTimeout(timer);
+
+    console.log(request);
+    if (data) {
+      try {
+        const fetchAIRecipe = async () => {
+          const res = await generateRecipe(request);
+          setRecipe(res);
+          console.log(res);
+        };
+        fetchAIRecipe().then(() => setIsQuerying(false));
+      } catch (error) {
+        console.log("Error fetching recipe:", error);
+      }
+    }
   }, []);
 
   return (
@@ -100,8 +54,15 @@ const AIRecipies = () => {
             </p>
             <RotateLoader></RotateLoader>
           </div>
+        ) : recipe?.data.result.recipe ? (
+          <>
+            {/* <RecipeList recipeListData={recipeCardData} /> */}
+            <DisplayRecipe recipe={recipe.data.result.recipe} />
+          </>
         ) : (
-          <RecipeList recipeListData={recipeCardData} />
+          <div className="mx-auto text-center mt-40">
+            <p className="mb-10">No recipes found for your preferences</p>
+          </div>
         )}
       </div>
     </div>

@@ -88,7 +88,7 @@ public class RecipeController extends BaseController {
     }
 
     @PostMapping("/ai-recipe-recommend")
-    public ResponseEntity<ApiResult<AIRecipeRecommendationResult>> getAIRecipeRecommendation(@Valid @NotNull AIRecipeRecommendationRequest request) {
+    public ResponseEntity<ApiResult<AIRecipeRecommendationResult>> getAIRecipeRecommendation(@RequestBody @Valid() @NotNull AIRecipeRecommendationRequest request) {
 
         log.debug("Request to get ai recipe recommendation: {}", request);
         try {
