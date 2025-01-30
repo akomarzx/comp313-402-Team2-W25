@@ -1,13 +1,26 @@
 "use client";
-import { useEffect, useState } from "react";
-import { CirclePlus, CircleMinus, CopyPlus, Trash2 } from "lucide-react";
+
+import {
+  CirclePlus,
+  CircleMinus,
+  CopyPlus,
+  Trash2,
+  Loader2Icon,
+} from "lucide-react";
 import { createRecipe } from "@/api/recipe";
-import { useRouter } from "next/navigation";
+import { useRouter, redirect } from "next/navigation";
 import { toast } from "sonner";
 import { LoaderIcon } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { useEffect, useState } from "react";
 
-export default function RecipeForm() {
+const RecipeForm = () => {
   const router = useRouter();
+  const { user, loading } = useAuth();
+  if (loading) return <Loader2Icon className="animate-spin m-auto" />;
+  if (!user) {
+    redirect("/");
+  }
   const [formData, setFormData] = useState({
     title: "",
     summary: "",
@@ -435,4 +448,6 @@ export default function RecipeForm() {
       </form>
     </>
   );
-}
+};
+
+export default RecipeForm;

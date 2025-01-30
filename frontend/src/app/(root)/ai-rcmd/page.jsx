@@ -22,7 +22,7 @@ import {
   Calendar,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import { Input } from "@/components/ui/input";
 
@@ -35,7 +35,7 @@ const AIReccommend = () => {
   const [caloriesGoal, setCaloriesGoal] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, login } = useAuth();
 
   const handleGenerateMealPlan = async () => {
     if (ingredients.length === 0) {
@@ -43,22 +43,26 @@ const AIReccommend = () => {
       return;
     }
     setIsLoading(true);
+    const requestBody = {
+      ingredients,
+      dietary,
+      allergies,
+      mealPlanDays,
+      mealPlanGoal,
+      caloriesGoal,
+    };
     if (!user) {
       toast.error("Please login to generate meal plan");
       setIsLoading(false);
       setTimeout(() => {
-        router.push("/");
+        login(
+          `/ai-rcmd/meal-plan?data=${encodeURIComponent(
+            JSON.stringify(requestBody)
+          )}`
+        );
       }, 1500);
     } else {
       try {
-        const requestBody = {
-          ingredients,
-          dietary,
-          allergies,
-          mealPlanDays,
-          mealPlanGoal,
-          caloriesGoal,
-        };
         await new Promise((resolve) => setTimeout(resolve, 1500));
         router.push(
           `/ai-rcmd/meal-plan?data=${encodeURIComponent(
@@ -80,19 +84,24 @@ const AIReccommend = () => {
     }
 
     setIsLoading(true);
+    const requestBody = {
+      ingredients,
+      dietary,
+      allergies,
+    };
     if (!user) {
       toast.error("Please login to generate recipes");
       setIsLoading(false);
+
       setTimeout(() => {
-        router.push("/");
+        login(
+          `/ai-rcmd/recipes?data=${encodeURIComponent(
+            JSON.stringify(requestBody)
+          )}`
+        );
       }, 1500);
     } else {
       try {
-        const requestBody = {
-          ingredients,
-          dietary,
-          allergies,
-        };
         await new Promise((resolve) => setTimeout(resolve, 1500));
         router.push(
           `/ai-rcmd/recipes?data=${encodeURIComponent(
