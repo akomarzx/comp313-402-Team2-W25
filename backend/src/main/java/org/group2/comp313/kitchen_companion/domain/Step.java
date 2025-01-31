@@ -29,8 +29,8 @@ public class Step {
 
     @NotNull
     @Lob
-    @Column(name = "description", nullable = false)
-    private String description;
+    @Column(name = "label", nullable = false)
+    private String label;
 
     @Size(max = 500)
     @Column(name = "image_url", length = 500)
