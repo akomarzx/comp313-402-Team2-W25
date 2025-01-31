@@ -5,7 +5,7 @@ import org.group2.comp313.kitchen_companion.domain.CodeBook;
 import org.group2.comp313.kitchen_companion.domain.CodeValue;
 import org.group2.comp313.kitchen_companion.dto.ai.ChatCompletionRequest;
 import org.group2.comp313.kitchen_companion.dto.ai.ChatCompletionResponse;
-import org.group2.comp313.kitchen_companion.dto.recipe.AIRecipeRecommendationRequest;
+import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationRequest;
 import org.group2.comp313.kitchen_companion.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
