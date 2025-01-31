@@ -10,4 +10,5 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 public interface RecipeRepository extends PagingAndSortingRepository<Recipe, Integer>, CrudRepository<Recipe, Integer>, JpaSpecificationExecutor<Recipe> {
     Page<RecipeSummaryForCards> findAllBy(Pageable pageable);
+    Page<RecipeSummaryForCards> findAllByCreatedByOrderByIdDesc(String createdBy, Pageable pageable);
 }

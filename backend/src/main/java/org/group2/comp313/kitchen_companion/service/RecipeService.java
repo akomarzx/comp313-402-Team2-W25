@@ -10,7 +10,10 @@ import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationResult;
 import org.group2.comp313.kitchen_companion.dto.ai.ChatCompletionResponse;
 import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationRequest;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeDTO;
+import org.group2.comp313.kitchen_companion.dto.recipe.UpdateRecipeDTO;
+import org.group2.comp313.kitchen_companion.mapper.RecipeMapper;
 import org.group2.comp313.kitchen_companion.repository.RecipeRepository;
+import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -45,6 +48,11 @@ public class RecipeService extends BaseService {
     public Page<RecipeSummaryForCards> getRecipes(Integer page, Integer size) {
         Pageable pageRequest = PageRequest.of(page, size);
         return this.recipeRepository.findAllBy(pageRequest);
+    }
+
+    public Page<RecipeSummaryForCards> getRecipesByCreatedBy(String createdBy, Integer page, Integer size) {
+        Pageable pageRequest = PageRequest.of(page, size);
+        return this.recipeRepository.findAllByCreatedByOrderByIdDesc(createdBy, pageRequest);
     }
 
     @Transactional
@@ -89,6 +97,15 @@ public class RecipeService extends BaseService {
             log.error(e.getMessage(), e);
             throw e;
         }
+    }
+
+    public Boolean updateRecipe(Integer recipeId, UpdateRecipeDTO updateRecipeDTO) {
+
+        RecipeMapper recipeMapper = Mappers.getMapper(RecipeMapper.class);
+        Recipe recipeToUpdate = this.recipeRepository.findById(recipeId).orElse(null);
+        recipeMapper.partialUpdate(updateRecipeDTO, recipeToUpdate);
+
+        return true;
     }
 
     private Recipe mapDtoToRecipe(RecipeDTO dto) {

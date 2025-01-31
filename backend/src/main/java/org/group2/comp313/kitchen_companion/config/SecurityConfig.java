@@ -1,8 +1,6 @@
 package org.group2.comp313.kitchen_companion.config;
 
 import lombok.RequiredArgsConstructor;
-import org.keycloak.representations.adapters.config.PolicyEnforcerConfig;
-import org.keycloak.util.JsonSerialization;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

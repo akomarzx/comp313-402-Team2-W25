@@ -10,6 +10,7 @@ import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationResult;
 import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationRequest;
 import org.group2.comp313.kitchen_companion.dto.ApiResult;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeDTO;
+import org.group2.comp313.kitchen_companion.dto.recipe.UpdateRecipeDTO;
 import org.group2.comp313.kitchen_companion.service.AWSS3Service;
 import org.group2.comp313.kitchen_companion.service.RecipeService;
 
@@ -71,19 +72,37 @@ public class RecipeController extends BaseController {
         }
     }
 
-    @PostMapping
-    public ResponseEntity<Recipe> createRecipe(@RequestBody @Valid() RecipeDTO createRecipeDto,
-                                              @AuthenticationPrincipal(expression = "claims['email']") String createdByEmail) {
+    @GetMapping("/my-recipe")
+    public ResponseEntity<ApiResult<Page<RecipeSummaryForCards>>>getAllUserRecipes(@RequestParam Integer page,
+                                                                                   @RequestParam Integer size,
+                                                                                   @AuthenticationPrincipal(expression = "claims['email']") String userEmail) {
+        try {
+            return ResponseEntity.ok(new ApiResult<>("" ,this.recipeService.getRecipesByCreatedBy(userEmail, page, size)));
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ApiResult<>(e.getLocalizedMessage(), null), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
-        this.log.info("Request to create recipe: {}", createRecipeDto.toString());
-        this.log.info("Request By {}", createdByEmail);
-
-         Recipe newRecipe = this.recipeService.createRecipe(createRecipeDto, createdByEmail);
-        return new ResponseEntity<Recipe>(newRecipe,HttpStatus.OK);
     }
 
-    @PostMapping(path = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping
+    public ResponseEntity<ApiResult<Recipe>> createRecipe(@RequestBody @Valid() RecipeDTO createRecipeDto,
+                                              @AuthenticationPrincipal(expression = "claims['email']") String createdByEmail) {
+
+        this.log.debug("Request to create recipe: {}", createRecipeDto.toString());
+        this.log.debug("Request By {}", createdByEmail);
+
+         Recipe newRecipe = this.recipeService.createRecipe(createRecipeDto, createdByEmail);
+
+        return new ResponseEntity<>(new ApiResult<>("New recipe had been successfully created.", newRecipe),HttpStatus.OK);
+
+    }
+
+    @PostMapping(path = "/img-upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public String uploadFile(@RequestParam("file") MultipartFile file) {
+
+        log.debug("Request to upload file: {}", file.getOriginalFilename());
+        log.debug("Request to upload file size: {}", file.getSize());
+
         return awss3Service.uploadFile(file.getOriginalFilename(), file);
     }
 
@@ -91,11 +110,22 @@ public class RecipeController extends BaseController {
     public ResponseEntity<ApiResult<AIRecipeRecommendationResult>> getAIRecipeRecommendation(@RequestBody @Valid() @NotNull AIRecipeRecommendationRequest request) {
 
         log.debug("Request to get ai recipe recommendation: {}", request);
+
         try {
             AIRecipeRecommendationResult result = this.recipeService.getAiRecipeRecommendation(request);
             return new ResponseEntity<>(new ApiResult<>("Successful Generation.", result), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ApiResult<>(e.getLocalizedMessage(), null), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResult<Boolean>> updateRecipe(@PathVariable Integer id, @RequestBody @Valid() UpdateRecipeDTO updateRecipeDto) {
+        try {
+            Boolean result = this.recipeService.updateRecipe(id, updateRecipeDto);
+            return new ResponseEntity<>(new ApiResult<>("Recipe Update Successful.", result), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ApiResult<>(e.getLocalizedMessage(), false), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
