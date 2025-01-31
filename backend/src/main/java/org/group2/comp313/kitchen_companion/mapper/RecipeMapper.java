@@ -8,5 +8,7 @@ import org.mapstruct.*;
 public interface RecipeMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(ignore = true, target = "prepTimeUnitCd")
+    @Mapping(ignore = true, target = "cookTimeUnitCd")
     Recipe partialUpdate(UpdateRecipeDTO recipeDTO, @MappingTarget Recipe recipe);
 }

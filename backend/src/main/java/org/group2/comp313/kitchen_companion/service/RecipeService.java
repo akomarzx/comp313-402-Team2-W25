@@ -105,6 +105,9 @@ public class RecipeService extends BaseService {
         Recipe recipeToUpdate = this.recipeRepository.findById(recipeId).orElse(null);
         recipeMapper.partialUpdate(updateRecipeDTO, recipeToUpdate);
 
+        assert recipeToUpdate != null;
+        this.recipeRepository.save(recipeToUpdate);
+
         return true;
     }
 
