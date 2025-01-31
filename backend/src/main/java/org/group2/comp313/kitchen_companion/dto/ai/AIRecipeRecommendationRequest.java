@@ -1,4 +1,4 @@
-package org.group2.comp313.kitchen_companion.dto.recipe;
+package org.group2.comp313.kitchen_companion.dto.ai;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

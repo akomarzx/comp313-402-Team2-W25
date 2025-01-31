@@ -1,8 +1,6 @@
 package org.group2.comp313.kitchen_companion.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
@@ -10,7 +8,7 @@ import org.group2.comp313.kitchen_companion.domain.Recipe;
 import org.group2.comp313.kitchen_companion.domain.projection.RecipeSummaryForCards;
 import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationResult;
 import org.group2.comp313.kitchen_companion.dto.ai.ChatCompletionResponse;
-import org.group2.comp313.kitchen_companion.dto.recipe.AIRecipeRecommendationRequest;
+import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationRequest;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeDTO;
 import org.group2.comp313.kitchen_companion.repository.RecipeRepository;
 import org.springframework.data.domain.Page;
