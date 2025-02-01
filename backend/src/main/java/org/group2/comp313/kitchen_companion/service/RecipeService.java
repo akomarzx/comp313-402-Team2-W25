@@ -2,6 +2,7 @@ package org.group2.comp313.kitchen_companion.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import org.group2.comp313.kitchen_companion.domain.Recipe;
@@ -13,6 +14,8 @@ import org.group2.comp313.kitchen_companion.dto.recipe.RecipeDTO;
 import org.group2.comp313.kitchen_companion.dto.recipe.UpdateRecipeDTO;
 import org.group2.comp313.kitchen_companion.mapper.RecipeMapper;
 import org.group2.comp313.kitchen_companion.repository.RecipeRepository;
+import org.group2.comp313.kitchen_companion.utility.EntityToBeUpdatedNotFoundException;
+import org.group2.comp313.kitchen_companion.utility.IdMismatchedException;
 import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Objects;
 
 @Service
 public class RecipeService extends BaseService {
@@ -99,16 +103,34 @@ public class RecipeService extends BaseService {
         }
     }
 
-    public Boolean updateRecipe(Integer recipeId, UpdateRecipeDTO updateRecipeDTO) {
+    public Boolean updateRecipe(Integer recipeId, UpdateRecipeDTO updateRecipeDTO, String updatedByEmail) {
 
         RecipeMapper recipeMapper = Mappers.getMapper(RecipeMapper.class);
-        Recipe recipeToUpdate = this.recipeRepository.findById(recipeId).orElse(null);
-        recipeMapper.partialUpdate(updateRecipeDTO, recipeToUpdate);
+        Recipe recipeToUpdate = this.recipeRepository.findByIdAndCreatedBy(recipeId, updatedByEmail).orElse(null);
 
-        assert recipeToUpdate != null;
-        this.recipeRepository.save(recipeToUpdate);
+        if(recipeToUpdate != null) {
 
-        return true;
+            if(!Objects.equals(recipeToUpdate.getId(), recipeId)) {
+                throw new IdMismatchedException("Recipe Id in body does not match Recipe Id from path.");
+            }
+
+            recipeMapper.partialUpdate(updateRecipeDTO, recipeToUpdate);
+            if(updateRecipeDTO.prepTimeUnitCd() != null) {
+                recipeToUpdate.setPrepTimeUnitCd(this.staticCodeService.getCodeValueUsingCodeValueId(updateRecipeDTO.prepTimeUnitCd()).get());
+            }
+
+            if(updateRecipeDTO.cookTimeUnitCd() != null) {
+                recipeToUpdate.setCookTimeUnitCd(this.staticCodeService.getCodeValueUsingCodeValueId(updateRecipeDTO.cookTimeUnitCd()).get());
+            }
+
+            recipeToUpdate.setUpdatedBy(updatedByEmail);
+            recipeToUpdate.setUpdatedAt(Instant.now());
+
+            this.recipeRepository.save(recipeToUpdate);
+            return true;
+        } else {
+            throw new EntityToBeUpdatedNotFoundException("Recipe with id " + recipeId + " not found or does not belong to user.");
+        }
     }
 
     private Recipe mapDtoToRecipe(RecipeDTO dto) {

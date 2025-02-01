@@ -3,6 +3,7 @@ package org.group2.comp313.kitchen_companion.utility;
 import java.time.LocalDateTime;
 
 public class ErrorMessage {
+
     private final int statusCode;
     private final LocalDateTime timestamp;
     private final String message;
