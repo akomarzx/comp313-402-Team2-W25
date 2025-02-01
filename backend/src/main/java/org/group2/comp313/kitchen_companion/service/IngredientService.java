@@ -1,8 +1,11 @@
 package org.group2.comp313.kitchen_companion.service;
 
 import org.group2.comp313.kitchen_companion.domain.Ingredient;
+import org.group2.comp313.kitchen_companion.domain.Step;
+import org.group2.comp313.kitchen_companion.dto.recipe.ComponentUpdateDto;
 import org.group2.comp313.kitchen_companion.dto.recipe.IngredientDTO;
 import org.group2.comp313.kitchen_companion.repository.IngredientRepository;
+import org.group2.comp313.kitchen_companion.utility.EntityToBeUpdatedNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -16,7 +19,7 @@ public class IngredientService extends BaseService {
         this.ingredientRepository = ingredientRepository;
     }
 
-    public void createIngredient(IngredientDTO ingredientDTO, Integer ingredientGroupId, String createdBy) {
+    public Ingredient createIngredient(IngredientDTO ingredientDTO, Integer ingredientGroupId, String createdBy) {
 
         Ingredient newIngredient = new Ingredient();
 
@@ -29,6 +32,27 @@ public class IngredientService extends BaseService {
         newIngredient.setUpdatedAt(null);
         newIngredient.setUpdatedBy(null);
 
-        ingredientRepository.save(newIngredient);
+        return ingredientRepository.save(newIngredient);
+    }
+
+    public void updateIngredient(ComponentUpdateDto dto, String updatedBy) {
+
+        Ingredient ingredient = ingredientRepository.findByIdAndCreatedBy(dto.id(), updatedBy).orElse(null);
+
+        if (ingredient == null) {
+            throw new EntityToBeUpdatedNotFoundException("Ingredient not found. Please check the id or if this belongs to user.");
+        } else {
+            ingredient.setUpdatedBy(updatedBy);
+            ingredient.setUpdatedAt(Instant.now());
+            if(dto.label() != null){
+                ingredient.setLabel(dto.label());
+            }
+
+            if(dto.imageUrl() != null){
+                ingredient.setImageUrl(dto.imageUrl());
+            }
+
+            ingredientRepository.save(ingredient);
+        }
     }
 }
