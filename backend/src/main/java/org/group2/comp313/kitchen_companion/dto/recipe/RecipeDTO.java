@@ -6,11 +6,13 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.group2.comp313.kitchen_companion.annotation.ValidateCodeID;
+import org.group2.comp313.kitchen_companion.utility.ValidationGroups;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 public record RecipeDTO(
+        @NotNull(groups = ValidationGroups.Update.class) Integer id,
         @NotNull @Size(min = 1, max = 256) String title,
         @Size(max = 255) String summary,
         @NotNull @Min(1) int prepTime,
