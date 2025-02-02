@@ -120,14 +120,6 @@ public class RecipeService extends BaseService {
             recipeToUpdate.setUpdatedBy(updatedByEmail);
             recipeToUpdate.setUpdatedAt(Instant.now());
 
-            for(StepGroupDTO stepGroupDTO : updateRecipeDTO.stepGroups()) {
-                this.stepGroupService.updateStepGroup(stepGroupDTO, recipeToUpdate.getId(), stepGroupDTO.id(), updatedByEmail);
-            }
-
-            for(IngredientGroupDTO ingredientGroupDTO : updateRecipeDTO.ingredientGroups()) {
-                this.ingredientGroupService.updateIngredientGroup(ingredientGroupDTO, recipeToUpdate.getId(), ingredientGroupDTO.id(), updatedByEmail);
-            }
-
             this.recipeRepository.save(recipeToUpdate);
 
            return true;

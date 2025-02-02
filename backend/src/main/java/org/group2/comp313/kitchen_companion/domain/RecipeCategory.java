@@ -38,10 +38,4 @@ public class RecipeCategory {
     @JsonIgnore
     private String updatedBy;
 
-    @MapsId("recipeId")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "recipe_id")
-    @JsonIgnore
-    private Recipe recipe;
-
 }

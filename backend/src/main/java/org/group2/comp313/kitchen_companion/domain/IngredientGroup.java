@@ -51,7 +51,7 @@ public class IngredientGroup {
     @Column(name = "updated_by", length = 256)
     private String updatedBy;
 
-    @OneToMany(mappedBy = "ingredientGroup", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "ingredientGroup", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     private Set<Ingredient> ingredients = new LinkedHashSet<>();
 
 }

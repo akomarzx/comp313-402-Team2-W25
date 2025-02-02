@@ -94,7 +94,4 @@ public class Recipe {
     @OneToMany(mappedBy = "recipe", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     private Set<StepGroup> stepGroups = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "recipe", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
-    private Set<RecipeCategory> recipeCategories = new LinkedHashSet<>();
-
 }

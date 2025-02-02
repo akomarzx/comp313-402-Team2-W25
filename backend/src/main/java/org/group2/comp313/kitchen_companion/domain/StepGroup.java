@@ -51,7 +51,7 @@ public class StepGroup {
     @Column(name = "updated_by", length = 256)
     private String updatedBy;
 
-    @OneToMany(mappedBy = "stepGroup", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "stepGroup", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     private Set<Step> steps = new LinkedHashSet<>();
 
 }
