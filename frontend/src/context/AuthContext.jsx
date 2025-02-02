@@ -36,8 +36,10 @@ export const AuthProvider = ({ children }) => {
         withCredentials: true,
       });
       if (response.data.authenticated) {
+        console.log("User is authenticated:", response.data.user);
         setUser(response.data.user);
       } else {
+        console.log("User is not authenticated");
         setUser(null);
       }
     } catch (error) {
@@ -54,7 +56,9 @@ export const AuthProvider = ({ children }) => {
 
   // Provide the authentication state and actions
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider
+      value={{ user, login, logout, loading, fetchSession }}
+    >
       {children}
     </AuthContext.Provider>
   );

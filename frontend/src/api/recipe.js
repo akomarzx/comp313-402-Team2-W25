@@ -66,7 +66,7 @@ export async function generateRecipe(data) {
 export async function uploadImg(data) {
   try {
     const imgResponse = await axios.post(
-      `${recipeUrl}/kc/v1/recipe/upload`,
+      `${recipeUrl}/kc/v1/recipe/img-upload`,
       data,
       {
         headers: {
@@ -78,5 +78,36 @@ export async function uploadImg(data) {
     return imgResponse;
   } catch (error) {
     console.log("Error uploading image:", error);
+  }
+}
+
+export async function getMyRecipes(page) {
+  try {
+    console.log(page);
+    const recipes = await axios.get(
+      `${recipeUrl}/kc/v1/recipe/my-recipe?size=${10}&page=${page}`,
+      {
+        withCredentials: true,
+      }
+    );
+    console.log(recipes.data.result);
+    return recipes.data.result;
+  } catch (error) {
+    console.log("Error fetching my recipes:", error);
+  }
+}
+
+export async function updateRecipe(recipeId, data) {
+  try {
+    const recipeResponse = await axios.put(
+      `${recipeUrl}/kc/v1/recipe/${recipeId}`,
+      data,
+      {
+        withCredentials: true,
+      }
+    );
+    return recipeResponse;
+  } catch (error) {
+    console.log("Error updating recipe:", error);
   }
 }

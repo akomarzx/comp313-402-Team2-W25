@@ -24,6 +24,13 @@ const nextConfig = {
         pathname: "**",
         search: "",
       },
+      {
+        protocol: "https",
+        hostname: "kitchen-companion-team-2.s3.amazonaws.com",
+        port: "",
+        pathname: "**",
+        search: "",
+      },
     ],
   },
 };

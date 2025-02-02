@@ -2,11 +2,22 @@ import Image from "next/image";
 import React from "react";
 import Link from "next/link";
 
-const RecipeCard = ({ data }) => {
+const RecipeCard = ({ data, version = 1 }) => {
+  const cardStyle =
+    version === 2
+      ? "w-[170px] min-h-[180px] p-2"
+      : "w-[300px] min-h-[300px] p-4";
+
+  const imageStyle = version === 2 ? "h-[150px]" : "h-[200px]";
+
   return (
-    <div className="hover:scale-[101%] border w-[300px] min-h-[300px] max-h-[500px] p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-700 mx-auto">
+    <div
+      className={`hover:scale-[101%] border ${cardStyle} max-h-[500px]  bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-700 mx-auto`}
+    >
       <Link href={`/recipe/${data?.id}`}>
-        <div className="relative w-full h-[200px] rounded-md overflow-hidden ">
+        <div
+          className={`relative w-full ${imageStyle} rounded-md overflow-hidden`}
+        >
           <Image
             src={
               data?.thumbnailUrl ||
@@ -20,12 +31,18 @@ const RecipeCard = ({ data }) => {
         </div>
 
         <div className="py-4">
-          <h3 className="text-lg font-bold text-gray-800 truncate">
+          <h3
+            className={`${
+              version === 2 ? "font-bold" : "font-semibold"
+            } font-bold text-gray-800 truncate`}
+          >
             {data?.title}
           </h3>
-          <p className="text-sm text-gray-600 mt-2 line-clamp-3">
-            {data?.summary}
-          </p>
+          {version === 1 && (
+            <p className="text-sm text-gray-600 mt-2 line-clamp-3">
+              {data?.summary}
+            </p>
+          )}
         </div>
       </Link>{" "}
     </div>

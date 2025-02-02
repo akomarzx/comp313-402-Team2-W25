@@ -17,18 +17,17 @@ const app = express();
 const PORT = process.env.PORT;
 app.set("trust proxy", 1);
 
-const MySQLStore = require('express-mysql-session')(session);
+const MySQLStore = require("express-mysql-session")(session);
 
 const options = {
-	host: process.env.SESSION_STORE_DB_HOST,
-	port: process.env.SESSION_STORE_DB_PORT,
-	user: process.env.SESSION_STORE_DB_USER,
-	password: process.env.SESSION_STORE_DB_PASSWORD,
-	database: process.env.SESSION_STORE_DB_DATABASE
+  host: process.env.SESSION_STORE_DB_HOST,
+  port: process.env.SESSION_STORE_DB_PORT,
+  user: process.env.SESSION_STORE_DB_USER,
+  password: process.env.SESSION_STORE_DB_PASSWORD,
+  database: process.env.SESSION_STORE_DB_DATABASE,
 };
 
 const sessionStore = new MySQLStore(options);
-
 
 const OAUTH_CONFIG = {
   authorizationURL: process.env.OAUTH_AUTHORIZATION_URL,
@@ -130,7 +129,6 @@ let destroySession = async (req, res) => {
         });
 
         res.status(200).json({ message: "Logged out successfully" });
-
       });
     });
   } catch (error) {
@@ -155,7 +153,6 @@ const introspectToken = async (token) => {
     );
 
     return response.data.active;
-
   } catch (error) {
     console.error(
       "Error during token introspection:",
@@ -180,7 +177,7 @@ const refreshAccessToken = async (refreshToken) => {
 
     return {
       accessToken: response.data.access_token,
-      refreshToken: response.data.refresh_token
+      refreshToken: response.data.refresh_token,
     };
   } catch (error) {
     console.error(
@@ -218,14 +215,11 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(async (req, res, next) => {
-
   if (req.isAuthenticated() && req.user?.accessToken) {
     try {
-
       const isValid = await introspectToken(req.user.accessToken);
 
       if (!isValid) {
-
         const newTokens = await refreshAccessToken(req.user.refreshToken);
 
         if (!newTokens) {
@@ -270,7 +264,6 @@ app.get(
 );
 
 app.get("/session", (req, res) => {
-
   if (req.isAuthenticated()) {
     const { profile } = req.user;
 

@@ -78,8 +78,8 @@ const AIReccommend = () => {
     }
   };
   const handleGenerateRecipes = async () => {
-    if (ingredients.length === 0) {
-      toast.error("Please add at least one ingredient");
+    if (ingredients.length < 3) {
+      toast.error("Please add at least three ingredient");
       return;
     }
 
