@@ -88,7 +88,7 @@ const RecipePage = () => {
   return (
     <div className="py-10">
       <div>
-        {!isLoading && <RecipeCarousel data={recipeCardData.slice(0, 5)} />}
+        {!isLoading && <RecipeCarousel data={recipeCardData?.slice(0, 5)} />}
       </div>
       <div className="mx-auto max-w-[600px] mb-5">
         <h3 className="font-semibold text-normal p-2 mt-6">

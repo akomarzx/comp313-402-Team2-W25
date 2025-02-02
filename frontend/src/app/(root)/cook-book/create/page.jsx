@@ -169,12 +169,41 @@ const RecipeForm = () => {
         };
       }),
     };
+    if (newFormData.ingredientGroups?.length < 1) {
+      toast("Please add at least one ingredient group.");
+      setIsCreating(false);
+      return;
+    }
+    if (newFormData.stepGroups?.length < 1) {
+      toast("Please add at least one step group.");
+      setIsCreating(false);
+      return;
+    }
+    newFormData.ingredientGroups?.map((group) => {
+      if (group.ingredients.length < 1) {
+        toast("Please add at least one ingredient.");
+        setIsCreating(false);
+        return;
+      }
+    });
+    newFormData.stepGroups?.map((group) => {
+      if (group.steps.length < 1) {
+        toast("Please add at least one step.");
+        setIsCreating(false);
+        return;
+      }
+    });
+
     try {
-      // const imgRes = await uploadImg({ file: imgFile });
+      const imgRes = await uploadImg({ file: imgFile });
       console.log(imgRes);
+      if (imgRes.status === 200) {
+        newFormData.imageUrl = imgRes.data;
+        newFormData.thumbnailUrl = imgRes.data;
+      }
       const res = await createRecipe(newFormData);
       console.log(res);
-      if (res.status === 200 || 201) {
+      if (res?.status === 200 || 201) {
         toast("Recipe created successfully!");
         setTimeout(() => {
           router.replace(`/recipe/${res.data.id}`);

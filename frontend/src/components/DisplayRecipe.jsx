@@ -1,18 +1,52 @@
 import React from "react";
-
+import { Edit, SaveIcon } from "lucide-react";
 import Image from "next/image";
-const DisplayRecipe = ({ recipe }) => {
+import { useRouter } from "next/navigation";
+import { createRecipe } from "@/api/recipe";
+import { toast } from "sonner";
+const DisplayRecipe = ({
+  recipe,
+  updateButton = false,
+  saveButton = false,
+}) => {
+  const router = useRouter();
   return (
     <div>
       {" "}
       <div className="container mx-auto px-4 max-w-4xl">
-        <div className="mb-8 text-center">
+        <div className="mb-4 text-center">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">
             {recipe?.title}
           </h1>
           <p className="text-gray-600">{recipe?.summary}</p>
         </div>
-
+        {updateButton && (
+          <div
+            className="flex cursor-pointer w-[200px] text-center p-2  mb-4 font-semibold text-gray-600 border border-gray-200 rounded-lg hover:shadow-md transition-shadow"
+            onClick={() => {
+              router.push(`/recipe/update/${recipe?.id}`);
+            }}
+          >
+            <Edit size={16} className="mr-2" /> Update this Recipe
+          </div>
+        )}
+        {saveButton && (
+          <div
+            className="flex cursor-pointer w-[200px] text-center p-2  mb-4 font-semibold text-gray-600 border border-gray-200 rounded-lg hover:shadow-md transition-shadow"
+            onClick={async () => {
+              const res = await createRecipe(recipe);
+              console.log(res);
+              if (res?.status === 200 || 201) {
+                toast("Recipe added successfully!");
+                setTimeout(() => {
+                  router.replace(`/recipe/${res.data.id}`);
+                }, 1500);
+              }
+            }}
+          >
+            <SaveIcon size={16} className="mr-2" /> Save this Recipe
+          </div>
+        )}
         {/* Recipe Image */}
         <div className="relative w-full h-[300px] md:h-[400px] rounded-lg overflow-hidden mb-8">
           <Image

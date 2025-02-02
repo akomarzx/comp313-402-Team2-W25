@@ -56,8 +56,10 @@ const AIRecipies = () => {
           </div>
         ) : recipe?.data.result.recipe ? (
           <>
-            {/* <RecipeList recipeListData={recipeCardData} /> */}
-            <DisplayRecipe recipe={recipe.data.result.recipe} />
+            <DisplayRecipe
+              recipe={recipe.data.result.recipe}
+              saveButton={true}
+            />
           </>
         ) : (
           <div className="mx-auto text-center mt-40">
