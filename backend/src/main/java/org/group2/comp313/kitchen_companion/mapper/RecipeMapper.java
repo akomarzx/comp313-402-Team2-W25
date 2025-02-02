@@ -3,9 +3,7 @@ package org.group2.comp313.kitchen_companion.mapper;
 import org.group2.comp313.kitchen_companion.domain.Recipe;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeDTO;
 import org.group2.comp313.kitchen_companion.dto.recipe.UpdateRecipeDTO;
-import org.group2.comp313.kitchen_companion.service.StaticCodeService;
 import org.mapstruct.*;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
         componentModel = MappingConstants.ComponentModel.SPRING,
@@ -39,4 +37,5 @@ public interface RecipeMapper {
     @Mapping(target = "prepTimeUnitCd", source = "prepTimeUnitCd", qualifiedByName = "toEntity")
     @Mapping(target = "cookTimeUnitCd", source = "cookTimeUnitCd", qualifiedByName = "toEntity")
     Recipe partialUpdate(RecipeDTO recipeDTO, @MappingTarget Recipe recipe);
+
 }

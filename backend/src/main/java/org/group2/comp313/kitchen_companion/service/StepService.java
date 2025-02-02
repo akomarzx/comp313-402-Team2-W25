@@ -5,6 +5,7 @@ import org.group2.comp313.kitchen_companion.domain.Step;
 import org.group2.comp313.kitchen_companion.dto.recipe.ComponentUpdateDto;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeComponentUpdateDto;
 import org.group2.comp313.kitchen_companion.dto.recipe.StepDTO;
+import org.group2.comp313.kitchen_companion.mapper.StepMapper;
 import org.group2.comp313.kitchen_companion.repository.StepRepository;
 import org.group2.comp313.kitchen_companion.utility.EntityToBeUpdatedNotFoundException;
 import org.springframework.stereotype.Service;
@@ -15,9 +16,11 @@ import java.time.Instant;
 public class StepService extends BaseService {
 
     private final StepRepository stepRepository;
+    private final StepMapper stepMapper;
 
-    public StepService(StepRepository stepRepository) {
+    public StepService(StepRepository stepRepository, StepMapper stepMapper) {
         this.stepRepository = stepRepository;
+        this.stepMapper = stepMapper;
     }
 
     public Step createStep(StepDTO newStepDto, Integer stepGroupId, String createdBy) {
@@ -54,6 +57,24 @@ public class StepService extends BaseService {
             if(dto.imageUrl() != null){
                 step.setImageUrl(dto.imageUrl());
             }
+
+            stepRepository.save(step);
+
+        }
+    }
+
+    public void updateStep(StepDTO dto, String updatedBy) {
+
+        Step step = stepRepository.findByIdAndCreatedBy(dto.id(), updatedBy).orElse(null);
+
+        if (step == null) {
+            throw new EntityToBeUpdatedNotFoundException("Step not found. Please check the id or if this belongs to user.");
+        } else {
+
+            step.setUpdatedBy(updatedBy);
+            step.setUpdatedAt(Instant.now());
+
+            this.stepMapper.partialUpdate(dto, step);
 
             stepRepository.save(step);
 

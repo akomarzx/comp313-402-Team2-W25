@@ -9,7 +9,9 @@ import org.group2.comp313.kitchen_companion.domain.projection.RecipeSummaryForCa
 import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationResult;
 import org.group2.comp313.kitchen_companion.dto.ai.ChatCompletionResponse;
 import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationRequest;
+import org.group2.comp313.kitchen_companion.dto.recipe.IngredientGroupDTO;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeDTO;
+import org.group2.comp313.kitchen_companion.dto.recipe.StepGroupDTO;
 import org.group2.comp313.kitchen_companion.dto.recipe.UpdateRecipeDTO;
 import org.group2.comp313.kitchen_companion.mapper.RecipeMapper;
 import org.group2.comp313.kitchen_companion.repository.RecipeRepository;
@@ -114,12 +116,22 @@ public class RecipeService extends BaseService {
         if(recipeToUpdate != null) {
 
             recipeMapper.partialUpdate(updateRecipeDTO, recipeToUpdate);
+
             recipeToUpdate.setUpdatedBy(updatedByEmail);
             recipeToUpdate.setUpdatedAt(Instant.now());
+
+            for(StepGroupDTO stepGroupDTO : updateRecipeDTO.stepGroups()) {
+                this.stepGroupService.updateStepGroup(stepGroupDTO, recipeToUpdate.getId(), stepGroupDTO.id(), updatedByEmail);
+            }
+
+            for(IngredientGroupDTO ingredientGroupDTO : updateRecipeDTO.ingredientGroups()) {
+                this.ingredientGroupService.updateIngredientGroup(ingredientGroupDTO, recipeToUpdate.getId(), ingredientGroupDTO.id(), updatedByEmail);
+            }
 
             this.recipeRepository.save(recipeToUpdate);
 
            return true;
+
         } else {
             throw new EntityToBeUpdatedNotFoundException("Recipe with id " + recipeId + " not found or does not belong to user.");
         }

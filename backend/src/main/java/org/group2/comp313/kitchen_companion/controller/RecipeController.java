@@ -165,9 +165,7 @@ public class RecipeController extends BaseController {
             log.error(e.getLocalizedMessage());
             return new ResponseEntity<>(new ApiResult<>(e.getLocalizedMessage(), false), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
-
     @PatchMapping("{recipeId}/step-group/{stepGroupId}")
     public ResponseEntity<ApiResult<Boolean>> updateStepGroup(@PathVariable Integer recipeId,
                                                                     @PathVariable Integer stepGroupId,

@@ -3,6 +3,7 @@ package org.group2.comp313.kitchen_companion.service;
 import jakarta.transaction.Transactional;
 import org.group2.comp313.kitchen_companion.domain.StepGroup;
 import org.group2.comp313.kitchen_companion.dto.recipe.*;
+import org.group2.comp313.kitchen_companion.mapper.StepGroupMapper;
 import org.group2.comp313.kitchen_companion.repository.StepGroupRepository;
 import org.group2.comp313.kitchen_companion.repository.StepRepository;
 import org.group2.comp313.kitchen_companion.utility.EntityToBeUpdatedNotFoundException;
@@ -18,10 +19,12 @@ public class StepGroupService extends BaseService {
 
     private final StepGroupRepository stepGroupRepository;
     private final StepService stepService;
+    private final StepGroupMapper stepGroupMapper;
 
-    public StepGroupService(StepGroupRepository stepGroupRepository, StepService stepService) {
+    public StepGroupService(StepGroupRepository stepGroupRepository, StepService stepService, StepGroupMapper stepGroupMapper) {
         this.stepGroupRepository = stepGroupRepository;
         this.stepService = stepService;
+        this.stepGroupMapper = stepGroupMapper;
     }
 
     public Set<StepGroup> createStepGroup(List<StepGroupDTO> newStepGroupList, Integer recipeId, String createdBy) {
@@ -73,6 +76,25 @@ public class StepGroupService extends BaseService {
             if(dto.componentUpdateDtoList() != null && !dto.componentUpdateDtoList().isEmpty()) {
                 for(ComponentUpdateDto componentUpdateDto: dto.componentUpdateDtoList()) {
                     this.stepService.updateStep(componentUpdateDto, updatedBy);
+                }
+            }
+        }
+    }
+
+    @Transactional
+    public void updateStepGroup(StepGroupDTO dto, Integer recipeId, Integer stepGroupId, String updatedBy) {
+
+        StepGroup stepGroup = this.stepGroupRepository.findByIdAndRecipeAndCreatedBy(stepGroupId, recipeId, updatedBy).orElse(null);
+
+        if(stepGroup == null) {
+            throw new EntityToBeUpdatedNotFoundException("Step group not found. Please check the recipe id, step group id, or this belongs to user.");
+        } else {
+
+            this.stepGroupMapper.partialUpdate(dto, stepGroup);
+
+            if(dto != null && !dto.steps().isEmpty()) {
+                for(StepDTO step: dto.steps()) {
+                    this.stepService.updateStep(step, updatedBy);
                 }
             }
         }
