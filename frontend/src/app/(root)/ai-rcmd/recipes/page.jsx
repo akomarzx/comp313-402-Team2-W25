@@ -8,6 +8,7 @@ import { RotateLoader } from "react-spinners";
 import { useAuth } from "@/context/AuthContext";
 import { generateRecipe } from "@/api/recipe";
 import DisplayRecipe from "@/components/DisplayRecipe";
+import { ChefHat } from "lucide-react";
 
 const AIRecipies = () => {
   const router = useRouter();
@@ -50,9 +51,9 @@ const AIRecipies = () => {
           <div className="mx-auto text-center mt-40">
             <p className="mb-10">
               {" "}
-              Our AI is cooking up your repies please wait ...
+              Our AI is cooking up your recipe please wait ...
             </p>
-            <RotateLoader></RotateLoader>
+            <ChefHat className="shake h-20 w-20 text-green-500 mx-auto" />
           </div>
         ) : recipe?.data.result.recipe ? (
           <>

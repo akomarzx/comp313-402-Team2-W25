@@ -39,8 +39,8 @@ const DisplayRecipe = ({
               if (res?.status === 200 || 201) {
                 toast("Recipe added successfully!");
                 setTimeout(() => {
-                  router.replace(`/recipe/${res.data.id}`);
-                }, 1500);
+                  router.replace(`/recipe/${res.data.result.id}`);
+                }, 2500);
               }
             }}
           >

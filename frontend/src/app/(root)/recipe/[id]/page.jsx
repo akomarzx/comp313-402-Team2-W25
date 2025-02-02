@@ -11,8 +11,7 @@ const Recipe = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { id } = useParams();
   const [recipe, setRecipe] = useState(null);
-  const { user, fetchSession } = useAuth();
-  const [canUpdate, setCanUpdate] = useState(false);
+  const { loading, user, fetchSession } = useAuth();
   if (isNaN(id)) {
     redirect("/recipes");
   }
@@ -24,15 +23,15 @@ const Recipe = () => {
       const data = await getRecipeById(id);
       setRecipe(data);
     };
-    fetchRecipe().then(() => setIsLoading(false));
-    if (user?.email === recipe?.createdBy) {
-      setCanUpdate(true);
-    }
+    if (!loading) fetchRecipe().then(() => setIsLoading(false));
   }, [id, user]);
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       {!isLoading ? (
-        <DisplayRecipe recipe={recipe} updateButton={canUpdate} />
+        <DisplayRecipe
+          recipe={recipe}
+          updateButton={user?.email === recipe?.createdBy}
+        />
       ) : (
         <div className="text-center mt-40">
           <RotateLoader />

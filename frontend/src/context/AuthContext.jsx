@@ -32,6 +32,7 @@ export const AuthProvider = ({ children }) => {
 
   const fetchSession = async () => {
     try {
+      setLoading(true);
       const response = await axios.get(`${bffUrl}/session`, {
         withCredentials: true,
       });

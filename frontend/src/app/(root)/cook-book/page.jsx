@@ -11,6 +11,7 @@ const MyCookBook = () => {
   const [myRecipes, setMyRecipes] = useState([]);
   const [recipePage, setRecipePage] = useState(1);
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchMyRecipes = async () => {
     const data = await getMyRecipes(recipePage);
@@ -25,6 +26,7 @@ const MyCookBook = () => {
       const data = await getMyRecipes(0);
       console.log(data);
       setMyRecipes(data.content);
+      setIsLoading(false);
     }
     firstFetch();
   }, []);
@@ -51,19 +53,21 @@ const MyCookBook = () => {
           <legend>
             <h2 className="font-semibold">MY RECIPIES</h2>
           </legend>
-
+          {isLoading && <LoaderIcon className="animate-spin m-auto" />}
           <div className=" mx-auto max-w-[1200px]">
             <RecipesResult recipeCardData={myRecipes} version={2} />
           </div>
           <div className="text-center mt-4">
-            <button
-              onClick={() => {
-                fetchMyRecipes();
-              }}
-              className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded"
-            >
-              Load More Recipes
-            </button>
+            {myRecipes && (
+              <button
+                onClick={() => {
+                  fetchMyRecipes();
+                }}
+                className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded"
+              >
+                Load More Recipes
+              </button>
+            )}
           </div>
         </fieldset>
       </div>

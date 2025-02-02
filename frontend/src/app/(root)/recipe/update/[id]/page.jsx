@@ -7,7 +7,13 @@ import {
   Loader2Icon,
   LoaderIcon,
 } from "lucide-react";
-import { updateRecipe, getRecipeById, uploadImg } from "@/api/recipe";
+import {
+  updateRecipe,
+  getRecipeById,
+  uploadImg,
+  updateIngredientGroup,
+  updateStepGroup,
+} from "@/api/recipe";
 import { useRouter, useParams, redirect } from "next/navigation";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
@@ -27,13 +33,30 @@ const UpdateRecipe = () => {
     cookTime: "",
     servings: "",
     yield: "",
-    ingredientGroups: [{ label: "", ingredients: [] }],
-    stepGroups: [{ label: "", steps: [] }],
     calories: "",
     carbs: "",
     sugars: "",
     fat: "",
     imageUrl: "",
+  });
+
+  const [ingredientGroupForm, setIngredientGroupForm] = useState({
+    ingredientGroups: [
+      {
+        id: null,
+        label: "",
+        ingredients: [],
+      },
+    ],
+  });
+  const [stepGroupForm, setStepGroupForm] = useState({
+    stepGroups: [
+      {
+        id: null,
+        label: "",
+        steps: [],
+      },
+    ],
   });
 
   const { user, loading, fetchSession } = useAuth();
@@ -64,12 +87,17 @@ const UpdateRecipe = () => {
         carbs: recipe.carbsG,
         sugars: recipe.sugarsG,
         fat: recipe.fatG,
-
+      });
+      setIngredientGroupForm({
         ingredientGroups: recipe.ingredientGroups.map((group) => ({
+          id: group.id,
           label: group.label,
           ingredients: group.ingredients.map((ing) => ing.label),
         })),
+      });
+      setStepGroupForm({
         stepGroups: recipe.stepGroups.map((group) => ({
+          id: group.id,
           label: group.label,
           steps: group.steps.map((step) => step.label),
         })),
@@ -95,74 +123,36 @@ const UpdateRecipe = () => {
     setImgFile(() => e.target.files[0]);
   };
 
-  const addGroup = (field) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: [
-        ...prev[field],
-        field === "ingredientGroups"
-          ? { label: "", ingredients: [[]] }
-          : { label: "", steps: [[]] },
-      ],
-    }));
-  };
-
   const handleGroupChange = (e, groupIndex, field, subIndex = null) => {
     const value = e.target.value;
-    setFormData((prev) => {
-      const updatedGroups = [...prev[field]];
-      if (subIndex === null) {
-        updatedGroups[groupIndex] = {
-          ...updatedGroups[groupIndex],
-          [e.target.name]: value,
-        };
-      } else {
-        if (field === "stepGroups") {
-          updatedGroups[groupIndex].steps[subIndex] = value;
+
+    if (field === "ingredientGroups") {
+      setIngredientGroupForm((prev) => {
+        const updatedGroups = [...prev[field]];
+        if (subIndex === null) {
+          updatedGroups[groupIndex] = {
+            ...updatedGroups[groupIndex],
+            [e.target.name]: value,
+          };
         } else {
           updatedGroups[groupIndex].ingredients[subIndex] = value;
         }
-      }
-      return { ...prev, [field]: updatedGroups };
-    });
-  };
-
-  const addSubField = (groupIndex, field) => {
-    setFormData((prev) => {
-      const updatedGroups = [...prev[field]];
-      if (field === "ingredientGroups") {
-        updatedGroups[groupIndex] = {
-          ...updatedGroups[groupIndex],
-          ingredients: [...updatedGroups[groupIndex].ingredients, ""],
-        };
-      } else {
-        updatedGroups[groupIndex] = {
-          ...updatedGroups[groupIndex],
-          steps: [...updatedGroups[groupIndex].steps, ""],
-        };
-      }
-      return { ...prev, [field]: updatedGroups };
-    });
-  };
-
-  const removeGroup = (groupIndex, field) => {
-    setFormData((prev) => {
-      const updatedGroups = [...prev[field]];
-      updatedGroups.splice(groupIndex, 1);
-      return { ...prev, [field]: updatedGroups };
-    });
-  };
-
-  const removeSubField = (groupIndex, subIndex, field) => {
-    setFormData((prev) => {
-      const updatedGroups = [...prev[field]];
-      if (field === "ingredientGroups") {
-        updatedGroups[groupIndex].ingredients.splice(subIndex, 1);
-      } else {
-        updatedGroups[groupIndex].steps.splice(subIndex, 1);
-      }
-      return { ...prev, [field]: updatedGroups };
-    });
+        return { ...prev, [field]: updatedGroups };
+      });
+    } else {
+      setStepGroupForm((prev) => {
+        const updatedGroups = [...prev[field]];
+        if (subIndex === null) {
+          updatedGroups[groupIndex] = {
+            ...updatedGroups[groupIndex],
+            [e.target.name]: value,
+          };
+        } else {
+          updatedGroups[groupIndex].steps[subIndex] = value;
+        }
+        return { ...prev, [field]: updatedGroups };
+      });
+    }
   };
 
   // Similar handlers for removing groups and items...
@@ -179,30 +169,6 @@ const UpdateRecipe = () => {
       prepTimeUnitCd: 100,
       cookTimeUnitCd: 100,
       categoryIds: [1],
-      ingredientGroups: formData.ingredientGroups.map((group, idx) => {
-        return {
-          label: group.label,
-          ingredientGroupOrder: idx + 1,
-          ingredients: group.ingredients.map((ingredient, subIdx) => {
-            return {
-              label: ingredient,
-              ingredientOrder: subIdx + 1,
-            };
-          }),
-        };
-      }),
-      stepGroups: formData.stepGroups.map((group, idx) => {
-        return {
-          label: group.label,
-          stepGroupOrder: idx + 1,
-          steps: group.steps.map((step, subIdx) => {
-            return {
-              label: step,
-              stepOrder: subIdx + 1,
-            };
-          }),
-        };
-      }),
     };
 
     try {
@@ -214,6 +180,7 @@ const UpdateRecipe = () => {
           updatedFormData.thumbnailUrl = imgRes.data;
         }
       }
+
       const res = await updateRecipe(id, updatedFormData);
       if (res.status === 200) {
         toast.success("Recipe updated successfully!");
@@ -221,6 +188,74 @@ const UpdateRecipe = () => {
       }
     } catch (error) {
       toast.error("Error updating recipe");
+      console.error(error);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleIngredientSubmit = async (e) => {
+    setIsUpdating(true);
+    e.preventDefault();
+    const updatedIngredientGroups = {
+      ingredientGroups: formData.ingredientGroups.map((group, idx) => {
+        return {
+          id: group.id,
+          label: group.label,
+          ingredientGroupOrder: idx + 1,
+          ingredients: group.ingredients.map((ingredient, subIdx) => {
+            return {
+              id: ingredient.id,
+              label: ingredient,
+              ingredientOrder: subIdx + 1,
+            };
+          }),
+        };
+      }),
+    };
+
+    try {
+      const res = await updateIngredientGroup(id, updatedIngredientGroups);
+      if (res.status === 200) {
+        toast.success("Ingredients updated successfully!");
+        setTimeout(() => router.replace(`/recipe/${id}`), 750);
+      }
+    } catch (error) {
+      toast.error("Error updating ingredients");
+      console.error(error);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleStepSubmit = async (e) => {
+    setIsUpdating(true);
+    e.preventDefault();
+    const updatedStepGroups = {
+      stepGroups: formData.stepGroups.map((group, idx) => {
+        return {
+          id: group.id,
+          label: group.label,
+          stepGroupOrder: idx + 1,
+          steps: group.steps.map((step, subIdx) => {
+            return {
+              id: step.id,
+              label: step,
+              stepOrder: subIdx + 1,
+            };
+          }),
+        };
+      }),
+    };
+
+    try {
+      // const res = await updateRecipe(id, updatedStepGroups);
+      // if (res.status === 200) {
+      //   toast.success("Steps updated successfully!");
+      //   setTimeout(() => router.replace(`/recipe/${id}`), 750);
+      // }
+    } catch (error) {
+      toast.error("Error updating steps");
       console.error(error);
     } finally {
       setIsUpdating(false);
@@ -334,10 +369,21 @@ const UpdateRecipe = () => {
             </div>
           ))}
         </div>
+        <button
+          type="submit"
+          className="w-1/2 bg-green-600 hover:bg-green-500 text-white py-2 px-4 rounded-lg font-semibold transition-colors"
+        >
+          Update Recipe
+        </button>
+      </form>
+      <form
+        onSubmit={handleIngredientSubmit}
+        className="bg-white p-6 rounded-lg max-w-[800px] mx-auto z-0"
+      >
         {/* Ingredient Groups */}
         <div className="mb-6">
           <h3 className="text-lg font-semibold">Ingredient Groups</h3>
-          {formData.ingredientGroups.map((group, groupIndex) => (
+          {ingredientGroupForm.ingredientGroups.map((group, groupIndex) => (
             <div key={groupIndex} className="mb-4 p-4 border rounded">
               <input
                 type="text"
@@ -351,7 +397,7 @@ const UpdateRecipe = () => {
                 required
               />
               {group.ingredients.map((ingredient, subIndex) => (
-                <div key={subIndex} className="flex items-center mb-2">
+                <div key={subIndex} className="flex items-center mb-2 mr-8">
                   <input
                     type="text"
                     className="w-full p-2 border rounded-lg"
@@ -367,55 +413,26 @@ const UpdateRecipe = () => {
                     }
                     required
                   />
-                  <button
-                    type="button"
-                    className="ml-2 px-2 text-gray-500 py-1 rounded"
-                    onClick={() =>
-                      removeSubField(groupIndex, subIndex, "ingredientGroups")
-                    }
-                  >
-                    <CircleMinus size={20} />
-                  </button>
                 </div>
               ))}
-              <div className="flex justify-between">
-                {" "}
-                <button
-                  type="button"
-                  className=" text-gray-600 px-4 py-2 rounded flex border-2 hover:shadow-sm"
-                  onClick={() => addSubField(groupIndex, "ingredientGroups")}
-                >
-                  <CirclePlus size={20} />
-                  <span className="px-2 font-semibold text-gray-600">
-                    Add Ingredient
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  className="ml-4 text-gray-600 px-4 py-2 rounded flex border-2 hover:shadow-sm"
-                  onClick={() => removeGroup(groupIndex, "ingredientGroups")}
-                >
-                  <Trash2 size={20} />
-                  <span className="px-2 font-semibold text-gray-600">
-                    Delete Group
-                  </span>
-                </button>
-              </div>
             </div>
           ))}
-          <button
-            type="button"
-            className=" text-green-700 hover:text-green-500 font-semibold p-2 rounded border-2 flex"
-            onClick={() => addGroup("ingredientGroups")}
-          >
-            <CopyPlus size={20} />
-            <span className="px-2">Add Ingredient Group</span>
-          </button>
         </div>
+        <button
+          type="submit"
+          className="w-1/2 bg-green-600 hover:bg-green-500 text-white py-2 px-4 rounded-lg font-semibold transition-colors"
+        >
+          Update Ingredients
+        </button>
+      </form>
+      <form
+        onSubmit={handleStepSubmit}
+        className="bg-white p-6 rounded-lg max-w-[800px] mx-auto z-0"
+      >
         {/* Step Groups */}
         <div className="mb-6">
           <h3 className="text-lg font-semibold">Step Groups</h3>
-          {formData.stepGroups.map((group, groupIndex) => (
+          {stepGroupForm.stepGroups.map((group, groupIndex) => (
             <div key={groupIndex} className="mb-4 p-4 border rounded">
               <input
                 type="text"
@@ -427,7 +444,7 @@ const UpdateRecipe = () => {
                 required
               />
               {group.steps.map((step, subIndex) => (
-                <div key={subIndex} className="flex items-center mb-2">
+                <div key={subIndex} className="flex items-center mb-2 mr-8">
                   <textarea
                     className="w-full p-2 border rounded-lg"
                     placeholder={`Step ${subIndex + 1}`}
@@ -437,55 +454,16 @@ const UpdateRecipe = () => {
                     }
                     required
                   />
-                  <button
-                    type="button"
-                    className="ml-2 text-gray-500 px-2 py-1 rounded"
-                    onClick={() =>
-                      removeSubField(groupIndex, subIndex, "stepGroups")
-                    }
-                  >
-                    <CircleMinus size={20} />
-                  </button>
                 </div>
               ))}
-              <div className="flex justify-between">
-                <button
-                  type="button"
-                  className=" text-gray-600 px-4 py-2 rounded flex border-2 hover:shadow-sm"
-                  onClick={() => addSubField(groupIndex, "stepGroups")}
-                >
-                  <CirclePlus size={20} />
-                  <span className="px-2 font-semibold text-gray-600">
-                    Add Step
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  className="ml-4 text-gray-600 px-4 py-2 rounded flex border-2 hover:shadow-sm"
-                  onClick={() => removeGroup(groupIndex, "stepGroups")}
-                >
-                  <Trash2 size={20} />
-                  <span className="px-2 font-semibold text-gray-600">
-                    Delete Group
-                  </span>
-                </button>
-              </div>
             </div>
           ))}
-          <button
-            type="button"
-            className=" text-green-700 hover:text-green-500 border-2 font-semibold p-2 rounded flex"
-            onClick={() => addGroup("stepGroups")}
-          >
-            <CopyPlus size={20} />
-            <span className="px-2">Add Step Group</span>
-          </button>
         </div>
         <button
           type="submit"
           className="w-1/2 bg-green-600 hover:bg-green-500 text-white py-2 px-4 rounded-lg font-semibold transition-colors"
         >
-          Update Recipe
+          Update Steps
         </button>
       </form>
     </div>

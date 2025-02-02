@@ -111,3 +111,33 @@ export async function updateRecipe(recipeId, data) {
     console.log("Error updating recipe:", error);
   }
 }
+
+export async function updateIngredientGroup(recipeId, ingredientGroupId, data) {
+  try {
+    const recipeResponse = await axios.patch(
+      `${recipeUrl}/kc/v1/recipe/${recipeId}/ingredient-group/${ingredientGroupId}`,
+      data,
+      {
+        withCredentials: true,
+      }
+    );
+    return recipeResponse;
+  } catch (error) {
+    console.log("Error updating ingredients group:", error);
+  }
+}
+
+export async function updateStepGroup(recipeId, stepGroupId, data) {
+  try {
+    const recipeResponse = await axios.patch(
+      `${recipeUrl}/kc/v1/recipe/${recipeId}/step-group/${stepGroupId}`,
+      data,
+      {
+        withCredentials: true,
+      }
+    );
+    return recipeResponse;
+  } catch (error) {
+    console.log("Error updating step group:", error);
+  }
+}
