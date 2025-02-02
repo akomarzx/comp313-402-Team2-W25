@@ -206,7 +206,7 @@ const RecipeForm = () => {
       if (res?.status === 200 || 201) {
         toast("Recipe created successfully!");
         setTimeout(() => {
-          router.replace(`/recipe/${res.data.id}`);
+          router.replace(`/recipe/${res.data.result.id}`);
         }, 1500);
       }
     } catch (error) {
