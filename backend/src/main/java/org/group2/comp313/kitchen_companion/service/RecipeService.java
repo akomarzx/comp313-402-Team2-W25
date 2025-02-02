@@ -2,7 +2,6 @@ package org.group2.comp313.kitchen_companion.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import org.group2.comp313.kitchen_companion.domain.Recipe;
@@ -10,7 +9,9 @@ import org.group2.comp313.kitchen_companion.domain.projection.RecipeSummaryForCa
 import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationResult;
 import org.group2.comp313.kitchen_companion.dto.ai.ChatCompletionResponse;
 import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationRequest;
+import org.group2.comp313.kitchen_companion.dto.recipe.IngredientGroupDTO;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeDTO;
+import org.group2.comp313.kitchen_companion.dto.recipe.StepGroupDTO;
 import org.group2.comp313.kitchen_companion.dto.recipe.UpdateRecipeDTO;
 import org.group2.comp313.kitchen_companion.mapper.RecipeMapper;
 import org.group2.comp313.kitchen_companion.repository.RecipeRepository;
@@ -34,14 +35,16 @@ public class RecipeService extends BaseService {
     private final StepGroupService stepGroupService;
     private final RecipeCategoryService recipeCategoryService;
     private final ChatGptClientService chatGptClientService;
+    private final RecipeMapper recipeMapper;
 
-    public RecipeService(RecipeRepository recipeRepository, StaticCodeService staticCodeService, IngredientGroupService ingredientGroupService, StepGroupService stepGroupService, RecipeCategoryService recipeCategoryService, ChatGptClientService chatGptClientService) {
+    public RecipeService(RecipeRepository recipeRepository, StaticCodeService staticCodeService, IngredientGroupService ingredientGroupService, StepGroupService stepGroupService, RecipeCategoryService recipeCategoryService, ChatGptClientService chatGptClientService, RecipeMapper recipeMapper) {
         this.recipeRepository = recipeRepository;
         this.staticCodeService = staticCodeService;
         this.ingredientGroupService = ingredientGroupService;
         this.stepGroupService = stepGroupService;
         this.recipeCategoryService = recipeCategoryService;
         this.chatGptClientService = chatGptClientService;
+        this.recipeMapper = recipeMapper;
     }
 
     @Transactional
@@ -61,7 +64,9 @@ public class RecipeService extends BaseService {
 
     @Transactional
     public Recipe createRecipe(RecipeDTO dto, @NotNull String createdByEmail) {
+
         try {
+
             Recipe newRecipe = mapDtoToRecipe(dto);
             newRecipe.setCreatedBy(createdByEmail);
             newRecipe.setCreatedAt(Instant.now());
@@ -103,31 +108,22 @@ public class RecipeService extends BaseService {
         }
     }
 
-    public Boolean updateRecipe(Integer recipeId, UpdateRecipeDTO updateRecipeDTO, String updatedByEmail) {
+    @Transactional
+    public Boolean updateRecipe(Integer recipeId, RecipeDTO updateRecipeDTO, String updatedByEmail) {
 
-        RecipeMapper recipeMapper = Mappers.getMapper(RecipeMapper.class);
         Recipe recipeToUpdate = this.recipeRepository.findByIdAndCreatedBy(recipeId, updatedByEmail).orElse(null);
 
         if(recipeToUpdate != null) {
 
-            if(!Objects.equals(recipeToUpdate.getId(), recipeId)) {
-                throw new IdMismatchedException("Recipe Id in body does not match Recipe Id from path.");
-            }
-
             recipeMapper.partialUpdate(updateRecipeDTO, recipeToUpdate);
-            if(updateRecipeDTO.prepTimeUnitCd() != null) {
-                recipeToUpdate.setPrepTimeUnitCd(this.staticCodeService.getCodeValueUsingCodeValueId(updateRecipeDTO.prepTimeUnitCd()).get());
-            }
-
-            if(updateRecipeDTO.cookTimeUnitCd() != null) {
-                recipeToUpdate.setCookTimeUnitCd(this.staticCodeService.getCodeValueUsingCodeValueId(updateRecipeDTO.cookTimeUnitCd()).get());
-            }
 
             recipeToUpdate.setUpdatedBy(updatedByEmail);
             recipeToUpdate.setUpdatedAt(Instant.now());
 
             this.recipeRepository.save(recipeToUpdate);
-            return true;
+
+           return true;
+
         } else {
             throw new EntityToBeUpdatedNotFoundException("Recipe with id " + recipeId + " not found or does not belong to user.");
         }

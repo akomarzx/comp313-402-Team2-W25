@@ -19,11 +19,13 @@ import org.group2.comp313.kitchen_companion.service.RecipeService;
 import org.group2.comp313.kitchen_companion.service.StepGroupService;
 import org.group2.comp313.kitchen_companion.utility.EntityToBeUpdatedNotFoundException;
 import org.group2.comp313.kitchen_companion.utility.IdMismatchedException;
+import org.group2.comp313.kitchen_companion.utility.ValidationGroups;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -100,7 +102,7 @@ public class RecipeController extends BaseController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResult<Recipe>> createRecipe(@NotNull @RequestBody @Valid() RecipeDTO createRecipeDto,
+    public ResponseEntity<ApiResult<Recipe>> createRecipe(@NotNull @RequestBody @Validated(ValidationGroups.Create.class) RecipeDTO createRecipeDto,
                                                           @AuthenticationPrincipal(expression = "claims['email']") String createdByEmail) {
 
         log.info("Request to create recipe: {}", createRecipeDto.toString());
@@ -145,7 +147,7 @@ public class RecipeController extends BaseController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResult<Boolean>> updateRecipe(@PathVariable Integer id,
-                                                           @NotNull @RequestBody @Valid() UpdateRecipeDTO updateRecipeDto,
+                                                           @NotNull @RequestBody @Validated(ValidationGroups.Update.class) RecipeDTO updateRecipeDto,
                                                            @AuthenticationPrincipal(expression = "claims['email']") String createdByEmail) {
 
         log.info("Request to update recipe: {}", updateRecipeDto.toString());
@@ -163,9 +165,7 @@ public class RecipeController extends BaseController {
             log.error(e.getLocalizedMessage());
             return new ResponseEntity<>(new ApiResult<>(e.getLocalizedMessage(), false), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
-
     @PatchMapping("{recipeId}/step-group/{stepGroupId}")
     public ResponseEntity<ApiResult<Boolean>> updateStepGroup(@PathVariable Integer recipeId,
                                                                     @PathVariable Integer stepGroupId,

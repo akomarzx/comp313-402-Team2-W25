@@ -17,6 +17,7 @@ public class RecipeCategoryService {
     }
 
     public void createRecipeCategory(Integer categoryId, Integer recipeId, String createdByEmail) {
+
         RecipeCategoryId recipeCategoryId = new RecipeCategoryId();
         recipeCategoryId.setCategoryId(categoryId);
         recipeCategoryId.setRecipeId(recipeId);

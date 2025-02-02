@@ -88,10 +88,10 @@ public class Recipe {
     @Column(name = "updated_by", length = 256)
     private String updatedBy;
 
-    @OneToMany(mappedBy = "recipe", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "recipe", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     private Set<IngredientGroup> ingredientGroups = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "recipe", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "recipe", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     private Set<StepGroup> stepGroups = new LinkedHashSet<>();
 
 }
