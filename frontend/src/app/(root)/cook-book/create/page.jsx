@@ -276,6 +276,7 @@ const RecipeForm = () => {
             accept="image/*"
             className="w-full p-2 border rounded-lg"
             onChange={handleFileChange}
+            required
           />
         </div>
         {/* Times and Servings */}
