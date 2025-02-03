@@ -38,23 +38,28 @@ const UpdateRecipe = () => {
     sugars: "",
     fat: "",
     imageUrl: "",
-  });
-
-  const [ingredientGroupForm, setIngredientGroupForm] = useState({
     ingredientGroups: [
       {
         id: null,
         label: "",
-        ingredients: [],
+        ingredients: [
+          {
+            label: "",
+            id: null,
+          },
+        ],
       },
     ],
-  });
-  const [stepGroupForm, setStepGroupForm] = useState({
     stepGroups: [
       {
         id: null,
         label: "",
-        steps: [],
+        steps: [
+          {
+            label: "",
+            id: null,
+          },
+        ],
       },
     ],
   });
@@ -87,20 +92,28 @@ const UpdateRecipe = () => {
         carbs: recipe.carbsG,
         sugars: recipe.sugarsG,
         fat: recipe.fatG,
-      });
-      setIngredientGroupForm({
-        ingredientGroups: recipe.ingredientGroups.map((group) => ({
-          id: group.id,
-          label: group.label,
-          ingredients: group.ingredients.map((ing) => ing.label),
-        })),
-      });
-      setStepGroupForm({
-        stepGroups: recipe.stepGroups.map((group) => ({
-          id: group.id,
-          label: group.label,
-          steps: group.steps.map((step) => step.label),
-        })),
+        ingredientGroups: recipe.ingredientGroups
+          .sort((a, b) => a.ingredientGroupOrder - b.ingredientGroupOrder)
+          .map((group) => ({
+            ...group,
+            ingredients: group.ingredients
+              .sort((a, b) => a.ingredientOrder - b.ingredientOrder)
+              .map((ingredient) => ({
+                id: ingredient.id,
+                label: ingredient.label,
+              })),
+          })),
+        stepGroups: recipe.stepGroups
+          .sort((a, b) => a.stepGroupOrder - b.stepGroupOrder)
+          .map((group) => ({
+            ...group,
+            steps: group.steps
+              .sort((a, b) => a.stepOrder - b.stepOrder)
+              .map((step) => ({
+                id: step.id,
+                label: step.label,
+              })),
+          })),
       });
     } catch (error) {
       toast.error("Error fetching recipe");
@@ -127,31 +140,37 @@ const UpdateRecipe = () => {
     const value = e.target.value;
 
     if (field === "ingredientGroups") {
-      setIngredientGroupForm((prev) => {
-        const updatedGroups = [...prev[field]];
-        if (subIndex === null) {
-          updatedGroups[groupIndex] = {
-            ...updatedGroups[groupIndex],
-            [e.target.name]: value,
-          };
-        } else {
-          updatedGroups[groupIndex].ingredients[subIndex] = value;
-        }
-        return { ...prev, [field]: updatedGroups };
-      });
+      if (subIndex !== null) {
+        const updatedGroups = [...formData[field]];
+        updatedGroups[groupIndex].ingredients[subIndex].label = value;
+        setFormData((prev) => ({
+          ...prev,
+          [field]: updatedGroups,
+        }));
+      } else {
+        const updatedGroups = [...formData[field]];
+        updatedGroups[groupIndex].label = value;
+        setFormData((prev) => ({
+          ...prev,
+          [field]: updatedGroups,
+        }));
+      }
     } else {
-      setStepGroupForm((prev) => {
-        const updatedGroups = [...prev[field]];
-        if (subIndex === null) {
-          updatedGroups[groupIndex] = {
-            ...updatedGroups[groupIndex],
-            [e.target.name]: value,
-          };
-        } else {
-          updatedGroups[groupIndex].steps[subIndex] = value;
-        }
-        return { ...prev, [field]: updatedGroups };
-      });
+      if (subIndex !== null) {
+        const updatedGroups = [...formData[field]];
+        updatedGroups[groupIndex].steps[subIndex].label = value;
+        setFormData((prev) => ({
+          ...prev,
+          [field]: updatedGroups,
+        }));
+      } else {
+        const updatedGroups = [...formData[field]];
+        updatedGroups[groupIndex].label = value;
+        setFormData((prev) => ({
+          ...prev,
+          [field]: updatedGroups,
+        }));
+      }
     }
   };
 
@@ -169,8 +188,25 @@ const UpdateRecipe = () => {
       prepTimeUnitCd: 100,
       cookTimeUnitCd: 100,
       categoryIds: [1],
+      ingredientGroups: formData.ingredientGroups.map((group) => ({
+        ...group,
+        ingredients: group.ingredients.map((ingredient, index) => ({
+          label: ingredient.label,
+          id: ingredient.id,
+          ingredientOrder: index + 1,
+        })),
+      })),
+      stepGroups: formData.stepGroups.map((group) => ({
+        ...group,
+        steps: group.steps.map((step, index) => ({
+          label: step.label,
+          id: step.id,
+          stepOrder: index + 1,
+        })),
+      })),
     };
 
+    console.log(updatedFormData);
     try {
       if (imgFile) {
         const imgRes = await uploadImg({ file: imgFile });
@@ -188,74 +224,6 @@ const UpdateRecipe = () => {
       }
     } catch (error) {
       toast.error("Error updating recipe");
-      console.error(error);
-    } finally {
-      setIsUpdating(false);
-    }
-  };
-
-  const handleIngredientSubmit = async (e) => {
-    setIsUpdating(true);
-    e.preventDefault();
-    const updatedIngredientGroups = {
-      ingredientGroups: formData.ingredientGroups.map((group, idx) => {
-        return {
-          id: group.id,
-          label: group.label,
-          ingredientGroupOrder: idx + 1,
-          ingredients: group.ingredients.map((ingredient, subIdx) => {
-            return {
-              id: ingredient.id,
-              label: ingredient,
-              ingredientOrder: subIdx + 1,
-            };
-          }),
-        };
-      }),
-    };
-
-    try {
-      const res = await updateIngredientGroup(id, updatedIngredientGroups);
-      if (res.status === 200) {
-        toast.success("Ingredients updated successfully!");
-        setTimeout(() => router.replace(`/recipe/${id}`), 750);
-      }
-    } catch (error) {
-      toast.error("Error updating ingredients");
-      console.error(error);
-    } finally {
-      setIsUpdating(false);
-    }
-  };
-
-  const handleStepSubmit = async (e) => {
-    setIsUpdating(true);
-    e.preventDefault();
-    const updatedStepGroups = {
-      stepGroups: formData.stepGroups.map((group, idx) => {
-        return {
-          id: group.id,
-          label: group.label,
-          stepGroupOrder: idx + 1,
-          steps: group.steps.map((step, subIdx) => {
-            return {
-              id: step.id,
-              label: step,
-              stepOrder: subIdx + 1,
-            };
-          }),
-        };
-      }),
-    };
-
-    try {
-      // const res = await updateRecipe(id, updatedStepGroups);
-      // if (res.status === 200) {
-      //   toast.success("Steps updated successfully!");
-      //   setTimeout(() => router.replace(`/recipe/${id}`), 750);
-      // }
-    } catch (error) {
-      toast.error("Error updating steps");
       console.error(error);
     } finally {
       setIsUpdating(false);
@@ -369,70 +337,52 @@ const UpdateRecipe = () => {
             </div>
           ))}
         </div>
-        <button
-          type="submit"
-          className="w-1/2 bg-green-600 hover:bg-green-500 text-white py-2 px-4 rounded-lg font-semibold transition-colors"
-        >
-          Update Recipe
-        </button>
-      </form>
-      <form
-        onSubmit={handleIngredientSubmit}
-        className="bg-white p-6 rounded-lg max-w-[800px] mx-auto z-0"
-      >
         {/* Ingredient Groups */}
         <div className="mb-6">
           <h3 className="text-lg font-semibold">Ingredient Groups</h3>
-          {ingredientGroupForm.ingredientGroups.map((group, groupIndex) => (
-            <div key={groupIndex} className="mb-4 p-4 border rounded">
-              <input
-                type="text"
-                name="label"
-                className="w-full p-2 mb-2 border font-semibold rounded-lg"
-                placeholder={`Group ${groupIndex + 1} Label`}
-                value={group.label}
-                onChange={(e) =>
-                  handleGroupChange(e, groupIndex, "ingredientGroups")
-                }
-                required
-              />
-              {group.ingredients.map((ingredient, subIndex) => (
-                <div key={subIndex} className="flex items-center mb-2 mr-8">
-                  <input
-                    type="text"
-                    className="w-full p-2 border rounded-lg"
-                    placeholder={`Ingredient ${subIndex + 1}`}
-                    value={ingredient}
-                    onChange={(e) =>
-                      handleGroupChange(
-                        e,
-                        groupIndex,
-                        "ingredientGroups",
-                        subIndex
-                      )
-                    }
-                    required
-                  />
-                </div>
-              ))}
-            </div>
-          ))}
+          {formData.ingredientGroups
+            .sort((a, b) => a.ingredientGroupOrder - b.ingredientGroupOrder)
+            .map((group, groupIndex) => (
+              <div key={groupIndex} className="mb-4 p-4 border rounded">
+                <input
+                  type="text"
+                  name="label"
+                  className="w-full p-2 mb-2 border font-semibold rounded-lg"
+                  placeholder={`Group ${groupIndex + 1} Label`}
+                  value={group.label}
+                  onChange={(e) =>
+                    handleGroupChange(e, groupIndex, "ingredientGroups")
+                  }
+                  required
+                />
+                {group.ingredients
+                  .sort((a, b) => a.ingredientOrder - b.ingredientOrder)
+                  .map((ingredient, subIndex) => (
+                    <div key={subIndex} className="flex items-center mb-2 mr-8">
+                      <input
+                        type="text"
+                        className="w-full p-2 border rounded-lg"
+                        placeholder={`Ingredient ${subIndex + 1}`}
+                        value={ingredient.label}
+                        onChange={(e) =>
+                          handleGroupChange(
+                            e,
+                            groupIndex,
+                            "ingredientGroups",
+                            subIndex
+                          )
+                        }
+                        required
+                      />
+                    </div>
+                  ))}
+              </div>
+            ))}
         </div>
-        <button
-          type="submit"
-          className="w-1/2 bg-green-600 hover:bg-green-500 text-white py-2 px-4 rounded-lg font-semibold transition-colors"
-        >
-          Update Ingredients
-        </button>
-      </form>
-      <form
-        onSubmit={handleStepSubmit}
-        className="bg-white p-6 rounded-lg max-w-[800px] mx-auto z-0"
-      >
         {/* Step Groups */}
         <div className="mb-6">
           <h3 className="text-lg font-semibold">Step Groups</h3>
-          {stepGroupForm.stepGroups.map((group, groupIndex) => (
+          {formData.stepGroups.map((group, groupIndex) => (
             <div key={groupIndex} className="mb-4 p-4 border rounded">
               <input
                 type="text"
@@ -448,7 +398,7 @@ const UpdateRecipe = () => {
                   <textarea
                     className="w-full p-2 border rounded-lg"
                     placeholder={`Step ${subIndex + 1}`}
-                    value={step}
+                    value={step.label}
                     onChange={(e) =>
                       handleGroupChange(e, groupIndex, "stepGroups", subIndex)
                     }
