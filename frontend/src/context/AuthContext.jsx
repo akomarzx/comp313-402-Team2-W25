@@ -50,9 +50,48 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     }
   };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_RECIPE_API}/kc/v1/category`,
+        {
+          withCredentials: true,
+        }
+      );
+      if (response.data) {
+        localStorage.setItem(
+          "categories",
+          JSON.stringify({
+            data: response.data.result,
+            lastUpdated: Date.now(),
+          })
+        );
+        console.log("Categories fetched:", response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
   // Check if user is logged in on initial load
   useEffect(() => {
-    fetchSession();
+    // localStorage.clear();
+    if (!user) fetchSession();
+    const categories = localStorage.getItem("categories");
+    console.log("Categories:", JSON.parse(categories));
+    if (!categories) {
+      fetchCategories();
+    } else {
+      try {
+        const threeDays = 24 * 60 * 60 * 1000;
+        if (Date.now() - categories.lastUpdated > threeDays) {
+          fetchCategories();
+        }
+      } catch (error) {
+        console.log("Failed to parse categories:", error);
+        fetchCategories();
+      }
+    }
   }, []);
 
   // Provide the authentication state and actions

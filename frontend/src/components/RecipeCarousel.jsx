@@ -22,7 +22,7 @@ const RecipeCarousel = ({ data }) => {
         opts={{
           align: "start",
         }}
-        className=" max-w-sm md:max-w-xl  lg:max-w-3xl  2xl:max-w-4xl mx-auto"
+        className=" max-w-[280px] md:max-w-lg  lg:max-w-3xl  2xl:max-w-[1000px] mx-auto"
       >
         <CarouselContent>
           {data?.map((item, index) => (

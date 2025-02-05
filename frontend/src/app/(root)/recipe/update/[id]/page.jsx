@@ -18,6 +18,7 @@ import { useRouter, useParams, redirect } from "next/navigation";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import { useState, useEffect, use } from "react";
+import Image from "next/image";
 
 const UpdateRecipe = () => {
   const router = useRouter();
@@ -26,6 +27,7 @@ const UpdateRecipe = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [hasFetched, setHasFetched] = useState(false);
   const [imgFile, setImgFile] = useState(null);
+  const [imageSrc, setImageSrc] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
     summary: "",
@@ -134,6 +136,8 @@ const UpdateRecipe = () => {
   const handleFileChange = (e) => {
     console.log(e.target.files[0]);
     setImgFile(() => e.target.files[0]);
+    const url = window.URL.createObjectURL(e.target.files[0]);
+    setImageSrc(url);
   };
 
   const handleGroupChange = (e, groupIndex, field, subIndex = null) => {
@@ -241,6 +245,11 @@ const UpdateRecipe = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
+      {isUpdating && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <LoaderIcon size={50} className="animate-spin m-auto" />
+        </div>
+      )}
       <form
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded-lg max-w-[800px] mx-auto z-0"
@@ -284,9 +293,23 @@ const UpdateRecipe = () => {
         </div>
         {/* Image Upload */}
         <div className="mb-6">
+          <div className="relative w-full h-[300px] md:h-[400px] rounded-lg overflow-hidden mb-8">
+            <Image
+              src={
+                imageSrc ||
+                (formData?.imageUrl !== "x" && formData?.imageUrl) ||
+                "https://www.themealdb.com/images/media/meals/58oia61564916529.jpg"
+              }
+              alt={formData?.title || "image"}
+              layout="fill"
+              objectFit="cover"
+              className="rounded-lg"
+            />
+          </div>
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Recipe Image
           </label>
+
           <input
             type="file"
             accept="image/*"
