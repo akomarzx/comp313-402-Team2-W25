@@ -7,11 +7,14 @@ import axios from "axios";
 // Create Auth Context
 const AuthContext = createContext();
 const bffUrl = process.env.NEXT_PUBLIC_NODE_API;
+
 // Auth Provider Component
 export const AuthProvider = ({ children }) => {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const [categories, setCategories] = useState(null);
   // Function to log in
   const login = async (currentUrl = "") => {
     localStorage.setItem("lastUrl", currentUrl);
@@ -54,20 +57,14 @@ export const AuthProvider = ({ children }) => {
   const fetchCategories = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_RECIPE_API}/kc/v1/category`,
-        {
-          withCredentials: true,
-        }
+        `${process.env.NEXT_PUBLIC_RECIPE_API}/kc/v1/category`
       );
       if (response.data) {
-        localStorage.setItem(
-          "categories",
-          JSON.stringify({
-            data: response.data.result,
-            lastUpdated: Date.now(),
-          })
-        );
-        console.log("Categories fetched:", response.data);
+        setCategories({
+          data: response.data.result,
+          lastUpdated: Date.now(),
+        });
+        console.log("Categories fetched:", response.data.result);
       }
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -75,10 +72,7 @@ export const AuthProvider = ({ children }) => {
   };
   // Check if user is logged in on initial load
   useEffect(() => {
-    // localStorage.clear();
     if (!user) fetchSession();
-    const categories = localStorage.getItem("categories");
-    console.log("Categories:", JSON.parse(categories));
     if (!categories) {
       fetchCategories();
     } else {
@@ -97,7 +91,7 @@ export const AuthProvider = ({ children }) => {
   // Provide the authentication state and actions
   return (
     <AuthContext.Provider
-      value={{ user, login, logout, loading, fetchSession }}
+      value={{ user, login, logout, loading, fetchSession, categories }}
     >
       {children}
     </AuthContext.Provider>
