@@ -38,8 +38,7 @@ const RecipeForm = () => {
   const [imgFile, setImgFile] = useState(null);
   const [imageSrc, setImageSrc] = useState(null);
 
-  const categories = JSON.parse(localStorage.getItem("categories"));
-  const { user, loading } = useAuth();
+  const { user, loading, categories } = useAuth();
   if (loading) return <Loader2Icon className="animate-spin m-auto" />;
   if (!user) {
     redirect("/");
