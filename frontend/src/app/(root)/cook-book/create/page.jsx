@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { LoaderIcon } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useState } from "react";
+import Image from "next/image";
 
 const RecipeForm = () => {
   const router = useRouter();
@@ -29,12 +30,15 @@ const RecipeForm = () => {
     carbs: "",
     sugars: "",
     fat: "",
+    categoryIds: [],
     imageUrl: "",
   });
 
   const [isCreating, setIsCreating] = useState(false);
   const [imgFile, setImgFile] = useState(null);
+  const [imageSrc, setImageSrc] = useState(null);
 
+  const categories = JSON.parse(localStorage.getItem("categories"));
   const { user, loading } = useAuth();
   if (loading) return <Loader2Icon className="animate-spin m-auto" />;
   if (!user) {
@@ -52,6 +56,8 @@ const RecipeForm = () => {
   const handleFileChange = (e) => {
     console.log(e.target.files[0]);
     setImgFile(() => e.target.files[0]);
+    const url = window.URL.createObjectURL(e.target.files[0]);
+    setImageSrc(url);
   };
 
   const addGroup = (field) => {
@@ -266,8 +272,72 @@ const RecipeForm = () => {
             required
           />
         </div>
+        <div className="mb-6">
+          <div className="mb-6">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Categories
+            </label>
+            <select
+              multiple
+              value={formData.categoryIds}
+              onChange={(e) => {
+                e.preventDefault();
+              }}
+              className="w-full p-2 border rounded-lg"
+            >
+              {categories?.data.map((cat) => (
+                <option
+                  key={cat.id}
+                  value={cat.id}
+                  onClick={() => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      categoryIds: [...prev.categoryIds, cat.id],
+                    }));
+                  }}
+                >
+                  {cat.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {formData.categoryIds?.map((catId) => {
+              const category = categories?.data.find((cat) => cat.id === catId);
+              if (!category) return null;
+              return (
+                <div
+                  key={catId}
+                  className="flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full cursor-pointer"
+                  onClick={() =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      categoryIds: prev.categoryIds.filter(
+                        (id) => id !== catId
+                      ),
+                    }))
+                  }
+                >
+                  <span>{category.label}</span>
+                  <span>&times;</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
         {/* Image Upload */}
         <div className="mb-6">
+          {imageSrc && (
+            <div className="relative w-full h-[300px] md:h-[400px] rounded-lg overflow-hidden mb-8">
+              <Image
+                src={imageSrc}
+                alt={formData?.title || "image"}
+                layout="fill"
+                objectFit="cover"
+                className="rounded-lg"
+              />
+            </div>
+          )}
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Recipe Image
           </label>
