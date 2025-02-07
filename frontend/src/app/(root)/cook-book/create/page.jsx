@@ -147,7 +147,7 @@ const RecipeForm = () => {
       carbsG: formData.carbs,
       sugarsG: formData.sugars,
       fatG: formData.fat,
-      categoryIds: [1],
+      categoryIds: formData.categoryIds || [1],
       imageUrl: "x",
       ingredientGroups: formData.ingredientGroups.map((group, idx) => {
         return {
@@ -214,6 +214,8 @@ const RecipeForm = () => {
           router.replace(`/recipe/${res.data.result.id}`);
         }, 1500);
       }
+
+      // console.log(newFormData);
     } catch (error) {
       toast("Error creating recipe. Please try again.");
       console.error("Error:", error);

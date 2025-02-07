@@ -436,7 +436,7 @@ const UpdateRecipe = () => {
           type="submit"
           className="w-1/2 bg-green-600 hover:bg-green-500 text-white py-2 px-4 rounded-lg font-semibold transition-colors"
         >
-          Update Steps
+          Update Recipe
         </button>
       </form>
     </div>
