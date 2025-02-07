@@ -1,15 +1,17 @@
 import React from "react";
-import { Edit, SaveIcon } from "lucide-react";
+import { Edit, SaveIcon, ChefHatIcon } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createRecipe } from "@/api/recipe";
 import { toast } from "sonner";
+import Rating from "react-rating";
 const DisplayRecipe = ({
   recipe,
   updateButton = false,
   saveButton = false,
 }) => {
   const router = useRouter();
+  const [rating, setRating] = React.useState(4.7);
   return (
     <div>
       {" "}
@@ -59,6 +61,20 @@ const DisplayRecipe = ({
             objectFit="cover"
             className="rounded-lg"
           />
+        </div>
+        <div className="flex">
+          <Rating
+            initialRating={rating}
+            onChange={(value) => setRating(value)}
+            emptySymbol={
+              <ChefHatIcon className="text-green-600 font-semibold" />
+            }
+            fullSymbol={
+              <ChefHatIcon className="text-green-600 fill-yellow-300 font-semibold" />
+            }
+            fractions={4}
+          />
+          <p className="font-semibold text-lg">{rating}</p>
         </div>
         {/* Recipe Meta Information */}
         <div className="my-4  border-b border-gray-200">
