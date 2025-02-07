@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createRecipe } from "@/api/recipe";
 import { toast } from "sonner";
-import Rating from "react-rating";
+import RatingAPILayer from "@/rating_component/react-rating";
 const DisplayRecipe = ({
   recipe,
   updateButton = false,
@@ -63,7 +63,7 @@ const DisplayRecipe = ({
           />
         </div>
         <div className="flex">
-          <Rating
+          <RatingAPILayer
             initialRating={rating}
             onChange={(value) => setRating(value)}
             emptySymbol={
