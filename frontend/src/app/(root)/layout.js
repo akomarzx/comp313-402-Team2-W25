@@ -3,7 +3,7 @@ import Navbar from "@/components/Navbar";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import "@smastrom/react-rating/style.css";
+
 export default function RootLayout({ children }) {
   return (
     <>
