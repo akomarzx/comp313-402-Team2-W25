@@ -2,44 +2,45 @@ package org.group2.comp313.kitchen_companion.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
+import org.group2.comp313.kitchen_companion.domain.Category;
 import org.group2.comp313.kitchen_companion.domain.Recipe;
+import org.group2.comp313.kitchen_companion.domain.RecipeCategoryId;
 import org.group2.comp313.kitchen_companion.domain.projection.RecipeSummaryForCards;
 import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationResult;
 import org.group2.comp313.kitchen_companion.dto.ai.ChatCompletionResponse;
 import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationRequest;
-import org.group2.comp313.kitchen_companion.dto.recipe.IngredientGroupDTO;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeDTO;
-import org.group2.comp313.kitchen_companion.dto.recipe.StepGroupDTO;
-import org.group2.comp313.kitchen_companion.dto.recipe.UpdateRecipeDTO;
 import org.group2.comp313.kitchen_companion.mapper.RecipeMapper;
 import org.group2.comp313.kitchen_companion.repository.RecipeRepository;
 import org.group2.comp313.kitchen_companion.utility.EntityToBeUpdatedNotFoundException;
-import org.group2.comp313.kitchen_companion.utility.IdMismatchedException;
-import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class RecipeService extends BaseService {
 
     private final RecipeRepository recipeRepository;
-    private final StaticCodeService staticCodeService;
     private final IngredientGroupService ingredientGroupService;
     private final StepGroupService stepGroupService;
     private final RecipeCategoryService recipeCategoryService;
     private final ChatGptClientService chatGptClientService;
     private final RecipeMapper recipeMapper;
 
-    public RecipeService(RecipeRepository recipeRepository, StaticCodeService staticCodeService, IngredientGroupService ingredientGroupService, StepGroupService stepGroupService, RecipeCategoryService recipeCategoryService, ChatGptClientService chatGptClientService, RecipeMapper recipeMapper) {
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    public RecipeService(RecipeRepository recipeRepository, IngredientGroupService ingredientGroupService, StepGroupService stepGroupService, RecipeCategoryService recipeCategoryService, ChatGptClientService chatGptClientService, RecipeMapper recipeMapper) {
         this.recipeRepository = recipeRepository;
-        this.staticCodeService = staticCodeService;
         this.ingredientGroupService = ingredientGroupService;
         this.stepGroupService = stepGroupService;
         this.recipeCategoryService = recipeCategoryService;
@@ -67,7 +68,7 @@ public class RecipeService extends BaseService {
 
         try {
 
-            Recipe newRecipe = mapDtoToRecipe(dto);
+            Recipe newRecipe = this.recipeMapper.toRecipe(dto);
             newRecipe.setCreatedBy(createdByEmail);
             newRecipe.setCreatedAt(Instant.now());
             newRecipe.setUpdatedBy(null);
@@ -81,6 +82,11 @@ public class RecipeService extends BaseService {
 
             newRecipe.setIngredientGroups(this.ingredientGroupService.createIngredientGroups(dto.ingredientGroups(), newRecipe.getId(), createdByEmail));
             newRecipe.setStepGroups(this.stepGroupService.createStepGroup(dto.stepGroups(), newRecipe.getId(), createdByEmail));
+
+            // Just wanted to return categories of the new recipe. If entity is not detached it will try to persist the category which will break stuff
+            this.entityManager.detach(newRecipe);
+
+            newRecipe.setCategories(this.recipeRepository.findCategoriesByRecipeId(newRecipe.getId()));
 
             return newRecipe;
 
@@ -119,6 +125,7 @@ public class RecipeService extends BaseService {
 
             recipeToUpdate.setUpdatedBy(updatedByEmail);
             recipeToUpdate.setUpdatedAt(Instant.now());
+            this.updateRecipeCategory(recipeToUpdate.getCategories(), updateRecipeDTO.categoryIds(), recipeToUpdate.getId(), updatedByEmail);
 
             this.recipeRepository.save(recipeToUpdate);
 
@@ -129,22 +136,26 @@ public class RecipeService extends BaseService {
         }
     }
 
-    private Recipe mapDtoToRecipe(RecipeDTO dto) {
-        Recipe newRecipe = new Recipe();
-        newRecipe.setTitle(dto.title());
-        newRecipe.setSummary(dto.summary());
-        newRecipe.setPrepTime(dto.prepTime());
-        newRecipe.setCookTime(dto.cookTime());
-        newRecipe.setServings(dto.servings());
-        newRecipe.setYield(dto.yield());
-        newRecipe.setImageUrl(dto.imageUrl());
-        newRecipe.setThumbnailUrl(dto.thumbnailUrl());
-        newRecipe.setCalories(dto.calories());
-        newRecipe.setCarbsG(dto.carbsG());
-        newRecipe.setFatG(dto.fatG());
-        newRecipe.setSugarsG(dto.sugarsG());
-        newRecipe.setCookTimeUnitCd(this.staticCodeService.getCodeValueUsingCodeValueId(dto.cookTimeUnitCd()).get());
-        newRecipe.setPrepTimeUnitCd(this.staticCodeService.getCodeValueUsingCodeValueId(dto.prepTimeUnitCd()).get());
-        return newRecipe;
+    @Transactional
+    protected void updateRecipeCategory(Set<Category> categories, Set<Integer> categoryIds, Integer recipeId, String updatedByEmail) {
+
+        Set<Integer> existingCategoryIds = categories.stream().map(Category::getId).collect(Collectors.toSet());
+
+        if(!(existingCategoryIds.equals(categoryIds) && categories.size() == categoryIds.size())) {
+
+            Set<Integer> categoryIdsToRemove = existingCategoryIds.stream().filter(id -> !categoryIds.contains(id)).collect(Collectors.toSet());
+            Set<Integer> newCategoryIds = categoryIds.stream().filter(id -> !existingCategoryIds.contains(id)).collect(Collectors.toSet());
+
+            for(Integer categoryId : categoryIdsToRemove) {
+                this.recipeCategoryService.deleteRecipeCategory(categoryId, recipeId);
+            }
+
+            for(Integer categoryId : newCategoryIds) {
+                this.recipeCategoryService.createRecipeCategory(categoryId, recipeId, updatedByEmail);
+            }
+
+        }
+
     }
+
 }

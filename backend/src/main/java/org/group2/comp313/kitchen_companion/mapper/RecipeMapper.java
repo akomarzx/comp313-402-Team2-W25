@@ -17,8 +17,18 @@ import java.util.stream.Collectors;
         nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
 public interface RecipeMapper {
 
-    //@Mapping(ignore = true, target = "prepTimeUnitCd")
-    //@Mapping(ignore = true, target = "cookTimeUnitCd")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "createdBy", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedBy", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "prepTimeUnitCd", source = "prepTimeUnitCd", qualifiedByName = "toEntity")
+    @Mapping(target = "cookTimeUnitCd", source = "cookTimeUnitCd", qualifiedByName = "toEntity")
+    @Mapping(target = "ingredientGroups", ignore = true)
+    @Mapping(target = "stepGroups", ignore = true)
+    @Mapping(target = "categories", ignore = true)
+    Recipe toRecipe(RecipeDTO recipeDTO);
+
     @Mapping(target = "prepTimeUnitCd", source = "prepTimeUnitCd", qualifiedByName = "toEntity")
     @Mapping(target = "cookTimeUnitCd", source = "cookTimeUnitCd", qualifiedByName = "toEntity")
     Recipe partialUpdate(RecipeDTO recipeDTO, @MappingTarget Recipe recipe);
