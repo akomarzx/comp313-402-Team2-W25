@@ -9,15 +9,10 @@ import org.group2.comp313.kitchen_companion.domain.projection.RecipeSummaryForCa
 import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationResult;
 import org.group2.comp313.kitchen_companion.dto.ai.ChatCompletionResponse;
 import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationRequest;
-import org.group2.comp313.kitchen_companion.dto.recipe.IngredientGroupDTO;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeDTO;
-import org.group2.comp313.kitchen_companion.dto.recipe.StepGroupDTO;
-import org.group2.comp313.kitchen_companion.dto.recipe.UpdateRecipeDTO;
 import org.group2.comp313.kitchen_companion.mapper.RecipeMapper;
 import org.group2.comp313.kitchen_companion.repository.RecipeRepository;
 import org.group2.comp313.kitchen_companion.utility.EntityToBeUpdatedNotFoundException;
-import org.group2.comp313.kitchen_companion.utility.IdMismatchedException;
-import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,16 +25,14 @@ import java.util.Objects;
 public class RecipeService extends BaseService {
 
     private final RecipeRepository recipeRepository;
-    private final StaticCodeService staticCodeService;
     private final IngredientGroupService ingredientGroupService;
     private final StepGroupService stepGroupService;
     private final RecipeCategoryService recipeCategoryService;
     private final ChatGptClientService chatGptClientService;
     private final RecipeMapper recipeMapper;
 
-    public RecipeService(RecipeRepository recipeRepository, StaticCodeService staticCodeService, IngredientGroupService ingredientGroupService, StepGroupService stepGroupService, RecipeCategoryService recipeCategoryService, ChatGptClientService chatGptClientService, RecipeMapper recipeMapper) {
+    public RecipeService(RecipeRepository recipeRepository, IngredientGroupService ingredientGroupService, StepGroupService stepGroupService, RecipeCategoryService recipeCategoryService, ChatGptClientService chatGptClientService, RecipeMapper recipeMapper) {
         this.recipeRepository = recipeRepository;
-        this.staticCodeService = staticCodeService;
         this.ingredientGroupService = ingredientGroupService;
         this.stepGroupService = stepGroupService;
         this.recipeCategoryService = recipeCategoryService;
@@ -67,7 +60,7 @@ public class RecipeService extends BaseService {
 
         try {
 
-            Recipe newRecipe = mapDtoToRecipe(dto);
+            Recipe newRecipe = this.recipeMapper.toRecipe(dto);
             newRecipe.setCreatedBy(createdByEmail);
             newRecipe.setCreatedAt(Instant.now());
             newRecipe.setUpdatedBy(null);
@@ -129,22 +122,4 @@ public class RecipeService extends BaseService {
         }
     }
 
-    private Recipe mapDtoToRecipe(RecipeDTO dto) {
-        Recipe newRecipe = new Recipe();
-        newRecipe.setTitle(dto.title());
-        newRecipe.setSummary(dto.summary());
-        newRecipe.setPrepTime(dto.prepTime());
-        newRecipe.setCookTime(dto.cookTime());
-        newRecipe.setServings(dto.servings());
-        newRecipe.setYield(dto.yield());
-        newRecipe.setImageUrl(dto.imageUrl());
-        newRecipe.setThumbnailUrl(dto.thumbnailUrl());
-        newRecipe.setCalories(dto.calories());
-        newRecipe.setCarbsG(dto.carbsG());
-        newRecipe.setFatG(dto.fatG());
-        newRecipe.setSugarsG(dto.sugarsG());
-        newRecipe.setCookTimeUnitCd(this.staticCodeService.getCodeValueUsingCodeValueId(dto.cookTimeUnitCd()).get());
-        newRecipe.setPrepTimeUnitCd(this.staticCodeService.getCodeValueUsingCodeValueId(dto.prepTimeUnitCd()).get());
-        return newRecipe;
-    }
 }
