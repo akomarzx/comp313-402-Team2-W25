@@ -10,6 +10,7 @@ import org.group2.comp313.kitchen_companion.utility.ValidationGroups;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 
 public record RecipeDTO(
         @NotNull(groups = ValidationGroups.Update.class) Integer id,
@@ -27,7 +28,7 @@ public record RecipeDTO(
         @NotNull @DecimalMin(value = "0.0") BigDecimal carbsG,
         @NotNull @DecimalMin(value = "0.0") BigDecimal sugarsG,
         @NotNull @DecimalMin(value = "0.0") BigDecimal fatG,
-        @NotNull @Size(min = 1) List<@NotNull Integer> categoryIds,
+        @NotNull @Size(min = 1) Set<@NotNull Integer> categoryIds,
         @NotNull @Size(min = 1) List<@Valid IngredientGroupDTO> ingredientGroups,
         @NotNull @Size(min = 1) List<@Valid StepGroupDTO> stepGroups
 ) {

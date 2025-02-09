@@ -30,4 +30,11 @@ public class RecipeCategoryService {
         newRecipeCategory.setUpdatedAt(null);
         this.recipeCategoryRepository.save(newRecipeCategory);
     }
+
+    public void deleteRecipeCategory(Integer categoryId, Integer recipeId) {
+        RecipeCategoryId recipeCategoryId = new RecipeCategoryId();
+        recipeCategoryId.setCategoryId(categoryId);
+        recipeCategoryId.setRecipeId(recipeId);
+        this.recipeCategoryRepository.deleteById(recipeCategoryId);
+    }
 }
