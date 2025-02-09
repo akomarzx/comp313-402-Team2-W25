@@ -6,6 +6,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.time.Instant;
 import java.util.LinkedHashSet;
@@ -52,6 +54,7 @@ public class StepGroup {
     private String updatedBy;
 
     @OneToMany(mappedBy = "stepGroup", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @Fetch(FetchMode.JOIN)
     private Set<Step> steps = new LinkedHashSet<>();
 
 }

@@ -8,12 +8,12 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import org.group2.comp313.kitchen_companion.domain.Category;
 import org.group2.comp313.kitchen_companion.domain.Recipe;
-import org.group2.comp313.kitchen_companion.domain.RecipeCategoryId;
 import org.group2.comp313.kitchen_companion.domain.projection.RecipeSummaryForCards;
 import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationResult;
 import org.group2.comp313.kitchen_companion.dto.ai.ChatCompletionResponse;
 import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationRequest;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeDTO;
+import org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryCardWithCategory;
 import org.group2.comp313.kitchen_companion.mapper.RecipeMapper;
 import org.group2.comp313.kitchen_companion.repository.RecipeRepository;
 import org.group2.comp313.kitchen_companion.utility.EntityToBeUpdatedNotFoundException;
@@ -53,9 +53,9 @@ public class RecipeService extends BaseService {
         return recipeRepository.findById(id).orElse(null);
     }
 
-    public Page<RecipeSummaryForCards> getRecipes(Integer page, Integer size) {
+    public Page<RecipeSummaryCardWithCategory> getRecipes(Integer page, Integer size) {
         Pageable pageRequest = PageRequest.of(page, size);
-        return this.recipeRepository.findAllBy(pageRequest);
+        return this.recipeRepository.findAllRecipeSummaryCards(pageRequest);
     }
 
     public Page<RecipeSummaryForCards> getRecipesByCreatedBy(String createdBy, Integer page, Integer size) {

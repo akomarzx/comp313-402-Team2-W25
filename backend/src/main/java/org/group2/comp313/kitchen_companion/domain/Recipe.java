@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -34,16 +36,18 @@ public class Recipe {
     @Column(name = "prep_time", nullable = false)
     private Integer prepTime;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "prep_time_unit_cd")
+    @Fetch(FetchMode.JOIN)
     private CodeValue prepTimeUnitCd;
 
     @NotNull
     @Column(name = "cook_time", nullable = false)
     private Integer cookTime;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cook_time_unit_cd")
+    @Fetch(FetchMode.JOIN)
     private CodeValue cookTimeUnitCd;
 
     @NotNull
@@ -89,10 +93,12 @@ public class Recipe {
     @Column(name = "updated_by", length = 256)
     private String updatedBy;
 
-    @OneToMany(mappedBy = "recipe", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @OneToMany(mappedBy = "recipe", fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @Fetch(FetchMode.JOIN)
     private Set<IngredientGroup> ingredientGroups = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "recipe", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @OneToMany(mappedBy = "recipe", fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @Fetch(FetchMode.JOIN)
     private Set<StepGroup> stepGroups = new LinkedHashSet<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -100,5 +106,6 @@ public class Recipe {
             joinColumns = @JoinColumn(name = "recipe_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
+    @Fetch(FetchMode.JOIN)
     private Set<Category> categories = new HashSet<>();
 }

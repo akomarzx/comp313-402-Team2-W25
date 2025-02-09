@@ -11,7 +11,7 @@ import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationRequest
 import org.group2.comp313.kitchen_companion.dto.ApiResult;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeComponentUpdateDto;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeDTO;
-import org.group2.comp313.kitchen_companion.dto.recipe.UpdateRecipeDTO;
+import org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryCardWithCategory;
 import org.group2.comp313.kitchen_companion.service.AWSS3Service;
 import org.group2.comp313.kitchen_companion.service.IngredientGroupService;
 import org.group2.comp313.kitchen_companion.service.RecipeService;
@@ -74,7 +74,7 @@ public class RecipeController extends BaseController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResult<Page<RecipeSummaryForCards>>>getAllRecipes(@RequestParam Integer page, @RequestParam Integer size) {
+    public ResponseEntity<ApiResult<Page<RecipeSummaryCardWithCategory>>>getAllRecipes(@RequestParam Integer page, @RequestParam Integer size) {
 
         log.info("Request to retrieve all recipe");
 
