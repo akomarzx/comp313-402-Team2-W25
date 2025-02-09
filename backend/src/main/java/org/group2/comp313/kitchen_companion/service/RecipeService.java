@@ -2,6 +2,8 @@ package org.group2.comp313.kitchen_companion.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import org.group2.comp313.kitchen_companion.domain.Recipe;
@@ -19,7 +21,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.Objects;
 
 @Service
 public class RecipeService extends BaseService {
@@ -30,6 +31,9 @@ public class RecipeService extends BaseService {
     private final RecipeCategoryService recipeCategoryService;
     private final ChatGptClientService chatGptClientService;
     private final RecipeMapper recipeMapper;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public RecipeService(RecipeRepository recipeRepository, IngredientGroupService ingredientGroupService, StepGroupService stepGroupService, RecipeCategoryService recipeCategoryService, ChatGptClientService chatGptClientService, RecipeMapper recipeMapper) {
         this.recipeRepository = recipeRepository;
@@ -74,6 +78,11 @@ public class RecipeService extends BaseService {
 
             newRecipe.setIngredientGroups(this.ingredientGroupService.createIngredientGroups(dto.ingredientGroups(), newRecipe.getId(), createdByEmail));
             newRecipe.setStepGroups(this.stepGroupService.createStepGroup(dto.stepGroups(), newRecipe.getId(), createdByEmail));
+
+            // Just wanted to return categories of the new recipe. If entity is not detached it will try to persist the category which will break stuff
+            this.entityManager.detach(newRecipe);
+
+            newRecipe.setCategories(this.recipeRepository.findCategoriesByRecipeId(newRecipe.getId()));
 
             return newRecipe;
 

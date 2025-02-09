@@ -24,8 +24,9 @@ public interface RecipeMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "prepTimeUnitCd", source = "prepTimeUnitCd", qualifiedByName = "toEntity")
     @Mapping(target = "cookTimeUnitCd", source = "cookTimeUnitCd", qualifiedByName = "toEntity")
-    @Mapping(target = "ingredientGroups", source = "categoryIds", ignore = true)
+    @Mapping(target = "ingredientGroups", ignore = true)
     @Mapping(target = "stepGroups", ignore = true)
+    @Mapping(target = "categories", ignore = true)
     Recipe toRecipe(RecipeDTO recipeDTO);
 
     @Mapping(target = "prepTimeUnitCd", source = "prepTimeUnitCd", qualifiedByName = "toEntity")
