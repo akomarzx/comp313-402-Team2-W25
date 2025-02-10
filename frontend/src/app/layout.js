@@ -45,10 +45,7 @@ export default function RootLayout({ children }) {
         <body
           className={`${geistSans.variable} ${geistMono.variable} min-w-[350px] bg-slate-100 text-[#333] antialiased`}
         >
-          <Suspense fallback={<div>Loading...</div>}>
-            {children}
-            <Analytics />
-          </Suspense>
+          <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
         </body>
       </AuthProvider>
     </html>
