@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
         withCredentials: true,
       });
       if (response.data.authenticated) {
-        console.log("User is authenticated:", response.data.user);
+        // console.log("User is authenticated:", response.data.user);
         setUser(response.data.user);
       } else {
         console.log("User is not authenticated");
@@ -64,7 +64,7 @@ export const AuthProvider = ({ children }) => {
           data: response.data.result,
           lastUpdated: Date.now(),
         });
-        console.log("Categories fetched:", response.data.result);
+        // console.log("Categories fetched:", response.data.result);
       }
     } catch (error) {
       console.error("Error fetching categories:", error);

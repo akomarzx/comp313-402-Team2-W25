@@ -63,18 +63,35 @@ const DisplayRecipe = ({
           />
         </div>
         <div className="flex">
-          <RatingAPILayer
-            initialRating={rating}
-            onChange={(value) => setRating(value)}
-            emptySymbol={
-              <ChefHatIcon className="text-green-600 font-semibold" />
-            }
-            fullSymbol={
-              <ChefHatIcon className="text-green-600 fill-yellow-300 font-semibold" />
-            }
-            fractions={4}
-          />
-          <p className="font-semibold text-lg">{rating}</p>
+          <div className="flex flex-wrap gap-2 mb-2">
+            {recipe.categories?.map((cat) => {
+              return (
+                <div
+                  key={cat.id}
+                  className="flex items-center gap-1 px-3 py-1 bg-green-200 text-gray-800 rounded-full cursor-pointer"
+                >
+                  <span>{cat.label}</span>
+                </div>
+              );
+            })}
+          </div>
+          <div className="flex items-right ml-auto">
+            <p className="font-semibold text-lg w-30">
+              {" "}
+              Rating: {rating} &nbsp;
+            </p>
+            <RatingAPILayer
+              initialRating={rating}
+              onChange={(value) => setRating(value)}
+              emptySymbol={
+                <ChefHatIcon className="text-green-600 font-semibold" />
+              }
+              fullSymbol={
+                <ChefHatIcon className="text-green-600 fill-yellow-300 font-semibold" />
+              }
+              fractions={4}
+            />
+          </div>
         </div>
         {/* Recipe Meta Information */}
         <div className="my-4  border-b border-gray-200">
