@@ -15,16 +15,18 @@ const Recipe = () => {
   if (isNaN(id)) {
     redirect("/recipes");
   }
+  const fetchRecipe = async () => {
+    const data = await getRecipeById(id);
+    if (data) setIsLoading(false);
+    setRecipe(data);
+  };
   useEffect(() => {
     fetchSession();
+    fetchRecipe();
   }, []);
   useEffect(() => {
-    const fetchRecipe = async () => {
-      const data = await getRecipeById(id);
-      setRecipe(data);
-    };
-    if (!loading) fetchRecipe().then(() => setIsLoading(false));
-  }, [id, user]);
+    if (!loading) fetchRecipe();
+  }, [id]);
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       {!isLoading ? (
