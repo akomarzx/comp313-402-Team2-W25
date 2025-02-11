@@ -27,6 +27,7 @@ const RecipeCard = ({ data, version = 1 }) => {
             fill
             sizes="100%"
             className="rounded-t-lg"
+            priority
           />
         </div>
 

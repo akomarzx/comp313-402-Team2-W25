@@ -18,6 +18,7 @@ import { BarLoader } from "react-spinners";
 import RecipeCarousel from "@/components/RecipeCarousel";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
+import { ArrowBigUp } from "lucide-react";
 
 const RecipePage = () => {
   const { user, logout } = useAuth();
@@ -40,7 +41,6 @@ const RecipePage = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [recipeCardData, setRecipeCardData] = useState([]);
-  const [data, setData] = useState({});
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(parseInt(page));
   const router = useRouter();
@@ -48,8 +48,8 @@ const RecipePage = () => {
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
-        setIsLoading(true); // Set loading to true
-        const fetchData = await getRecipes(currentPage, 10); // Fetch data
+        setIsLoading(true);
+        const fetchData = await getRecipes(currentPage, 10);
         if (fetchData === 401) {
           logout();
           toast("Session expired. Please login again.");
@@ -58,14 +58,13 @@ const RecipePage = () => {
           }, 2000);
           return;
         }
-        setData(fetchData); // Set the main data state
-        setRecipeCardData(fetchData?.content); // Update the recipe card data
-        setTotalPages(fetchData?.page?.totalPages); // Uncomment if total pages logic is required
-        console.log(fetchData); // Log the fetched data
+        setRecipeCardData(fetchData?.content);
+        setTotalPages(fetchData?.page?.totalPages);
+        console.log(fetchData);
       } catch (error) {
-        console.error("Error fetching recipes:", error); // Handle errors gracefully
+        console.error("Error fetching recipes:", error);
       } finally {
-        setIsLoading(false); // Set loading to false regardless of success/failure
+        setIsLoading(false);
       }
     };
     fetchRecipes();
@@ -109,7 +108,14 @@ const RecipePage = () => {
               isSearching={isSearching}
               recipeCardData={recipeCardData}
             />
-
+            {/* add a jump to top button */}
+            <ArrowBigUp
+              size={50}
+              className="fixed bottom-10 right-10 2xl:right-[100px] p-2 bg-white text-gray-600 rounded-full cursor-pointer"
+              onClick={() => {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+            />
             <Pagination>
               <PaginationContent className="gap-0 border mt-8 rounded-lg divide-x overflow-hidden">
                 <PaginationItem>

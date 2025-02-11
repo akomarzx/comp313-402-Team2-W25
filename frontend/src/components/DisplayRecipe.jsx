@@ -60,6 +60,7 @@ const DisplayRecipe = ({
             layout="fill"
             objectFit="cover"
             className="rounded-lg"
+            priority
           />
         </div>
         <div className="flex">
