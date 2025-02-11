@@ -7,5 +7,4 @@ public interface RecipeSummaryForCards {
     String getTitle();
     String getSummary();
     String getThumbnailUrl();
-    Set<CategorySummary> getCategories();
 }

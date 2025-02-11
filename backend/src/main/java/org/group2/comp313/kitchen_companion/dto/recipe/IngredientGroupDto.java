@@ -8,9 +8,10 @@ import org.group2.comp313.kitchen_companion.utility.ValidationGroups;
 
 import java.util.List;
 
-public record StepGroupDTO(
+public record IngredientGroupDto(
         @NotNull(groups = ValidationGroups.Update.class) Integer id,
-        @NotNull @Min(0) int stepGroupOrder,
+        @NotNull @Min(1) int ingredientGroupOrder,
         @Size(max = 255) String label,
-        @NotNull @Size(min = 1) List<@Valid StepDTO> steps
-) {}
+        @NotNull @Size(min = 1) List<@Valid IngredientDto> ingredients
+) {
+}

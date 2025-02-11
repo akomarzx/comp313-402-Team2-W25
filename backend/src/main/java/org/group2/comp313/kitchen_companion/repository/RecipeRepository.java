@@ -12,11 +12,12 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 public interface RecipeRepository extends PagingAndSortingRepository<Recipe, Integer>, CrudRepository<Recipe, Integer>, JpaSpecificationExecutor<Recipe> {
-    Page<RecipeSummaryForCards> findAllBy(Pageable pageable);
+
     Page<RecipeSummaryForCards> findAllByCreatedByOrderByIdDesc(String createdBy, Pageable pageable);
     Optional<Recipe> findByIdAndCreatedBy(Integer id, String createdBy);
 
@@ -24,7 +25,7 @@ public interface RecipeRepository extends PagingAndSortingRepository<Recipe, Int
     Set<Category> findCategoriesByRecipeId(@Param("recipeId") Integer recipeId);
 
     @Query(value = "SELECT r.recipe_id AS id, r.title, r.summary AS description, r.thumbnail_url AS thumbnailUrl, " +
-            "GROUP_CONCAT(c.label SEPARATOR ',') AS category " +
+            "GROUP_CONCAT(c.label SEPARATOR ', ') AS category " +
             "FROM recipe r " +
             "LEFT JOIN recipe_category rc ON r.recipe_id = rc.recipe_id " +
             "LEFT JOIN category c ON rc.category_id = c.category_id " +
@@ -32,5 +33,10 @@ public interface RecipeRepository extends PagingAndSortingRepository<Recipe, Int
             countQuery = "SELECT COUNT(*) FROM recipe",
             nativeQuery = true)
     Page<RecipeSummaryCardWithCategory> findAllRecipeSummaryCards(Pageable pageable);
+
+    @Query(value = "SELECT r.recipe_id, r.title, r.summary, r.thumbnail_url " +
+            "FROM recipe r LEFT JOIN saved_recipe sr ON r.recipe_id = sr.saved_recipe_id " +
+            "WHERE sr.created_by = :username", nativeQuery = true)
+    Page<RecipeSummaryForCards> findSavedRecipeSummaryCardsByUser(@Param("username") String username, Pageable pageable);
 
 }

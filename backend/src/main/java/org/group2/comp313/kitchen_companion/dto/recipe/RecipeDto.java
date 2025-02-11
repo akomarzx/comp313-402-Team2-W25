@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 
-public record RecipeDTO(
+public record RecipeDto(
         @NotNull(groups = ValidationGroups.Update.class) Integer id,
         @NotNull @Size(min = 1, max = 256) String title,
         @Size(max = 255) String summary,
@@ -29,7 +29,7 @@ public record RecipeDTO(
         @NotNull @DecimalMin(value = "0.0") BigDecimal sugarsG,
         @NotNull @DecimalMin(value = "0.0") BigDecimal fatG,
         @NotNull @Size(min = 1) Set<@NotNull Integer> categoryIds,
-        @NotNull @Size(min = 1) List<@Valid IngredientGroupDTO> ingredientGroups,
-        @NotNull @Size(min = 1) List<@Valid StepGroupDTO> stepGroups
+        @NotNull @Size(min = 1) List<@Valid IngredientGroupDto> ingredientGroups,
+        @NotNull @Size(min = 1) List<@Valid StepGroupDto> stepGroups
 ) {
 }

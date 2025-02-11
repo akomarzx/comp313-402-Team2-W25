@@ -18,6 +18,7 @@ import java.util.Set;
 @Entity
 @Table(name = "ingredient_group")
 public class IngredientGroup {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ingredient_group_id", nullable = false)

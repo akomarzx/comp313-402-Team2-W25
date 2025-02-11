@@ -1,14 +1,12 @@
 package org.group2.comp313.kitchen_companion.service;
 
 import jakarta.transaction.Transactional;
-import org.group2.comp313.kitchen_companion.domain.Ingredient;
 import org.group2.comp313.kitchen_companion.domain.IngredientGroup;
 import org.group2.comp313.kitchen_companion.dto.recipe.ComponentUpdateDto;
-import org.group2.comp313.kitchen_companion.dto.recipe.IngredientDTO;
-import org.group2.comp313.kitchen_companion.dto.recipe.IngredientGroupDTO;
+import org.group2.comp313.kitchen_companion.dto.recipe.IngredientDto;
+import org.group2.comp313.kitchen_companion.dto.recipe.IngredientGroupDto;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeComponentUpdateDto;
 import org.group2.comp313.kitchen_companion.mapper.IngredientGroupMapper;
-import org.group2.comp313.kitchen_companion.mapper.IngredientMapper;
 import org.group2.comp313.kitchen_companion.repository.IngredientGroupRepository;
 import org.group2.comp313.kitchen_companion.utility.EntityToBeUpdatedNotFoundException;
 import org.springframework.stereotype.Service;
@@ -33,11 +31,11 @@ public class IngredientGroupService extends BaseService {
         this.ingredientGroupMapper = ingredientGroupMapper;
     }
 
-    public Set<IngredientGroup> createIngredientGroups(List<IngredientGroupDTO> newIngredientGroupDtoList, Integer recipeId, String createdBy) {
+    public Set<IngredientGroup> createIngredientGroups(List<IngredientGroupDto> newIngredientGroupDtoList, Integer recipeId, String createdBy) {
 
         Set<IngredientGroup> ingredientGroups = new HashSet<>();
 
-        for(IngredientGroupDTO ingredientGroupDto: newIngredientGroupDtoList){
+        for(IngredientGroupDto ingredientGroupDto: newIngredientGroupDtoList){
 
             IngredientGroup ingredientGroup = new IngredientGroup();
             ingredientGroup.setLabel(ingredientGroupDto.label());
@@ -52,7 +50,7 @@ public class IngredientGroupService extends BaseService {
             ingredientGroup = this.ingredientGroupRepository.save(ingredientGroup);
             Integer ingredientGroupId = ingredientGroup.getId();
 
-            for(IngredientDTO ingredientDto : ingredientGroupDto.ingredients()) {
+            for(IngredientDto ingredientDto : ingredientGroupDto.ingredients()) {
                 ingredientGroup.getIngredients().add(this.ingredientService.createIngredient(ingredientDto, ingredientGroupId, createdBy));
             }
 
@@ -85,7 +83,7 @@ public class IngredientGroupService extends BaseService {
     }
 
     @Transactional
-    public IngredientGroup updateIngredientGroup(IngredientGroupDTO dto, Integer recipeId, Integer ingredientGroupId, String updatedBy) {
+    public IngredientGroup updateIngredientGroup(IngredientGroupDto dto, Integer recipeId, Integer ingredientGroupId, String updatedBy) {
 
         IngredientGroup ingredientGroup = this.ingredientGroupRepository.findByIdAndRecipeAndCreatedBy(ingredientGroupId, recipeId, updatedBy).orElse(null);
 
@@ -99,7 +97,7 @@ public class IngredientGroupService extends BaseService {
             this.ingredientGroupMapper.partialUpdate(dto, ingredientGroup);
 
             if(dto.ingredients() != null && !dto.ingredients().isEmpty()) {
-                for(IngredientDTO ingredient : dto.ingredients()) {
+                for(IngredientDto ingredient : dto.ingredients()) {
                     this.ingredientService.updateIngredient(ingredient, updatedBy);
                 }
             }
