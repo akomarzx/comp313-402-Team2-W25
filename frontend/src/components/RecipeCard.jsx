@@ -1,6 +1,7 @@
 import Image from "next/image";
 import React from "react";
 import Link from "next/link";
+import { ChefHatIcon } from "lucide-react";
 
 const RecipeCard = ({ data, version = 1 }) => {
   const cardStyle =
@@ -31,7 +32,7 @@ const RecipeCard = ({ data, version = 1 }) => {
           />
         </div>
 
-        <div className="py-4">
+        <div className="pt-4">
           <h3
             className={`${
               version === 2 ? "font-bold" : "font-semibold"
@@ -40,9 +41,34 @@ const RecipeCard = ({ data, version = 1 }) => {
             {data?.title}
           </h3>
           {version === 1 && (
-            <p className="text-sm text-gray-600 mt-2 line-clamp-3">
-              {data?.summary}
-            </p>
+            <div className="flex mt-2 w-full justify-between">
+              <p className="text-sm text-gray-600 line-clamp-1 flex">
+                <span className="border rounded-full px-2 bg-blue-100">
+                  {data?.category}
+                </span>
+              </p>
+              <p className="text-sm text-gray-600 flex items-right font-semibold">
+                {data?.ratingValue && (
+                  <span className="flex items-center">
+                    <ChefHatIcon
+                      size={20}
+                      className={
+                        data?.ratingValue >= 4
+                          ? "text-green-600"
+                          : data?.ratingValue >= 3
+                          ? "text-yellow-400"
+                          : data?.ratingValue >= 2
+                          ? "text-orange-400"
+                          : data?.ratingValue >= 1
+                          ? "text-red-400"
+                          : "text-gray-400"
+                      }
+                    />
+                    {data?.ratingValue}({data?.ratingCount})
+                  </span>
+                )}
+              </p>
+            </div>
           )}
         </div>
       </Link>{" "}
