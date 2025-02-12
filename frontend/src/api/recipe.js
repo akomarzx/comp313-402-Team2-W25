@@ -2,7 +2,9 @@ import axios from "axios";
 const recipeUrl = process.env.NEXT_PUBLIC_RECIPE_API;
 export async function getRecipeById(recipeId) {
   try {
-    const recipe = await axios.get(`${recipeUrl}/kc/v1/recipe/${recipeId}`);
+    const recipe = await axios.get(
+      `${recipeUrl}/kc/v1/public/recipe/${recipeId}`
+    );
     return recipe.data.result;
   } catch (error) {
     if (error.response) {
@@ -19,7 +21,7 @@ export async function getRecipeById(recipeId) {
 export async function getRecipes(page, size) {
   try {
     const recipes = await axios.get(
-      `${recipeUrl}/kc/v1/recipe?size=${size}&page=${page}`
+      `${recipeUrl}/kc/v1/public/recipe?size=${size}&page=${page}`
     );
     console.log(recipes.data.result);
     return recipes.data.result;
@@ -139,5 +141,41 @@ export async function updateStepGroup(recipeId, stepGroupId, data) {
     return recipeResponse;
   } catch (error) {
     console.log("Error updating step group:", error);
+  }
+}
+
+export async function getRatingById(recipeId, isUser) {
+  try {
+    if (isUser) {
+      const rating = await axios.get(
+        `${recipeUrl}/kc/v1/rating/my-rating/recipe/${recipeId}`,
+        {
+          withCredentials: true,
+        }
+      );
+      console.log(rating.data.result);
+      return rating.data.result;
+    }
+    const rating = await axios.get(
+      `${recipeUrl}/kc/v1/public/rating/recipe/${recipeId}`
+    );
+    return rating.data.result;
+  } catch (error) {
+    console.log("Error fetching rating:", error);
+  }
+}
+
+export async function sendRating(recipeId, data) {
+  try {
+    const ratingResponse = await axios.put(
+      `${recipeUrl}/kc/v1/rating/${recipeId}`,
+      { ratingValue: data },
+      {
+        withCredentials: true,
+      }
+    );
+    return ratingResponse;
+  } catch (error) {
+    console.log("Error sending rating:", error);
   }
 }

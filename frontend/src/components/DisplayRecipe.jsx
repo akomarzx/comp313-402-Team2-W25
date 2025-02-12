@@ -1,17 +1,26 @@
-import React from "react";
+import React, { useState } from "react";
 import { Edit, SaveIcon, ChefHatIcon } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { createRecipe } from "@/api/recipe";
+import { createRecipe, sendRating } from "@/api/recipe";
 import { toast } from "sonner";
 import RatingAPILayer from "@/rating_component/react-rating";
 const DisplayRecipe = ({
   recipe,
+  ratingCurrent,
   updateButton = false,
   saveButton = false,
 }) => {
   const router = useRouter();
-  const [rating, setRating] = React.useState(4.7);
+  const [rating, setRating] = useState(ratingCurrent);
+  const handleRatingChange = async (e) => {
+    const res = await sendRating(recipe.id, e);
+    if (res?.status === 200 || 201) {
+      toast("Rating added successfully!");
+      console.log(res.data.result);
+      setRating({ ...res.data.result, user: rating.user });
+    }
+  };
   return (
     <div>
       {" "}
@@ -65,34 +74,58 @@ const DisplayRecipe = ({
         </div>
         <div className="flex">
           <div className="flex flex-wrap gap-2 mb-2">
-            {recipe.categories?.map((cat) => {
-              return (
-                <div
-                  key={cat.id}
-                  className="flex items-center gap-1 px-3 py-1 bg-green-200 text-gray-800 rounded-full cursor-pointer"
-                >
-                  <span>{cat.label}</span>
-                </div>
-              );
-            })}
+            {recipe.categories
+              ?.sort((a, b) => a.id - b.id)
+              .map((cat) => {
+                return (
+                  <div
+                    key={cat.id}
+                    className="flex items-center gap-1 px-3 py-1 bg-green-200 text-gray-800 rounded-full cursor-pointer"
+                  >
+                    <span>{cat.label}</span>
+                  </div>
+                );
+              })}
           </div>
-          <div className="flex items-right ml-auto">
-            <p className="font-semibold text-lg w-30">
-              {" "}
-              Rating: {rating} &nbsp;
-            </p>
-            <RatingAPILayer
-              initialRating={rating}
-              onChange={(value) => setRating(value)}
-              emptySymbol={
-                <ChefHatIcon className="text-green-600 font-semibold" />
-              }
-              fullSymbol={
-                <ChefHatIcon className="text-green-600 fill-yellow-300 font-semibold" />
-              }
-              fractions={4}
-            />
-          </div>
+          {rating && (
+            <div className="flex flex-col ml-auto">
+              <div className="flex  ">
+                <RatingAPILayer
+                  initialRating={rating?.ratingValue}
+                  onChange={handleRatingChange}
+                  emptySymbol={[
+                    <ChefHatIcon className="text-gray-300 font-semibold" />,
+                    <ChefHatIcon className="text-gray-300 font-semibold" />,
+                    <ChefHatIcon className="text-gray-300 font-semibold" />,
+                    <ChefHatIcon className="text-gray-300 font-semibold" />,
+                    <ChefHatIcon className="text-gray-300 font-semibold" />,
+                  ]}
+                  fullSymbol={[
+                    <ChefHatIcon className="text-gray-600   font-semibold" />,
+                    <ChefHatIcon className="text-red-600  ont-semibold" />,
+                    <ChefHatIcon className="text-orange-400   0 font-semibold" />,
+                    <ChefHatIcon className="text-yellow-300   0 font-semibold" />,
+                    <ChefHatIcon className="text-green-600   font-semibold" />,
+                  ]}
+                  fractions={4}
+                  readonly={
+                    updateButton ||
+                    rating.currentUserRating ||
+                    rating.user === null
+                  }
+                />
+                <p className="font-semibold text-lg  text-right">
+                  {" "}
+                  {rating?.ratingValue} ({rating?.numberOfRatings})
+                </p>
+              </div>
+              {rating?.currentUserRating && (
+                <p className="text-sm text-gray-600 text-right">
+                  Your rating: {rating?.currentUserRating}
+                </p>
+              )}
+            </div>
+          )}
         </div>
         {/* Recipe Meta Information */}
         <div className="my-4  border-b border-gray-200">
