@@ -246,16 +246,6 @@ const AIReccommend = () => {
             <TabsContent value="mealplan" className="space-y-8">
               <div className="space-y-4">
                 <label className="block text-lg font-semibold text-gray-800">
-                  What ingredients do you have?
-                </label>
-                <IngredientInput
-                  ingredients={ingredients}
-                  setIngredients={setIngredients}
-                />
-              </div>
-
-              <div className="space-y-4">
-                <label className="block text-lg font-semibold text-gray-800">
                   Meal Plan Duration
                 </label>
                 <Select value={mealPlanDays} onValueChange={setMealPlanDays}>
