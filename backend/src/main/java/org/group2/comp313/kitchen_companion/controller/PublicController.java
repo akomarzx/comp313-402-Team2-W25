@@ -3,13 +3,17 @@ package org.group2.comp313.kitchen_companion.controller;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.group2.comp313.kitchen_companion.domain.Recipe;
 import org.group2.comp313.kitchen_companion.dto.ApiResult;
+import org.group2.comp313.kitchen_companion.dto.rating.RecipeRatingDto;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryCardWithCategory;
 import org.group2.comp313.kitchen_companion.service.AWSS3Service;
+import org.group2.comp313.kitchen_companion.service.RatingsService;
 import org.group2.comp313.kitchen_companion.service.RecipeService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,9 +23,11 @@ import org.springframework.web.multipart.MultipartFile;
 public class PublicController extends BaseController {
 
     private final RecipeService recipeService;
+    private final RatingsService ratingsService;
 
-    public PublicController(RecipeService recipeService) {
+    public PublicController(RecipeService recipeService, RatingsService ratingsService) {
         this.recipeService = recipeService;
+        this.ratingsService = ratingsService;
     }
 
     @GetMapping("/recipe/{id}")
@@ -60,6 +66,23 @@ public class PublicController extends BaseController {
             return ResponseEntity.ok(new ApiResult<>("" ,this.recipeService.getRecipes(page, size)));
         } catch (Exception e) {
             return new ResponseEntity<>(new ApiResult<>(e.getLocalizedMessage(), null), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/rating/recipe/{recipeId}")
+    public ResponseEntity<ApiResult<RecipeRatingDto>> getRatingForUser(@PathVariable(name = "recipeId") Integer recipeId) {
+        try {
+
+            RecipeRatingDto result = this.ratingsService.getRecipeRatingForUser(recipeId, null);
+
+            if (result != null) {
+                return new ResponseEntity<>(new ApiResult<>(null, result), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(new ApiResult<>("Failed to retrieve user rating for this recipe. ", null), HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            this.log.error(e.getMessage());
+            return new ResponseEntity<>(new ApiResult<>("Failed to retrieve user rating for this recipe. ", null), HttpStatus.BAD_REQUEST);
         }
     }
 
