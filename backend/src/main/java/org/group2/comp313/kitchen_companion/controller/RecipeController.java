@@ -10,15 +10,15 @@ import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationResult;
 import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationRequest;
 import org.group2.comp313.kitchen_companion.dto.ApiResult;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeComponentUpdateDto;
-import org.group2.comp313.kitchen_companion.dto.recipe.RecipeDTO;
-import org.group2.comp313.kitchen_companion.dto.recipe.UpdateRecipeDTO;
+import org.group2.comp313.kitchen_companion.dto.recipe.RecipeDto;
+import org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryCardWithCategory;
+import org.group2.comp313.kitchen_companion.dto.recipe.SaveRecipeDto;
 import org.group2.comp313.kitchen_companion.service.AWSS3Service;
 import org.group2.comp313.kitchen_companion.service.IngredientGroupService;
 import org.group2.comp313.kitchen_companion.service.RecipeService;
 
 import org.group2.comp313.kitchen_companion.service.StepGroupService;
 import org.group2.comp313.kitchen_companion.utility.EntityToBeUpdatedNotFoundException;
-import org.group2.comp313.kitchen_companion.utility.IdMismatchedException;
 import org.group2.comp313.kitchen_companion.utility.ValidationGroups;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -28,6 +28,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/recipe")
@@ -47,44 +49,6 @@ public class RecipeController extends BaseController {
         this.stepGroupService = stepGroupService;
     }
 
-    @GetMapping("{id}")
-    public ResponseEntity<ApiResult<Recipe>> getRecipe(@PathVariable Integer id) {
-
-        log.info("Get recipe with id {}", id);
-
-        ApiResult<Recipe> apiResult;
-        HttpStatus status;
-
-        try {
-            Recipe recipe = this.recipeService.getRecipeById(id);
-
-            if(recipe == null) {
-                status = HttpStatus.NOT_FOUND;
-                apiResult = new ApiResult<>("Recipe not found.", null);
-            } else {
-                status = HttpStatus.OK;
-                apiResult = new ApiResult<>("", recipe);
-            }
-
-            return new ResponseEntity<>(apiResult, status);
-
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ApiResult<>(e.getLocalizedMessage(), null), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @GetMapping
-    public ResponseEntity<ApiResult<Page<RecipeSummaryForCards>>>getAllRecipes(@RequestParam Integer page, @RequestParam Integer size) {
-
-        log.info("Request to retrieve all recipe");
-
-        try {
-            return ResponseEntity.ok(new ApiResult<>("" ,this.recipeService.getRecipes(page, size)));
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ApiResult<>(e.getLocalizedMessage(), null), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     @GetMapping("/my-recipe")
     public ResponseEntity<ApiResult<Page<RecipeSummaryForCards>>>getAllUserRecipes(@RequestParam Integer page,
                                                                                    @RequestParam Integer size,
@@ -102,7 +66,7 @@ public class RecipeController extends BaseController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResult<Recipe>> createRecipe(@NotNull @RequestBody @Validated(ValidationGroups.Create.class) RecipeDTO createRecipeDto,
+    public ResponseEntity<ApiResult<Recipe>> createRecipe(@NotNull @RequestBody @Validated(ValidationGroups.Create.class) RecipeDto createRecipeDto,
                                                           @AuthenticationPrincipal(expression = "claims['email']") String createdByEmail) {
 
         log.info("Request to create recipe: {}", createRecipeDto.toString());
@@ -147,7 +111,7 @@ public class RecipeController extends BaseController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResult<Boolean>> updateRecipe(@PathVariable Integer id,
-                                                           @NotNull @RequestBody @Validated(ValidationGroups.Update.class) RecipeDTO updateRecipeDto,
+                                                           @NotNull @RequestBody @Validated(ValidationGroups.Update.class) RecipeDto updateRecipeDto,
                                                            @AuthenticationPrincipal(expression = "claims['email']") String createdByEmail) {
 
         log.info("Request to update recipe: {}", updateRecipeDto.toString());
@@ -155,9 +119,6 @@ public class RecipeController extends BaseController {
         try {
             Boolean result = this.recipeService.updateRecipe(id, updateRecipeDto, createdByEmail);
             return new ResponseEntity<>(new ApiResult<>("Recipe Update Successful.", result), HttpStatus.OK);
-        } catch (IdMismatchedException e) {
-            log.error(e.getLocalizedMessage());
-            return new ResponseEntity<>(new ApiResult<>(e.getLocalizedMessage(), null), HttpStatus.BAD_REQUEST);
         } catch (EntityToBeUpdatedNotFoundException e) {
             log.error(e.getLocalizedMessage());
             return new ResponseEntity<>(new ApiResult<>(e.getLocalizedMessage(), null), HttpStatus.NOT_FOUND);
@@ -188,6 +149,29 @@ public class RecipeController extends BaseController {
 
     }
 
+    @PostMapping("/save")
+    public ResponseEntity<ApiResult<Void>> saveRecipeForUser(@Valid @RequestBody SaveRecipeDto saveRecipeDto,
+                                                             @AuthenticationPrincipal(expression = "claims['email']") String createdByEmail) {
+
+        this.recipeService.saveRecipeForUser(saveRecipeDto.recipeId(), createdByEmail);
+        return new ResponseEntity<>(new ApiResult<>("Recipe Saved Successfully.", null), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/save/{recipeId}")
+    public ResponseEntity<ApiResult<Void>> removeSavedRecipeForUser(@PathVariable(name = "recipeId") Integer id,
+                                                                    @AuthenticationPrincipal(expression = "claims['email']") String createdByEmail) {
+        this.recipeService.removeSavedRecipe(id, createdByEmail);
+        return new ResponseEntity<>(new ApiResult<>("Saved Recipe Removed.", null), HttpStatus.OK);
+    }
+
+    @GetMapping("/saved")
+    public ResponseEntity<Page<RecipeSummaryForCards>> getSavedRecipes(@RequestParam Integer page,
+                                                                       @RequestParam Integer size,
+                                                                       @AuthenticationPrincipal(expression = "claims['email']") String email) {
+
+        return ResponseEntity.ok(this.recipeService.getSavedRecipeForUser(page, size, email));
+    }
+
     private ResponseEntity<ApiResult<Boolean>> updateRecipeComponent(Integer recipeId,
                                                                      Integer groupId,
                                                                      RecipeComponentUpdateDto recipeComponentUpdateDto,
@@ -208,5 +192,4 @@ public class RecipeController extends BaseController {
             return new ResponseEntity<>(new ApiResult<>(e.getLocalizedMessage(), false), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 }

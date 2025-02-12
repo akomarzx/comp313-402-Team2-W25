@@ -8,14 +8,16 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import org.group2.comp313.kitchen_companion.domain.Category;
 import org.group2.comp313.kitchen_companion.domain.Recipe;
-import org.group2.comp313.kitchen_companion.domain.RecipeCategoryId;
+import org.group2.comp313.kitchen_companion.domain.SavedRecipe;
 import org.group2.comp313.kitchen_companion.domain.projection.RecipeSummaryForCards;
 import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationResult;
 import org.group2.comp313.kitchen_companion.dto.ai.ChatCompletionResponse;
 import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationRequest;
-import org.group2.comp313.kitchen_companion.dto.recipe.RecipeDTO;
+import org.group2.comp313.kitchen_companion.dto.recipe.RecipeDto;
+import org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryCardWithCategory;
 import org.group2.comp313.kitchen_companion.mapper.RecipeMapper;
 import org.group2.comp313.kitchen_companion.repository.RecipeRepository;
+import org.group2.comp313.kitchen_companion.repository.SavedRecipeRepository;
 import org.group2.comp313.kitchen_companion.utility.EntityToBeUpdatedNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -35,17 +38,19 @@ public class RecipeService extends BaseService {
     private final RecipeCategoryService recipeCategoryService;
     private final ChatGptClientService chatGptClientService;
     private final RecipeMapper recipeMapper;
+    private final SavedRecipeRepository savedRecipeRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
 
-    public RecipeService(RecipeRepository recipeRepository, IngredientGroupService ingredientGroupService, StepGroupService stepGroupService, RecipeCategoryService recipeCategoryService, ChatGptClientService chatGptClientService, RecipeMapper recipeMapper) {
+    public RecipeService(RecipeRepository recipeRepository, IngredientGroupService ingredientGroupService, StepGroupService stepGroupService, RecipeCategoryService recipeCategoryService, ChatGptClientService chatGptClientService, RecipeMapper recipeMapper, SavedRecipeRepository savedRecipeRepository) {
         this.recipeRepository = recipeRepository;
         this.ingredientGroupService = ingredientGroupService;
         this.stepGroupService = stepGroupService;
         this.recipeCategoryService = recipeCategoryService;
         this.chatGptClientService = chatGptClientService;
         this.recipeMapper = recipeMapper;
+        this.savedRecipeRepository = savedRecipeRepository;
     }
 
     @Transactional
@@ -53,9 +58,9 @@ public class RecipeService extends BaseService {
         return recipeRepository.findById(id).orElse(null);
     }
 
-    public Page<RecipeSummaryForCards> getRecipes(Integer page, Integer size) {
+    public Page<RecipeSummaryCardWithCategory> getRecipes(Integer page, Integer size) {
         Pageable pageRequest = PageRequest.of(page, size);
-        return this.recipeRepository.findAllBy(pageRequest);
+        return this.recipeRepository.findAllRecipeSummaryCards(pageRequest);
     }
 
     public Page<RecipeSummaryForCards> getRecipesByCreatedBy(String createdBy, Integer page, Integer size) {
@@ -64,7 +69,7 @@ public class RecipeService extends BaseService {
     }
 
     @Transactional
-    public Recipe createRecipe(RecipeDTO dto, @NotNull String createdByEmail) {
+    public Recipe createRecipe(RecipeDto dto, @NotNull String createdByEmail) {
 
         try {
 
@@ -115,17 +120,17 @@ public class RecipeService extends BaseService {
     }
 
     @Transactional
-    public Boolean updateRecipe(Integer recipeId, RecipeDTO updateRecipeDTO, String updatedByEmail) {
+    public Boolean updateRecipe(Integer recipeId, RecipeDto updateRecipeDto, String updatedByEmail) {
 
         Recipe recipeToUpdate = this.recipeRepository.findByIdAndCreatedBy(recipeId, updatedByEmail).orElse(null);
 
         if(recipeToUpdate != null) {
 
-            recipeMapper.partialUpdate(updateRecipeDTO, recipeToUpdate);
+            recipeMapper.partialUpdate(updateRecipeDto, recipeToUpdate);
 
             recipeToUpdate.setUpdatedBy(updatedByEmail);
             recipeToUpdate.setUpdatedAt(Instant.now());
-            this.updateRecipeCategory(recipeToUpdate.getCategories(), updateRecipeDTO.categoryIds(), recipeToUpdate.getId(), updatedByEmail);
+            this.updateRecipeCategory(recipeToUpdate.getCategories(), updateRecipeDto.categoryIds(), recipeToUpdate.getId(), updatedByEmail);
 
             this.recipeRepository.save(recipeToUpdate);
 
@@ -153,9 +158,33 @@ public class RecipeService extends BaseService {
             for(Integer categoryId : newCategoryIds) {
                 this.recipeCategoryService.createRecipeCategory(categoryId, recipeId, updatedByEmail);
             }
-
         }
-
     }
 
+    public void saveRecipeForUser(Integer recipeId, String userEmail) {
+
+        SavedRecipe savedRecipe = this.savedRecipeRepository.findOneByRecipeAndCreatedBy(recipeId, userEmail).orElse(null);
+
+        if(savedRecipe == null) {
+            SavedRecipe newSavedRecipe = new SavedRecipe();
+            newSavedRecipe.setCreatedBy(userEmail);
+            newSavedRecipe.setCreatedAt(Instant.now());
+            //newSavedRecipe.setRecipe(recipeId);
+            this.savedRecipeRepository.save(newSavedRecipe);
+        }
+    }
+
+    public void removeSavedRecipe(Integer recipeId, String userEmail) {
+
+        SavedRecipe savedRecipe = this.savedRecipeRepository.findOneByRecipeAndCreatedBy(recipeId, userEmail).orElse(null);
+
+        if(savedRecipe != null) {
+            this.savedRecipeRepository.delete(savedRecipe);
+        }
+    }
+
+    public Page<RecipeSummaryForCards> getSavedRecipeForUser(Integer page, Integer size, String userEmail) {
+        Pageable pageRequest = PageRequest.of(page, size);
+        return this.recipeRepository.findSavedRecipeSummaryCardsByUser(userEmail, pageRequest);
+    }
 }

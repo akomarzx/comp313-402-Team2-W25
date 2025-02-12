@@ -1,10 +1,8 @@
 package org.group2.comp313.kitchen_companion.service;
 
-import org.group2.comp313.kitchen_companion.domain.Recipe;
 import org.group2.comp313.kitchen_companion.domain.Step;
 import org.group2.comp313.kitchen_companion.dto.recipe.ComponentUpdateDto;
-import org.group2.comp313.kitchen_companion.dto.recipe.RecipeComponentUpdateDto;
-import org.group2.comp313.kitchen_companion.dto.recipe.StepDTO;
+import org.group2.comp313.kitchen_companion.dto.recipe.StepDto;
 import org.group2.comp313.kitchen_companion.mapper.StepMapper;
 import org.group2.comp313.kitchen_companion.repository.StepRepository;
 import org.group2.comp313.kitchen_companion.utility.EntityToBeUpdatedNotFoundException;
@@ -23,7 +21,7 @@ public class StepService extends BaseService {
         this.stepMapper = stepMapper;
     }
 
-    public Step createStep(StepDTO newStepDto, Integer stepGroupId, String createdBy) {
+    public Step createStep(StepDto newStepDto, Integer stepGroupId, String createdBy) {
 
         Step newStep = new Step();
 
@@ -63,7 +61,7 @@ public class StepService extends BaseService {
         }
     }
 
-    public void updateStep(StepDTO dto, String updatedBy) {
+    public void updateStep(StepDto dto, String updatedBy) {
 
         Step step = stepRepository.findByIdAndCreatedBy(dto.id(), updatedBy).orElse(null);
 

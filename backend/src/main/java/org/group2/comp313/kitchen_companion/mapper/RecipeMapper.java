@@ -1,12 +1,11 @@
 package org.group2.comp313.kitchen_companion.mapper;
 
 import org.group2.comp313.kitchen_companion.domain.*;
-import org.group2.comp313.kitchen_companion.dto.recipe.IngredientGroupDTO;
-import org.group2.comp313.kitchen_companion.dto.recipe.RecipeDTO;
-import org.group2.comp313.kitchen_companion.dto.recipe.StepGroupDTO;
+import org.group2.comp313.kitchen_companion.dto.recipe.IngredientGroupDto;
+import org.group2.comp313.kitchen_companion.dto.recipe.RecipeDto;
+import org.group2.comp313.kitchen_companion.dto.recipe.StepGroupDto;
 import org.mapstruct.*;
 
-import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -27,14 +26,14 @@ public interface RecipeMapper {
     @Mapping(target = "ingredientGroups", ignore = true)
     @Mapping(target = "stepGroups", ignore = true)
     @Mapping(target = "categories", ignore = true)
-    Recipe toRecipe(RecipeDTO recipeDTO);
+    Recipe toRecipe(RecipeDto recipeDTO);
 
     @Mapping(target = "prepTimeUnitCd", source = "prepTimeUnitCd", qualifiedByName = "toEntity")
     @Mapping(target = "cookTimeUnitCd", source = "cookTimeUnitCd", qualifiedByName = "toEntity")
-    Recipe partialUpdate(RecipeDTO recipeDTO, @MappingTarget Recipe recipe);
+    Recipe partialUpdate(RecipeDto recipeDTO, @MappingTarget Recipe recipe);
 
     @AfterMapping
-    default void mergeIngredientGroups(@MappingTarget Recipe recipe, RecipeDTO recipeDTO) {
+    default void mergeIngredientGroups(@MappingTarget Recipe recipe, RecipeDto recipeDTO) {
 
         if (recipeDTO.ingredientGroups() != null) {
 
@@ -69,7 +68,7 @@ public interface RecipeMapper {
     }
 
     @AfterMapping
-    default void mergeStepGroups(@MappingTarget Recipe recipe, RecipeDTO recipeDTO) {
+    default void mergeStepGroups(@MappingTarget Recipe recipe, RecipeDto recipeDTO) {
         if (recipeDTO.stepGroups() != null) {
 
             Map<Integer, StepGroup> existingGroups = recipe.getStepGroups().stream()
@@ -100,7 +99,7 @@ public interface RecipeMapper {
         }
     }
 
-    private void mergeIngredients(IngredientGroup group, IngredientGroupDTO dto) {
+    private void mergeIngredients(IngredientGroup group, IngredientGroupDto dto) {
 
         if (dto.ingredients() != null) {
 
@@ -134,7 +133,7 @@ public interface RecipeMapper {
         }
     }
 
-    private void mergeSteps(StepGroup group, StepGroupDTO dto) {
+    private void mergeSteps(StepGroup group, StepGroupDto dto) {
 
         if (dto.steps() != null) {
             Map<Integer, Step> existingSteps = group.getSteps().stream()

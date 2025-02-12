@@ -6,6 +6,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.time.Instant;
 import java.util.LinkedHashSet;
@@ -16,6 +18,7 @@ import java.util.Set;
 @Entity
 @Table(name = "ingredient_group")
 public class IngredientGroup {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ingredient_group_id", nullable = false)
@@ -52,6 +55,7 @@ public class IngredientGroup {
     private String updatedBy;
 
     @OneToMany(mappedBy = "ingredientGroup", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @Fetch(FetchMode.JOIN)
     private Set<Ingredient> ingredients = new LinkedHashSet<>();
 
 }

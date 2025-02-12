@@ -8,6 +8,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import java.util.List;
 
 public interface CategoryRepository extends JpaRepository<Category, Integer>, JpaSpecificationExecutor<Category> {
-    Category findByLabel(String cleanedLabel);
     List<CategorySummary> findAllBy();
 }

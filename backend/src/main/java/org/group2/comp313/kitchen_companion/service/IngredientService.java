@@ -1,9 +1,8 @@
 package org.group2.comp313.kitchen_companion.service;
 
 import org.group2.comp313.kitchen_companion.domain.Ingredient;
-import org.group2.comp313.kitchen_companion.domain.Step;
 import org.group2.comp313.kitchen_companion.dto.recipe.ComponentUpdateDto;
-import org.group2.comp313.kitchen_companion.dto.recipe.IngredientDTO;
+import org.group2.comp313.kitchen_companion.dto.recipe.IngredientDto;
 import org.group2.comp313.kitchen_companion.mapper.IngredientMapper;
 import org.group2.comp313.kitchen_companion.repository.IngredientRepository;
 import org.group2.comp313.kitchen_companion.utility.EntityToBeUpdatedNotFoundException;
@@ -22,7 +21,7 @@ public class IngredientService extends BaseService {
         this.ingredientMapper = ingredientMapper;
     }
 
-    public Ingredient createIngredient(IngredientDTO ingredientDTO, Integer ingredientGroupId, String createdBy) {
+    public Ingredient createIngredient(IngredientDto ingredientDTO, Integer ingredientGroupId, String createdBy) {
 
         Ingredient newIngredient = new Ingredient();
 
@@ -59,7 +58,7 @@ public class IngredientService extends BaseService {
         }
     }
 
-    public void updateIngredient(IngredientDTO dto, String updatedBy) {
+    public void updateIngredient(IngredientDto dto, String updatedBy) {
 
         Ingredient ingredient = ingredientRepository.findByIdAndCreatedBy(dto.id(), updatedBy).orElse(null);
 

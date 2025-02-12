@@ -5,7 +5,6 @@ import org.group2.comp313.kitchen_companion.domain.StepGroup;
 import org.group2.comp313.kitchen_companion.dto.recipe.*;
 import org.group2.comp313.kitchen_companion.mapper.StepGroupMapper;
 import org.group2.comp313.kitchen_companion.repository.StepGroupRepository;
-import org.group2.comp313.kitchen_companion.repository.StepRepository;
 import org.group2.comp313.kitchen_companion.utility.EntityToBeUpdatedNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -27,11 +26,11 @@ public class StepGroupService extends BaseService {
         this.stepGroupMapper = stepGroupMapper;
     }
 
-    public Set<StepGroup> createStepGroup(List<StepGroupDTO> newStepGroupList, Integer recipeId, String createdBy) {
+    public Set<StepGroup> createStepGroup(List<StepGroupDto> newStepGroupList, Integer recipeId, String createdBy) {
 
         Set<StepGroup> stepGroups = new HashSet<>();
 
-        for(StepGroupDTO stepGroupDto: newStepGroupList){
+        for(StepGroupDto stepGroupDto: newStepGroupList){
 
             StepGroup newStepGroup = new StepGroup();
             newStepGroup.setLabel(stepGroupDto.label());
@@ -47,7 +46,7 @@ public class StepGroupService extends BaseService {
 
             Integer newStepGroupId = newStepGroup.getId();
 
-            for(StepDTO stepDto: stepGroupDto.steps()) {
+            for(StepDto stepDto: stepGroupDto.steps()) {
                 newStepGroup.getSteps().add(this.stepService.createStep(stepDto, newStepGroupId, createdBy));
             }
 
@@ -82,7 +81,7 @@ public class StepGroupService extends BaseService {
     }
 
     @Transactional
-    public void updateStepGroup(StepGroupDTO dto, Integer recipeId, Integer stepGroupId, String updatedBy) {
+    public void updateStepGroup(StepGroupDto dto, Integer recipeId, Integer stepGroupId, String updatedBy) {
 
         StepGroup stepGroup = this.stepGroupRepository.findByIdAndRecipeAndCreatedBy(stepGroupId, recipeId, updatedBy).orElse(null);
 
@@ -93,7 +92,7 @@ public class StepGroupService extends BaseService {
             this.stepGroupMapper.partialUpdate(dto, stepGroup);
 
             if(dto != null && !dto.steps().isEmpty()) {
-                for(StepDTO step: dto.steps()) {
+                for(StepDto step: dto.steps()) {
                     this.stepService.updateStep(step, updatedBy);
                 }
             }
