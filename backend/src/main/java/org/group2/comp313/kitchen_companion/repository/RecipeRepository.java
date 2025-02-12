@@ -24,12 +24,18 @@ public interface RecipeRepository extends PagingAndSortingRepository<Recipe, Int
     @Query("SELECT c FROM Recipe r JOIN r.categories c WHERE r.id = :recipeId")
     Set<Category> findCategoriesByRecipeId(@Param("recipeId") Integer recipeId);
 
-    @Query(value = "SELECT r.recipe_id AS id, r.title, r.summary AS description, r.thumbnail_url AS thumbnailUrl, " +
+    @Query(value = "SELECT r.recipe_id AS id, " +
+            "r.title, " +
+            "r.summary AS description, " +
+            "r.thumbnail_url AS thumbnailUrl, " +
+            "CAST(IFNULL(r_calc.rating_count, 0) AS SIGNED) AS ratingCount, " +
+            "CAST(IFNULL(r_calc.rating_value, 0.0) AS DECIMAL(4,2)) AS ratingValue, " +
             "GROUP_CONCAT(c.label SEPARATOR ', ') AS category " +
             "FROM recipe r " +
             "LEFT JOIN recipe_category rc ON r.recipe_id = rc.recipe_id " +
             "LEFT JOIN category c ON rc.category_id = c.category_id " +
-            "GROUP BY r.recipe_id, r.title, r.summary, r.thumbnail_url",
+            "LEFT JOIN rating_calculated r_calc ON r.recipe_id = r_calc.recipe_id " +
+            "GROUP BY r.recipe_id, r.title, r.summary, r.thumbnail_url, r_calc.rating_count, r_calc.rating_value",
             countQuery = "SELECT COUNT(*) FROM recipe",
             nativeQuery = true)
     Page<RecipeSummaryCardWithCategory> findAllRecipeSummaryCards(Pageable pageable);

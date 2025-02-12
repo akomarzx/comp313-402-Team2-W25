@@ -49,44 +49,6 @@ public class RecipeController extends BaseController {
         this.stepGroupService = stepGroupService;
     }
 
-    @GetMapping("{id}")
-    public ResponseEntity<ApiResult<Recipe>> getRecipe(@PathVariable Integer id) {
-
-        log.info("Get recipe with id {}", id);
-
-        ApiResult<Recipe> apiResult;
-        HttpStatus status;
-
-        try {
-            Recipe recipe = this.recipeService.getRecipeById(id);
-
-            if(recipe == null) {
-                status = HttpStatus.NOT_FOUND;
-                apiResult = new ApiResult<>("Recipe not found.", null);
-            } else {
-                status = HttpStatus.OK;
-                apiResult = new ApiResult<>("", recipe);
-            }
-
-            return new ResponseEntity<>(apiResult, status);
-
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ApiResult<>(e.getLocalizedMessage(), null), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @GetMapping
-    public ResponseEntity<ApiResult<Page<RecipeSummaryCardWithCategory>>>getAllRecipes(@RequestParam Integer page, @RequestParam Integer size) {
-
-        log.info("Request to retrieve all recipe");
-
-        try {
-            return ResponseEntity.ok(new ApiResult<>("" ,this.recipeService.getRecipes(page, size)));
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ApiResult<>(e.getLocalizedMessage(), null), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     @GetMapping("/my-recipe")
     public ResponseEntity<ApiResult<Page<RecipeSummaryForCards>>>getAllUserRecipes(@RequestParam Integer page,
                                                                                    @RequestParam Integer size,
