@@ -11,6 +11,24 @@ package org.group2.comp313.kitchen_companion.service;
 //import org.springframework.core.io.ClassPathResource;
 //import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+/**
+ * Service responsible for importing recipes from a CSV file, parsing the data
+ * into proper format, and saving it into the system's database. This service
+ * utilizes data transformation, validation, and asynchronous processing to
+ * handle large-scale imports.
+ *
+ * The CSV file is expected to adhere to a predefined schema with columns
+ * such as name, category, ingredients, preparation time, and various
+ * nutritional information fields. The imported data is mapped into domain
+ * objects, such as recipes, categories, ingredients, and steps.
+ *
+ * Key responsibilities of the service include:
+ * - Reading a CSV file from the classpath resource.
+ * - Parsing the CSV data into structured Java objects.
+ * - Creating new recipes, categories, and associated entities in the database.
+ * - Deduplicating or normalizing categories to avoid redundancy.
+ * - Asynchronous execution for long-running import tasks.
+ */
 //import java.io.*;
 //import java.time.Instant;
 //import java.util.*;

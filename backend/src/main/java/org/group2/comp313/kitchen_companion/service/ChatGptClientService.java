@@ -41,6 +41,13 @@ public class ChatGptClientService extends BaseService{
         this.staticCodeService = staticCodeService;
     }
 
+    /**
+     * Retrieves recipe recommendations based on the provided input parameters.
+     * The method interacts with an AI-based recommendation system to generate a list of suggested recipes.
+     *
+     * @param recipeRecommendationRequest the request object containing parameters and preferences for recipe recommendations
+     * @return a ChatCompletionResponse containing the recommended recipes or related information
+     */
     public ChatCompletionResponse getRecipeRecommendations(AIRecipeRecommendationRequest recipeRecommendationRequest) {
 
         String recipeRecommendationPrompt = this.buildRecipeRecommendationPrompt(recipeRecommendationRequest);
@@ -67,6 +74,15 @@ public class ChatGptClientService extends BaseService{
 
     }
 
+    /**
+     * Builds a prompt string to guide an AI-based recipe recommendation system in generating
+     * a JSON output for a recipe tailored to the user's input ingredients, dietary preferences, allergies,
+     * and restrictions.
+     *
+     * @param recipeRecommendationRequest the AIRecipeRecommendationRequest object containing information
+     *                                    such as ingredient list, dietary preferences, and allergies.
+     * @return a formatted string to be used as a prompt for generating recipe recommendations.
+     */
     private String buildRecipeRecommendationPrompt(AIRecipeRecommendationRequest recipeRecommendationRequest) {
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -126,6 +142,17 @@ public class ChatGptClientService extends BaseService{
         //return "\"{\\n  \\\"title\\\": \\\"string\\\",\\n  \\\"summary\\\": \\\"string\\\",\\n  \\\"prepTime\\\": 1073741824,\\n  \\\"prepTimeUnitCd\\\": 1073741824,\\n  \\\"cookTime\\\": 1073741824,\\n  \\\"cookTimeUnitCd\\\": 1073741824,\\n  \\\"servings\\\": 1073741824,\\n  \\\"yield\\\": \\\"string\\\",\\n  \\\"imageUrl\\\": \\\"string\\\",\\n  \\\"thumbnailUrl\\\": \\\"string\\\",\\n  \\\"calories\\\": 0,\\n  \\\"carbsG\\\": 0,\\n  \\\"sugarsG\\\": 0,\\n  \\\"fatG\\\": 0,\\n  \\\"categoryIds\\\": [\\\"categoryId\\\"],\\n  \\\"ingredientGroups\\\": [\\n    {\\n      \\\"ingredientGroupOrder\\\": 1073741824,\\n      \\\"label\\\": \\\"string\\\",\\n      \\\"ingredients\\\": [\\n        {\\n          \\\"ingredientOrder\\\": 1073741824,\\n          \\\"imageUrl\\\": \\\"string\\\",\\n          \\\"label\\\": \\\"string\\\"\\n        }\\n      ]\\n    }\\n  ],\\n  \\\"stepGroups\\\": [\\n    {\\n      \\\"stepGroupOrder\\\": 1073741824,\\n      \\\"label\\\": \\\"string\\\",\\n      \\\"steps\\\": [\\n        {\\n          \\\"stepOrder\\\": 1073741824,\\n          \\\"label\\\": \\\"string\\\",\\n          \\\"imageUrl\\\": \\\"string\\\"\\n        }\\n      ]\\n    }\\n  ]\\n}\"\n";
     }
 
+
+    /**
+     * Constructs an instruction string by combining a leading prompt with a list of items,
+     * separated by a specified separator, and formatted with new lines as needed.
+     *
+     * @param leadingPrompt The initial prompt or heading to prepend to the instruction.
+     * @param items The list of items to be included in the instruction, separated by the specified separator.
+     * @param separator The string used to separate the items in the generated instruction.
+     * @return A constructed instruction string that starts with the leading prompt, followed by the items in the list,
+     *         joined by the specified separator. If the items list is null or empty, only the leading prompt is returned.
+     */
     private String createInstruction(String leadingPrompt, List<String> items, String separator) {
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -144,6 +171,14 @@ public class ChatGptClientService extends BaseService{
         return stringBuilder.toString();
     }
 
+    /**
+     * Creates and returns a formatted string representation of all categories
+     * including their IDs and names. The information is fetched from the
+     * category repository and each category is appended to the resulting string
+     * with a newline after each category's details.
+     *
+     * @return A formatted string containing details of all categories.
+     */
     private String createCategoryListString() {
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -161,6 +196,14 @@ public class ChatGptClientService extends BaseService{
         return stringBuilder.toString();
     }
 
+    /**
+     * Builds and returns a formatted string representation of a code value list for a given codeBookId.
+     * Includes an optional leading prompt followed by the list of code values if the codeBook exists.
+     *
+     * @param leadingPrompt a string to prepend to the generated list, typically used as a label or title
+     * @param codeBookId the identifier of the codeBook used to retrieve the list of code values
+     * @return a formatted string with the leading prompt and code values, or an empty string if the codeBook is not found
+     */
     private String createCodeValueListString(String leadingPrompt, Integer codeBookId) {
 
         StringBuilder stringBuilder = new StringBuilder();

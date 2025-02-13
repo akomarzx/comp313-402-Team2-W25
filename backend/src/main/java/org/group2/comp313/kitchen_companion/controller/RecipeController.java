@@ -72,13 +72,18 @@ public class RecipeController extends BaseController {
         log.info("Request to create recipe: {}", createRecipeDto.toString());
         log.info("Request By {}", createdByEmail);
 
-        Recipe newRecipe = this.recipeService.createRecipe(createRecipeDto, createdByEmail);
+        try {
+            Recipe newRecipe = this.recipeService.createRecipe(createRecipeDto, createdByEmail);
 
-        if(newRecipe == null) {
-            return new ResponseEntity<>(new ApiResult<>("Recipe creation failed.", null), HttpStatus.INTERNAL_SERVER_ERROR);
+            if(newRecipe == null) {
+                return new ResponseEntity<>(new ApiResult<>("Recipe creation failed.", null), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            return new ResponseEntity<>(new ApiResult<>("New recipe had been successfully created.", newRecipe),HttpStatus.OK);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ApiResult<>(e.getLocalizedMessage(), null), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        return new ResponseEntity<>(new ApiResult<>("New recipe had been successfully created.", newRecipe),HttpStatus.OK);
 
     }
 
@@ -129,12 +134,17 @@ public class RecipeController extends BaseController {
     }
     @PatchMapping("{recipeId}/step-group/{stepGroupId}")
     public ResponseEntity<ApiResult<Boolean>> updateStepGroup(@PathVariable Integer recipeId,
-                                                                    @PathVariable Integer stepGroupId,
-                                                                    @NotNull @Valid @RequestBody RecipeComponentUpdateDto recipeComponentUpdateDto,
-                                                                    @AuthenticationPrincipal(expression = "claims['email']") String createdByEmail) {
+                                                              @PathVariable Integer stepGroupId,
+                                                              @NotNull @Valid @RequestBody RecipeComponentUpdateDto recipeComponentUpdateDto,
+                                                              @AuthenticationPrincipal(expression = "claims['email']") String createdByEmail) {
 
         log.info("Request to update step group: {}", recipeComponentUpdateDto.toString());
-        return updateRecipeComponent(recipeId, stepGroupId, recipeComponentUpdateDto, createdByEmail, true);
+
+        try {
+            return updateRecipeComponent(recipeId, stepGroupId, recipeComponentUpdateDto, createdByEmail, true);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ApiResult<>(e.getLocalizedMessage(), false), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PatchMapping("{recipeId}/ingredient-group/{ingredientGroupId}")
@@ -153,8 +163,12 @@ public class RecipeController extends BaseController {
     public ResponseEntity<ApiResult<Void>> saveRecipeForUser(@Valid @RequestBody SaveRecipeDto saveRecipeDto,
                                                              @AuthenticationPrincipal(expression = "claims['email']") String createdByEmail) {
 
-        this.recipeService.saveRecipeForUser(saveRecipeDto.recipeId(), createdByEmail);
-        return new ResponseEntity<>(new ApiResult<>("Recipe Saved Successfully.", null), HttpStatus.OK);
+        try {
+            this.recipeService.saveRecipeForUser(saveRecipeDto.recipeId(), createdByEmail);
+            return new ResponseEntity<>(new ApiResult<>("Recipe Saved Successfully.", null), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ApiResult<>(e.getLocalizedMessage(), null), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @DeleteMapping("/save/{recipeId}")
@@ -165,11 +179,16 @@ public class RecipeController extends BaseController {
     }
 
     @GetMapping("/saved")
-    public ResponseEntity<Page<RecipeSummaryForCards>> getSavedRecipes(@RequestParam Integer page,
-                                                                       @RequestParam Integer size,
-                                                                       @AuthenticationPrincipal(expression = "claims['email']") String email) {
-
-        return ResponseEntity.ok(this.recipeService.getSavedRecipeForUser(page, size, email));
+    public ResponseEntity<ApiResult<Page<RecipeSummaryForCards>>> getSavedRecipes(@RequestParam Integer page,
+                                                                                  @RequestParam Integer size,
+                                                                                  @AuthenticationPrincipal(expression = "claims['email']") String email) {
+        try {
+            Page<RecipeSummaryForCards> savedRecipeForUser = this.recipeService.getSavedRecipeForUser(page, size, email);
+            return ResponseEntity.ok(new ApiResult<>(null, savedRecipeForUser));
+        } catch (Exception e) {
+            log.error(e.getLocalizedMessage());
+            return new ResponseEntity<>(new ApiResult<>(e.getLocalizedMessage(), null), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     private ResponseEntity<ApiResult<Boolean>> updateRecipeComponent(Integer recipeId,

@@ -21,6 +21,14 @@ public class IngredientService extends BaseService {
         this.ingredientMapper = ingredientMapper;
     }
 
+    /**
+     * Creates a new ingredient based on the provided parameters and persists it in the repository.
+     *
+     * @param ingredientDTO the data transfer object containing information about the ingredient to be created
+     * @param ingredientGroupId the identifier of the ingredient group to which the new ingredient belongs
+     * @param createdBy the username or identifier of the user creating the ingredient
+     * @return the newly created and persisted Ingredient object
+     */
     public Ingredient createIngredient(IngredientDto ingredientDTO, Integer ingredientGroupId, String createdBy) {
 
         Ingredient newIngredient = new Ingredient();
@@ -37,6 +45,14 @@ public class IngredientService extends BaseService {
         return ingredientRepository.save(newIngredient);
     }
 
+    /**
+     * Updates an existing ingredient using the details provided in the ComponentUpdateDto object.
+     *
+     * @param dto the data transfer object containing the updated details for the ingredient
+     * @param updatedBy the username or identifier of the user performing the update
+     * @throws EntityToBeUpdatedNotFoundException if the ingredient to be updated cannot be found
+     *         or does not belong to the user identified by updatedBy
+     */
     public void updateIngredient(ComponentUpdateDto dto, String updatedBy) {
 
         Ingredient ingredient = ingredientRepository.findByIdAndCreatedBy(dto.id(), updatedBy).orElse(null);
@@ -58,6 +74,14 @@ public class IngredientService extends BaseService {
         }
     }
 
+    /**
+     * Updates an existing ingredient using the details provided in the IngredientDto object.
+     *
+     * @param dto the data transfer object containing the updated details for the ingredient
+     * @param updatedBy the username or identifier of the user performing the update
+     * @throws EntityToBeUpdatedNotFoundException if the ingredient to be updated cannot be found
+     *         or does not belong to the user identified by updatedBy
+     */
     public void updateIngredient(IngredientDto dto, String updatedBy) {
 
         Ingredient ingredient = ingredientRepository.findByIdAndCreatedBy(dto.id(), updatedBy).orElse(null);

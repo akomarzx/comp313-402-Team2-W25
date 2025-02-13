@@ -31,6 +31,16 @@ public class IngredientGroupService extends BaseService {
         this.ingredientGroupMapper = ingredientGroupMapper;
     }
 
+    /**
+     * Creates a set of IngredientGroup entities based on the provided list of IngredientGroupDto objects.
+     * Saves the newly created IngredientGroup entities into the repository and associates them
+     * with the given recipeId.
+     *
+     * @param newIngredientGroupDtoList the list of IngredientGroupDto objects to be converted into IngredientGroup entities
+     * @param recipeId the ID of the recipe to which the IngredientGroups will be associated
+     * @param createdBy the username or identifier of the creator of these ingredient groups
+     * @return a set of IngredientGroup entities that were created and saved
+     */
     public Set<IngredientGroup> createIngredientGroups(List<IngredientGroupDto> newIngredientGroupDtoList, Integer recipeId, String createdBy) {
 
         Set<IngredientGroup> ingredientGroups = new HashSet<>();
@@ -60,6 +70,15 @@ public class IngredientGroupService extends BaseService {
         return ingredientGroups;
     }
 
+    /**
+     * Updates an ingredient group associated with a specified recipe and updates its related components.
+     *
+     * @param dto the data transfer object containing updated details for the ingredient group and its components
+     * @param recipeId the ID of the recipe the ingredient group belongs to
+     * @param ingredientGroupId the ID of the ingredient group to be updated
+     * @param updatedBy the username or identifier of the user performing the update
+     * @throws EntityToBeUpdatedNotFoundException if the specified ingredient group cannot be found or does not belong to the user
+     */
     @Transactional
     public void updateIngredientGroup(RecipeComponentUpdateDto dto, Integer recipeId, Integer ingredientGroupId, String updatedBy) {
 
@@ -82,6 +101,19 @@ public class IngredientGroupService extends BaseService {
         }
     }
 
+    /**
+     * Updates an existing ingredient group associated with a recipe and a specific user.
+     * The method fetches the ingredient group by its ID, recipe ID, and user who created it,
+     * then applies updates based on the provided data transfer object (DTO).
+     * It also updates all the ingredients under the group if provided with a list of ingredients in the DTO.
+     *
+     * @param dto           The data transfer object containing updates for the ingredient group.
+     * @param recipeId      The ID of the recipe the ingredient group belongs to.
+     * @param ingredientGroupId The ID of the ingredient group to be updated.
+     * @param updatedBy     The username of the user performing the update.
+     * @return The updated ingredient group.
+     * @throws EntityToBeUpdatedNotFoundException If the ingredient group is not found based on the provided criteria.
+     */
     @Transactional
     public IngredientGroup updateIngredientGroup(IngredientGroupDto dto, Integer recipeId, Integer ingredientGroupId, String updatedBy) {
 

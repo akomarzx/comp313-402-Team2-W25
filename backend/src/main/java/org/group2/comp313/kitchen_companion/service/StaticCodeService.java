@@ -30,6 +30,14 @@ public class StaticCodeService extends BaseService {
         this.codeBook = this.codeBookRepository.findAll();
     }
 
+    /**
+     * Retrieves all static code entries from the CodeBook repository. If the list
+     * of CodeBook entries is already cached within the service, the cached list
+     * is returned. Otherwise, it fetches all entries from the repository, caches
+     * them, and then returns the list.
+     *
+     * @return a list of all CodeBook entries available in the repository
+     */
     @Transactional
     public List<CodeBook> getAllStaticCode() {
         if(codeBook == null) {
@@ -39,10 +47,27 @@ public class StaticCodeService extends BaseService {
         return this.codeBook;
     }
 
+    /**
+     * Retrieves a CodeValue entity based on its unique identifier.
+     * This method queries the CodeValueRepository to find the corresponding
+     * CodeValue instance for the given codeValueId.
+     *
+     * @param codeValueId the unique identifier of the CodeValue entity to be retrieved
+     * @return an Optional containing the CodeValue if found, or an empty Optional if not found
+     */
     public Optional<CodeValue> getCodeValueUsingCodeValueId(Integer codeValueId) {
         return this.codeValueRepository.findById(codeValueId);
     }
 
+    /**
+     * Retrieves an Optional containing a CodeBook object based on a given CodeBook ID.
+     * This method filters the cached list of CodeBook objects to find the one
+     * whose ID matches the provided codebookID. If no matching CodeBook is found
+     * or if the cached list is null, an empty Optional is returned.
+     *
+     * @param codebookID the unique identifier of the CodeBook to be retrieved
+     * @return an Optional containing the matching CodeBook if found, or an empty Optional otherwise
+     */
     public Optional<CodeBook> getCodeValueListUsingCodeBookID(Integer codebookID) {
         if(codeBook != null) {
             return this.codeBook.stream().filter(codeBook1 -> Objects.equals(codeBook1.getId(), codebookID)).findFirst();

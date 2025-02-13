@@ -53,21 +53,52 @@ public class RecipeService extends BaseService {
         this.savedRecipeRepository = savedRecipeRepository;
     }
 
+    /**
+     * Retrieves a recipe by its unique identifier.
+     *
+     * @param id the unique identifier of the recipe to retrieve; must not be null
+     * @return the Recipe object if found, or null if no recipe is found with the given identifier
+     */
     @Transactional
     public Recipe getRecipeById(@NotNull Integer id) {
         return recipeRepository.findById(id).orElse(null);
     }
 
+    /**
+     * Retrieves a paginated list of recipe summary cards along with their categories.
+     *
+     * @param page the page number to retrieve, starting from 0
+     * @param size the number of items per page
+     * @return a paginated list of recipe summary cards with their categories
+     */
     public Page<RecipeSummaryCardWithCategory> getRecipes(Integer page, Integer size) {
         Pageable pageRequest = PageRequest.of(page, size);
         return this.recipeRepository.findAllRecipeSummaryCards(pageRequest);
     }
 
+    /**
+     * Retrieves a paginated list of recipes created by a specified user.
+     *
+     * @param createdBy the unique identifier of the user who created the recipes
+     * @param page the page number to retrieve (zero-based index)
+     * @param size the number of recipes per page
+     * @return a paginated list of recipes in the form of a Page object containing RecipeSummaryForCards
+     */
     public Page<RecipeSummaryForCards> getRecipesByCreatedBy(String createdBy, Integer page, Integer size) {
         Pageable pageRequest = PageRequest.of(page, size);
         return this.recipeRepository.findAllByCreatedByOrderByIdDesc(createdBy, pageRequest);
     }
 
+    /**
+     * Creates a new recipe and saves it to the database. The method maps the provided
+     * {@link RecipeDto} to a {@link Recipe} entity, saves it, and associates the recipe with
+     * its corresponding categories, ingredient groups, and step groups.
+     *
+     * @param dto The data transfer object containing the details of the recipe to be created.
+     * @param createdByEmail The email address of the user who is creating the recipe.
+     * @return The newly created {@link Recipe}, with its associated categories, ingredient groups,
+     *         and step groups populated, or null if an error occurs during the operation.
+     */
     @Transactional
     public Recipe createRecipe(RecipeDto dto, @NotNull String createdByEmail) {
 
@@ -101,6 +132,13 @@ public class RecipeService extends BaseService {
         }
     }
 
+    /**
+     * Retrieves AI-generated recipe recommendations based on the provided request.
+     *
+     * @param aiRecipeRecommendationRequest the request object containing the parameters for generating recipe recommendations
+     * @return an AIRecipeRecommendationResult object containing the recommended recipes and related information
+     * @throws JsonProcessingException if there is an error processing the JSON response
+     */
     public AIRecipeRecommendationResult getAiRecipeRecommendation(AIRecipeRecommendationRequest aiRecipeRecommendationRequest) throws JsonProcessingException {
 
         ChatCompletionResponse response = this.chatGptClientService.getRecipeRecommendations(aiRecipeRecommendationRequest);
@@ -119,6 +157,16 @@ public class RecipeService extends BaseService {
         }
     }
 
+    /**
+     * Updates an existing recipe with the given details.
+     *
+     * @param recipeId the ID of the recipe to be updated
+     * @param updateRecipeDto the data transfer object containing updated recipe details
+     * @param updatedByEmail the email of the user performing the update
+     * @return true if the recipe was successfully updated, otherwise throws an exception
+     * @throws EntityToBeUpdatedNotFoundException if no recipe is found with the specified ID
+     *         and user email, or if the recipe does not belong to the user
+     */
     @Transactional
     public Boolean updateRecipe(Integer recipeId, RecipeDto updateRecipeDto, String updatedByEmail) {
 
@@ -141,6 +189,16 @@ public class RecipeService extends BaseService {
         }
     }
 
+    /**
+     * Updates the categories associated with a recipe by comparing the current set of categories
+     * with a new set of category IDs. This method removes categories that are no longer associated
+     * and adds new categories that need to be linked to the recipe.
+     *
+     * @param categories       The current set of Category objects associated with the recipe.
+     * @param categoryIds      The new set of category IDs to be associated with the recipe.
+     * @param recipeId         The unique identifier of the recipe being updated.
+     * @param updatedByEmail   The email of the user performing the update operation.
+     */
     @Transactional
     protected void updateRecipeCategory(Set<Category> categories, Set<Integer> categoryIds, Integer recipeId, String updatedByEmail) {
 
@@ -161,6 +219,14 @@ public class RecipeService extends BaseService {
         }
     }
 
+    /**
+     * Saves a recipe for a user identified by their email. If the user has already
+     * saved the recipe, the method does nothing. Otherwise, it creates a new
+     * saved recipe entry and persists it to the repository.
+     *
+     * @param recipeId the ID of the recipe to be saved
+     * @param userEmail the email of the user who is saving the recipe
+     */
     public void saveRecipeForUser(Integer recipeId, String userEmail) {
 
         SavedRecipe savedRecipe = this.savedRecipeRepository.findOneByRecipeAndCreatedBy(recipeId, userEmail).orElse(null);
@@ -169,11 +235,17 @@ public class RecipeService extends BaseService {
             SavedRecipe newSavedRecipe = new SavedRecipe();
             newSavedRecipe.setCreatedBy(userEmail);
             newSavedRecipe.setCreatedAt(Instant.now());
-            //newSavedRecipe.setRecipe(recipeId);
+            newSavedRecipe.setRecipe(recipeId);
             this.savedRecipeRepository.save(newSavedRecipe);
         }
     }
 
+    /**
+     * Removes a saved recipe for a specific user.
+     *
+     * @param recipeId the ID of the recipe to be removed
+     * @param userEmail the email of the user who saved the recipe
+     */
     public void removeSavedRecipe(Integer recipeId, String userEmail) {
 
         SavedRecipe savedRecipe = this.savedRecipeRepository.findOneByRecipeAndCreatedBy(recipeId, userEmail).orElse(null);
@@ -183,6 +255,14 @@ public class RecipeService extends BaseService {
         }
     }
 
+    /**
+     * Retrieves a paginated list of saved recipe summaries for a specific user.
+     *
+     * @param page the page number to retrieve, 0-indexed
+     * @param size the number of items per page
+     * @param userEmail the email address of the user whose saved recipes are to be fetched
+     * @return a page containing the list of recipe summaries for the specified user
+     */
     public Page<RecipeSummaryForCards> getSavedRecipeForUser(Integer page, Integer size, String userEmail) {
         Pageable pageRequest = PageRequest.of(page, size);
         return this.recipeRepository.findSavedRecipeSummaryCardsByUser(userEmail, pageRequest);
