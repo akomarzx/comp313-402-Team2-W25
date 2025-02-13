@@ -106,6 +106,7 @@ const RecipePage = () => {
             recipeCardData={recipeCardData}
             displayType={displayType}
             isLoading={isLoading}
+            user={user}
           />
           {/* add a jump to top button */}
           <ArrowBigUp

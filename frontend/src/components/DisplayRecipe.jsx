@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { Edit, SaveIcon, ChefHatIcon } from "lucide-react";
+import { Edit, SaveIcon, ChefHatIcon, HeartIcon } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { createRecipe, sendRating } from "@/api/recipe";
+import { createRecipe, saveRecipe, sendRating } from "@/api/recipe";
 import { toast } from "sonner";
 import RatingAPILayer from "@/rating_component/react-rating";
 const DisplayRecipe = ({
@@ -13,12 +13,21 @@ const DisplayRecipe = ({
 }) => {
   const router = useRouter();
   const [rating, setRating] = useState(ratingCurrent);
+  const [saved, setSaved] = useState(false);
   const handleRatingChange = async (e) => {
     const res = await sendRating(recipe.id, e);
     if (res?.status === 200 || 201) {
       toast("Rating added successfully!");
       console.log(res.data.result);
       setRating({ ...res.data.result, user: rating.user });
+    }
+  };
+
+  const handleSaveClick = async () => {
+    const res = await saveRecipe(recipe.id);
+    if (res?.status === 200 || 201) {
+      setSaved(!saved);
+      toast("Recipe saved successfully");
     }
   };
   return (
@@ -60,6 +69,17 @@ const DisplayRecipe = ({
         )}
         {/* Recipe Image */}
         <div className="relative w-full h-[300px] md:h-[400px] rounded-lg overflow-hidden mb-8">
+          {!updateButton && rating.user && (
+            <div className="absolute top-5 right-5 z-10">
+              <HeartIcon
+                size={25}
+                className={`${
+                  saved && "fill-red-500"
+                } text-red-500 hover:scale-110`}
+                onClick={handleSaveClick}
+              />
+            </div>
+          )}
           <Image
             src={
               (recipe?.imageUrl !== "x" && recipe?.imageUrl) ||

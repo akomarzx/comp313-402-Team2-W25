@@ -1,63 +1,86 @@
-import { ChefHat, ChefHatIcon, Clock } from "lucide-react";
+import { ChefHat, ChefHatIcon, Clock, HeartIcon } from "lucide-react";
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
+import { saveRecipe } from "@/api/recipe";
+import { toast } from "sonner";
 
-const RecipeRow = ({ recipe }) => {
+const RecipeRow = ({ recipe, user }) => {
+  const [saved, setSaved] = useState(false);
+  const handleSaveClick = async () => {
+    const res = await saveRecipe(recipe.id);
+    if (res?.status === 200 || 201) {
+      toast("Recipe saved successfully");
+      setSaved(!saved);
+    }
+  };
   return (
-    <Link href={`/recipe/${recipe?.id}`}>
-      <div
-        key={recipe.id}
-        className="flex items-center gap-6 my-8 border-x-[1px] bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-4 cursor-pointer"
-      >
-        <div className="w-48 h-32 flex-shrink-0">
-          <Image
-            src={recipe.thumbnailUrl || "/placeholder.svg"}
-            alt={recipe.title}
-            width={192}
-            height={128}
-            className="w-full h-full object-cover rounded-md"
+    <div className="relative">
+      {" "}
+      {user && (
+        <div className="absolute top-5 right-5 z-10">
+          <HeartIcon
+            size={25}
+            className={`${
+              saved && "fill-red-500"
+            } text-red-500 hover:scale-110`}
+            onClick={handleSaveClick}
           />
         </div>
-
-        <div className="flex-grow">
-          <h3 className="font-serif text-xl font-semibold mb-2">
-            {recipe?.title}
-          </h3>
-          <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-            {recipe?.description}
-          </p>
-          <div className="flex w-full space-between gap-4 text-sm text-gray-500">
-            <p className="text-sm text-gray-600 line-clamp-1 flex">
-              <span className="border rounded-full px-2 bg-blue-100 font-semibold">
-                {recipe?.category}
-              </span>
+      )}
+      <Link href={`/recipe/${recipe?.id}`}>
+        <div
+          key={recipe.id}
+          className="flex relative items-center gap-6 my-8 border-x-[1px] bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-4 cursor-pointer"
+        >
+          <div className="w-48 h-32 flex-shrink-0">
+            <Image
+              src={recipe.thumbnailUrl || "/placeholder.svg"}
+              alt={recipe.title}
+              width={192}
+              height={128}
+              className="w-full h-full object-cover rounded-md"
+            />
+          </div>
+          <div className="flex-grow">
+            <h3 className="font-serif text-xl font-semibold mb-2">
+              {recipe?.title}
+            </h3>
+            <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+              {recipe?.description}
             </p>
-            <p className="text-sm text-gray-600 flex font-semibold">
-              {recipe?.ratingValue && (
-                <span className="flex items0">
-                  <ChefHatIcon
-                    size={20}
-                    className={
-                      recipe?.ratingValue >= 4
-                        ? "text-green-600"
-                        : recipe?.ratingValue >= 3
-                        ? "text-yellow-400"
-                        : recipe?.ratingValue >= 2
-                        ? "text-orange-400"
-                        : recipe?.ratingValue >= 1
-                        ? "text-red-400"
-                        : "text-gray-400"
-                    }
-                  />
-                  {recipe?.ratingValue}({recipe?.ratingCount})
+            <div className="flex w-full space-between gap-4 text-sm text-gray-500">
+              <p className="text-sm text-gray-600 line-clamp-1 w-1/2">
+                <span className="border rounded-full px-2 bg-blue-100 font-semibold">
+                  {recipe?.category}
                 </span>
-              )}
-            </p>
+              </p>
+              <p className="text-sm text-gray-600  font-semibold w-1/2 text-right">
+                {recipe?.ratingValue && (
+                  <span className="flex items-center  justify-end">
+                    <ChefHatIcon
+                      size={20}
+                      className={
+                        recipe?.ratingValue >= 4
+                          ? "text-green-600"
+                          : recipe?.ratingValue >= 3
+                          ? "text-yellow-400"
+                          : recipe?.ratingValue >= 2
+                          ? "text-orange-400"
+                          : recipe?.ratingValue >= 1
+                          ? "text-red-400"
+                          : "text-gray-400"
+                      }
+                    />
+                    {recipe?.ratingValue}({recipe?.ratingCount})
+                  </span>
+                )}
+              </p>
+            </div>
           </div>
         </div>
-      </div>
-    </Link>
+      </Link>
+    </div>
   );
 };
 

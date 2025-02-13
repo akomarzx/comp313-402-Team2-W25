@@ -7,7 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false); // For Profile Dropdown
-  const { user, logout, login } = useAuth();
+  const { user, logout, login, loading } = useAuth();
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
@@ -20,102 +20,108 @@ const Navbar = () => {
         <div className="text-xl font-bold text-green-600">
           <Link href="/recipes">Kitchen Companion</Link>
         </div>
-
-        <div className="hidden md:flex gap-10 text-slate-600 font-bold font-sans">
-          <Link
-            href="/recipes"
-            className={
-              currentPath === "/recipes" ? "text-green-600" : "text-slate-600"
-            }
-          >
-            HOME
-          </Link>
-          {user && (
-            <Link
-              href="/cook-book"
-              className={
-                currentPath === "/cook-book"
-                  ? "text-green-600"
-                  : "text-slate-600"
-              }
-            >
-              MY COOK BOOK
-            </Link>
-          )}
-          <Link
-            href="/ai-rcmd"
-            className={
-              currentPath === "/ai-rcmd" ? "text-green-600" : "text-slate-600"
-            }
-          >
-            AI RECOMMENDATIONS
-          </Link>
-
-          {/* Profile Dropdown */}
-          {user ? (
-            <div
-              className="relative"
-              onBlur={() =>
-                setTimeout(() => {
-                  setIsProfileDropdownOpen(false);
-                }, 100)
-              }
-            >
-              <button
-                onClick={() => setIsProfileDropdownOpen((prev) => !prev)}
-                className="flex items-center gap-2 hover:text-green-600 focus:outline-none"
+        {!loading && (
+          <>
+            <div className="hidden md:flex gap-10 text-slate-600 font-bold font-sans">
+              <Link
+                href="/recipes"
+                className={
+                  currentPath === "/recipes"
+                    ? "text-green-600"
+                    : "text-slate-600"
+                }
               >
-                <span>PROFILE</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
+                HOME
+              </Link>
+              {user && (
+                <Link
+                  href="/cook-book"
+                  className={
+                    currentPath === "/cook-book"
+                      ? "text-green-600"
+                      : "text-slate-600"
+                  }
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
+                  MY COOK BOOK
+                </Link>
+              )}
+              <Link
+                href="/ai-rcmd"
+                className={
+                  currentPath === "/ai-rcmd"
+                    ? "text-green-600"
+                    : "text-slate-600"
+                }
+              >
+                AI RECOMMENDATIONS
+              </Link>
 
-              {isProfileDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg">
-                  <Link
-                    href="/profile"
-                    className="block px-4 py-2 hover:bg-gray-100 text-slate-600"
-                  >
-                    MY PROFILE
-                  </Link>
+              {/* Profile Dropdown */}
+              {user ? (
+                <div
+                  className="relative"
+                  onBlur={() =>
+                    setTimeout(() => {
+                      setIsProfileDropdownOpen(false);
+                    }, 100)
+                  }
+                >
                   <button
-                    onClick={async () => {
-                      await logout();
-                    }}
-                    className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-slate-600"
+                    onClick={() => setIsProfileDropdownOpen((prev) => !prev)}
+                    className="flex items-center gap-2 hover:text-green-600 focus:outline-none"
                   >
-                    LOG OUT
+                    <span>PROFILE</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
                   </button>
+
+                  {isProfileDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg">
+                      <Link
+                        href="/profile"
+                        className="block px-4 py-2 hover:bg-gray-100 text-slate-600"
+                      >
+                        MY PROFILE
+                      </Link>
+                      <button
+                        onClick={async () => {
+                          await logout();
+                        }}
+                        className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-slate-600"
+                      >
+                        LOG OUT
+                      </button>
+                    </div>
+                  )}
                 </div>
+              ) : (
+                <Link
+                  href="/"
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    await login();
+                    setIsOpen(false);
+                  }}
+                  className="hover:text-green-600"
+                >
+                  LOGIN
+                </Link>
               )}
             </div>
-          ) : (
-            <Link
-              href="/"
-              onClick={async (e) => {
-                e.preventDefault();
-                await login();
-                setIsOpen(false);
-              }}
-              className="hover:text-green-600"
-            >
-              LOGIN
-            </Link>
-          )}
-        </div>
-
+          </>
+        )}
         {/* Mobile Menu Button */}
         <div className="md:hidden">
           <button

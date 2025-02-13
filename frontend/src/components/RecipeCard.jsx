@@ -1,20 +1,41 @@
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
-import { ChefHatIcon } from "lucide-react";
+import { ChefHatIcon, HeartIcon } from "lucide-react";
+import { toast } from "sonner";
+import { saveRecipe } from "@/api/recipe";
 
-const RecipeCard = ({ data, version = 1 }) => {
+const RecipeCard = ({ data, version = 1, user = {} }) => {
   const cardStyle =
     version === 2
       ? "w-[170px] min-h-[180px] p-2"
       : "w-[300px] min-h-[300px] p-4";
 
   const imageStyle = version === 2 ? "h-[150px]" : "h-[200px]";
+  const [saved, setSaved] = useState(false);
+  const handleSaveClick = async () => {
+    const res = await saveRecipe(data.id);
+    if (res?.status === 200 || 201) {
+      setSaved(!saved);
+      toast("Recipe saved successfully");
+    }
+  };
 
   return (
     <div
-      className={`hover:scale-[101%] border ${cardStyle} max-h-[500px]  bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-700 mx-auto`}
+      className={` relative hover:scale-[101%] border ${cardStyle} max-h-[500px]  bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-700 mx-auto`}
     >
+      {user && version !== 2 && (
+        <div className="absolute top-5 right-5 z-10">
+          <HeartIcon
+            size={25}
+            className={`${
+              saved && "fill-red-500"
+            } text-red-500 hover:scale-110`}
+            onClick={handleSaveClick}
+          />
+        </div>
+      )}
       <Link href={`/recipe/${data?.id}`}>
         <div
           className={`relative w-full ${imageStyle} rounded-md overflow-hidden`}

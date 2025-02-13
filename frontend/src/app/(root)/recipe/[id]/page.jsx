@@ -32,10 +32,9 @@ const Recipe = () => {
     if (!loading) fetchRecipe();
   }, []);
   useEffect(() => {
-    if (!loading) {
-      fetchRecipe();
-    }
-  }, [id, user]);
+    if (!loading) fetchRecipe();
+  }, [loading]);
+
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       {!isLoading ? (
