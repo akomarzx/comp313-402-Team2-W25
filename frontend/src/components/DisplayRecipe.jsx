@@ -69,7 +69,7 @@ const DisplayRecipe = ({
         )}
         {/* Recipe Image */}
         <div className="relative w-full h-[300px] md:h-[400px] rounded-lg overflow-hidden mb-8">
-          {!updateButton && rating.user && (
+          {!saveButton && !updateButton && rating?.user && (
             <div className="absolute top-5 right-5 z-10">
               <HeartIcon
                 size={25}

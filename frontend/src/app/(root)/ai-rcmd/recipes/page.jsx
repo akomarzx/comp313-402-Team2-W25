@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 
 import { redirect, useSearchParams, useRouter } from "next/navigation";
 
-import { RotateLoader } from "react-spinners";
 import { useAuth } from "@/context/AuthContext";
 import { generateRecipe } from "@/api/recipe";
 import DisplayRecipe from "@/components/DisplayRecipe";
