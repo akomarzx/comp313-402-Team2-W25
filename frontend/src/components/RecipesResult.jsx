@@ -4,7 +4,6 @@ import { BarLoader } from "react-spinners";
 import RecipeCard from "@/components/RecipeCard";
 import { Circle, Grid, List } from "lucide-react";
 import RecipeRow from "./RecipeRow";
-import { useRouter } from "next/navigation";
 import {
   Select,
   SelectContent,
@@ -20,15 +19,14 @@ const RecipesResult = ({
   displayType = "grid",
   sort = "default",
   version = 1,
+  user = {},
 }) => {
   const [sortOrder, setSortOrder] = useState(sort);
   const [viewMode, setViewMode] = useState(displayType);
   useEffect(() => {
-    setViewMode(sessionStorage.getItem("view") || displayType);
+    const lastView = sessionStorage.getItem("view");
+    setViewMode(lastView || displayType);
   }, []);
-  useEffect(() => {
-    sessionStorage.setItem("view", viewMode);
-  }, [viewMode]);
 
   const getSortedRecipes = () => {
     const recipes = [...recipeCardData];
@@ -104,6 +102,7 @@ const RecipesResult = ({
                 }`}
                 onClick={() => {
                   setViewMode("grid");
+                  sessionStorage.setItem("view", "grid");
                 }}
               >
                 <Grid size={20} />
@@ -116,6 +115,7 @@ const RecipesResult = ({
                 }`}
                 onClick={() => {
                   setViewMode("list");
+                  sessionStorage.setItem("view", "list");
                 }}
               >
                 <List size={20} />
@@ -129,7 +129,7 @@ const RecipesResult = ({
           {viewMode === "list" && version === 1 ? (
             <div className="mx-auto w-[90%]">
               {getSortedRecipes().map((recipe, index) => (
-                <RecipeRow key={index} recipe={recipe} />
+                <RecipeRow key={index} recipe={recipe} user={user} />
               ))}
             </div>
           ) : (
@@ -141,7 +141,12 @@ const RecipesResult = ({
               } gap-6 xl:px-4 py-4 mx-auto max-w-[1200px]`}
             >
               {getSortedRecipes().map((recipe, index) => (
-                <RecipeCard key={index} data={recipe} version={version} />
+                <RecipeCard
+                  key={index}
+                  data={recipe}
+                  version={version}
+                  user={user}
+                />
               ))}
             </div>
           )}

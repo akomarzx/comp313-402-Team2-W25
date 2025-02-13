@@ -99,6 +99,51 @@ export async function getMyRecipes(page) {
   }
 }
 
+export async function getSavedRecipes(page) {
+  try {
+    console.log(page);
+    const recipes = await axios.get(
+      `${recipeUrl}/kc/v1/recipe/saved?size=${10}&page=${page}`,
+      {
+        withCredentials: true,
+      }
+    );
+    console.log(recipes);
+    return recipes.data;
+  } catch (error) {
+    console.log("Error fetching saved recipes:", error);
+  }
+}
+
+export async function saveRecipe(recipeId) {
+  try {
+    const recipeResponse = await axios.post(
+      `${recipeUrl}/kc/v1/recipe/save`,
+      { recipeId },
+      {
+        withCredentials: true,
+      }
+    );
+    return recipeResponse;
+  } catch (error) {
+    console.log("Error saving recipe:", error);
+  }
+}
+
+export async function unsaveRecipe(recipeId) {
+  try {
+    const recipeResponse = await axios.delete(
+      `${recipeUrl}/kc/v1/recipe/save/${recipeId}`,
+      {
+        withCredentials: true,
+      }
+    );
+    return recipeResponse;
+  } catch (error) {
+    console.log("Error unsaving recipe:", error);
+  }
+}
+
 export async function updateRecipe(recipeId, data) {
   try {
     const recipeResponse = await axios.put(

@@ -291,10 +291,11 @@ const RecipeForm = () => {
                   key={cat.id}
                   value={cat.id}
                   onClick={() => {
-                    setFormData((prev) => ({
-                      ...prev,
-                      categoryIds: [...prev.categoryIds, cat.id],
-                    }));
+                    !formData.categoryIds?.includes(cat.id) &&
+                      setFormData((prev) => ({
+                        ...prev,
+                        categoryIds: [...prev.categoryIds, cat.id],
+                      }));
                   }}
                 >
                   {cat.label}
