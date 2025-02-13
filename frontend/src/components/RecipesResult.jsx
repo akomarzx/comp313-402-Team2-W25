@@ -53,7 +53,7 @@ const RecipesResult = ({
           </h2>
 
           <div className="flex justify-between items-center my-2 w-[90%] mx-auto">
-            <div className="mt-8 flex justify-end">
+            <div className="my-4 flex justify-end">
               <Select value={sortOrder} onValueChange={setSortOrder}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Sort by..." />

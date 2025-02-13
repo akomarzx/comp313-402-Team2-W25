@@ -108,14 +108,7 @@ const RecipePage = () => {
             isLoading={isLoading}
             user={user}
           />
-          {/* add a jump to top button */}
-          <ArrowBigUp
-            size={50}
-            className="fixed bottom-10 right-10 2xl:right-[100px] p-2 bg-white text-gray-600 rounded-full cursor-pointer"
-            onClick={() => {
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }}
-          />
+
           {!isLoading && (
             <Pagination>
               <PaginationContent className="gap-0 border mt-8 rounded-lg divide-x overflow-hidden">
@@ -192,6 +185,13 @@ const RecipePage = () => {
               </PaginationContent>
             </Pagination>
           )}
+          <ArrowBigUp
+            size={50}
+            className="fixed bottom-10 right-5 md:right-10 2xl:right-[100px] p-2 bg-white text-gray-600 rounded-full cursor-pointer z-20"
+            onClick={() => {
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+          />
         </>
       </div>
     </div>

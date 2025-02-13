@@ -31,9 +31,9 @@ const RecipeRow = ({ recipe, user }) => {
       <Link href={`/recipe/${recipe?.id}`}>
         <div
           key={recipe.id}
-          className="flex relative items-center gap-6 my-8 border-x-[1px] bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-4 cursor-pointer"
+          className="flex flex-col sm:flex-row relative items-center gap-6 my-8 border-x-[1px] bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-4 cursor-pointer"
         >
-          <div className="w-48 h-32 flex-shrink-0">
+          <div className="w-48 h-32 flex-shrink-0 mx-auto">
             <Image
               src={recipe.thumbnailUrl || "/placeholder.svg"}
               alt={recipe.title}
