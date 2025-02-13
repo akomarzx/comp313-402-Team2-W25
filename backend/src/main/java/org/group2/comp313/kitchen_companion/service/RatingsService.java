@@ -25,6 +25,17 @@ public class RatingsService extends BaseService {
         this.ratingCalculatedRepository = ratingCalculatedRepository;
     }
 
+    /**
+     * Retrieves the recipe rating details for a specific user given a recipe ID and username.
+     * The details include the average rating for the recipe, the number of ratings,
+     * the user's specific rating for the recipe (if available), and the user's rating ID (if available).
+     *
+     * @param recipeId The ID of the recipe for which the rating should be retrieved.
+     * @param username The username of the user whose rating details are to be fetched.
+     * @return A {@code RecipeRatingDto} object containing the recipe's average rating,
+     *         the number of ratings, the user's individual rating (if they have rated),
+     *         and the rating ID for the user (if applicable).
+     */
     public RecipeRatingDto getRecipeRatingForUser(Integer recipeId, String username) {
 
         Optional<RatingCalculated> calculated = this.ratingCalculatedRepository.findById(recipeId);
@@ -49,6 +60,17 @@ public class RatingsService extends BaseService {
         }
     }
 
+    /**
+     * Updates or inserts a rating for a user on a given recipe. If the user has already rated the
+     * specified recipe, their rating is updated. If no rating exists from the user for the recipe,
+     * a new rating is created. The overall average rating and rating count for the recipe are also updated.
+     *
+     * @param postRatingDto The details of the rating provided by the user, including the rating value.
+     * @param recipeId The ID of the recipe for which the rating is being provided.
+     * @param username The username of the user submitting the rating.
+     * @return A {@code RecipeRatingDto} object containing the updated average rating for the recipe,
+     *         the total count of ratings for the recipe, the user's submitted rating value, and the ID of the user's rating.
+     */
     @Transactional
     public RecipeRatingDto upsertRatingForUser(PostRatingDto postRatingDto, Integer recipeId, String username) {
 
@@ -90,6 +112,13 @@ public class RatingsService extends BaseService {
 
     }
 
+    /**
+     * Removes a rating for a given user if it exists.
+     *
+     * @param ratingId the ID of the rating to be removed
+     * @param username the username of the user who created the rating
+     * @return true if the rating was found and removed, false otherwise
+     */
     public Boolean removeRatingForUser(Integer ratingId, String username) {
         Optional<Rating> rating = ratingRepository.findByIdAndCreatedBy(ratingId, username);
         rating.ifPresent(value -> this.ratingRepository.deleteById(value.getId()));

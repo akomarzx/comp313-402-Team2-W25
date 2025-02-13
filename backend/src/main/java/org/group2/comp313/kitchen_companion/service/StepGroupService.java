@@ -26,6 +26,16 @@ public class StepGroupService extends BaseService {
         this.stepGroupMapper = stepGroupMapper;
     }
 
+    /**
+     * Creates a set of StepGroup entities from a list of StepGroupDto objects, associates
+     * them with a specific recipe, and sets the createdBy field. Each StepGroup is persisted
+     * in the repository and populated with associated steps.
+     *
+     * @param newStepGroupList the list of StepGroupDto objects representing the step groups to be created
+     * @param recipeId the unique identifier of the recipe to associate with the step groups
+     * @param createdBy the identifier of the user creating the step groups
+     * @return a set of newly created and persisted StepGroup entities
+     */
     public Set<StepGroup> createStepGroup(List<StepGroupDto> newStepGroupList, Integer recipeId, String createdBy) {
 
         Set<StepGroup> stepGroups = new HashSet<>();
@@ -56,6 +66,17 @@ public class StepGroupService extends BaseService {
         return stepGroups;
     }
 
+    /**
+     * Updates an existing StepGroup entity associated with a specific recipe and user.
+     * The method updates the StepGroup's label and its associated components based on
+     * the provided data transfer object (DTO).
+     *
+     * @param dto the data transfer object containing updated StepGroup and component information
+     * @param recipeId the unique identifier of the recipe to which the StepGroup belongs
+     * @param stepGroupId the unique identifier of the StepGroup to be updated
+     * @param updatedBy the identifier of the user performing the update operation
+     * @throws EntityToBeUpdatedNotFoundException if the StepGroup to be updated is not found
+     */
     @Transactional
     public void updateStepGroup(RecipeComponentUpdateDto dto, Integer recipeId, Integer stepGroupId, String updatedBy) {
 
@@ -80,6 +101,20 @@ public class StepGroupService extends BaseService {
         }
     }
 
+    /**
+     * Updates an existing step group entity associated with a given recipe.
+     * The method retrieves the step group using the provided recipe ID, step group ID,
+     * and the identifier of the user who is updating it. If the step group is found,
+     * it applies updates from the provided {@code StepGroupDto}. Additionally, it processes
+     * any associated steps within the step group for updates.
+     *
+     * @param dto the data transfer object containing the updated data for the step group
+     * @param recipeId the ID of the recipe the step group belongs to
+     * @param stepGroupId the ID of the step group to be updated
+     * @param updatedBy the identifier of the user performing the update
+     * @throws EntityToBeUpdatedNotFoundException if the step group is not found based on the
+     *         recipe ID, step group ID, and the user identifier
+     */
     @Transactional
     public void updateStepGroup(StepGroupDto dto, Integer recipeId, Integer stepGroupId, String updatedBy) {
 
