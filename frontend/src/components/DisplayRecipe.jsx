@@ -10,6 +10,7 @@ const DisplayRecipe = ({
   ratingCurrent,
   updateButton = false,
   saveButton = false,
+  categories = [],
 }) => {
   const router = useRouter();
   const [rating, setRating] = useState(ratingCurrent);
@@ -22,6 +23,7 @@ const DisplayRecipe = ({
       setRating({ ...res.data.result, user: rating.user });
     }
   };
+  console.log(categories);
 
   const handleSaveClick = async () => {
     const res = await saveRecipe(recipe.id);
@@ -69,7 +71,7 @@ const DisplayRecipe = ({
         )}
         {/* Recipe Image */}
         <div className="relative w-full h-[300px] md:h-[400px] rounded-lg overflow-hidden mb-8">
-          {!updateButton && rating.user && (
+          {!saveButton && !updateButton && rating?.user && (
             <div className="absolute top-5 right-5 z-10">
               <HeartIcon
                 size={25}
@@ -92,61 +94,86 @@ const DisplayRecipe = ({
             priority
           />
         </div>
-        <div className="flex">
-          <div className="flex flex-wrap gap-2 mb-2 w-2/3">
-            {recipe.categories
-              ?.sort((a, b) => a.id - b.id)
-              .map((cat) => {
-                return (
-                  <div
-                    key={cat.id}
-                    className="flex items-center gap-1 px-3 py-1 bg-green-200 text-gray-800 rounded-full cursor-pointer"
-                  >
-                    <span>{cat.label}</span>
-                  </div>
-                );
-              })}
-          </div>
-          {rating && (
-            <div className="flex flex-col ml-auto w-1/3 items-end">
-              <div className="flex  ">
-                <RatingAPILayer
-                  initialRating={rating?.ratingValue}
-                  onChange={handleRatingChange}
-                  emptySymbol={[
-                    <ChefHatIcon className="text-gray-300 font-semibold" />,
-                    <ChefHatIcon className="text-gray-300 font-semibold" />,
-                    <ChefHatIcon className="text-gray-300 font-semibold" />,
-                    <ChefHatIcon className="text-gray-300 font-semibold" />,
-                    <ChefHatIcon className="text-gray-300 font-semibold" />,
-                  ]}
-                  fullSymbol={[
-                    <ChefHatIcon className="text-gray-600   font-semibold" />,
-                    <ChefHatIcon className="text-red-600  ont-semibold" />,
-                    <ChefHatIcon className="text-orange-400   0 font-semibold" />,
-                    <ChefHatIcon className="text-yellow-300   0 font-semibold" />,
-                    <ChefHatIcon className="text-green-600   font-semibold" />,
-                  ]}
-                  fractions={4}
-                  readonly={
-                    updateButton ||
-                    rating.currentUserRating ||
-                    rating.user === null
+        {saveButton ? (
+          <div className="flex flex-wrap gap-2 mb-2">
+            {recipe?.categoryIds?.map((catId, index) => {
+              const category = categories?.data.find((cat) => cat.id === catId);
+              if (!category) return null;
+              return (
+                <div
+                  key={index}
+                  className="flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full cursor-pointer"
+                  onClick={() =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      categoryIds: prev.categoryIds.filter(
+                        (id) => id !== catId
+                      ),
+                    }))
                   }
-                />
-                <p className="font-semibold text-lg  text-right">
-                  {" "}
-                  {rating?.ratingValue} ({rating?.numberOfRatings})
-                </p>
-              </div>
-              {rating?.currentUserRating && (
-                <p className="text-sm text-gray-600 text-right">
-                  Your rating: {rating?.currentUserRating}
-                </p>
-              )}
+                >
+                  <span>{category.label}</span>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="flex">
+            <div className="flex flex-wrap gap-2 mb-2 w-2/3">
+              {recipe.categories
+                ?.sort((a, b) => a.id - b.id)
+                .map((cat) => {
+                  return (
+                    <div
+                      key={cat.id}
+                      className="flex items-center gap-1 px-3 py-1 bg-green-200 text-gray-800 rounded-full cursor-pointer"
+                    >
+                      <span>{cat.label}</span>
+                    </div>
+                  );
+                })}
             </div>
-          )}
-        </div>
+            {rating && (
+              <div className="flex flex-col ml-auto w-1/3 items-end">
+                <div className="flex  ">
+                  <RatingAPILayer
+                    initialRating={rating?.ratingValue}
+                    onChange={handleRatingChange}
+                    emptySymbol={[
+                      <ChefHatIcon className="text-gray-300 font-semibold" />,
+                      <ChefHatIcon className="text-gray-300 font-semibold" />,
+                      <ChefHatIcon className="text-gray-300 font-semibold" />,
+                      <ChefHatIcon className="text-gray-300 font-semibold" />,
+                      <ChefHatIcon className="text-gray-300 font-semibold" />,
+                    ]}
+                    fullSymbol={[
+                      <ChefHatIcon className="text-gray-600   font-semibold" />,
+                      <ChefHatIcon className="text-red-600  ont-semibold" />,
+                      <ChefHatIcon className="text-orange-400   0 font-semibold" />,
+                      <ChefHatIcon className="text-yellow-300   0 font-semibold" />,
+                      <ChefHatIcon className="text-green-600   font-semibold" />,
+                    ]}
+                    fractions={4}
+                    readonly={
+                      updateButton ||
+                      rating.currentUserRating ||
+                      rating.user === null
+                    }
+                  />
+                  <p className="font-semibold text-lg  text-right">
+                    {" "}
+                    {rating?.ratingValue} ({rating?.numberOfRatings})
+                  </p>
+                </div>
+                {!updateButton && rating?.currentUserRating && (
+                  <p className="text-sm text-gray-600 text-right">
+                    Your rating: {rating?.currentUserRating}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
         {/* Recipe Meta Information */}
         <div className="my-4  border-b border-gray-200">
           <div className="flex justify-between text-sm text-gray-600">

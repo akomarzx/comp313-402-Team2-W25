@@ -1,23 +1,10 @@
 "use client";
-import {
-  CirclePlus,
-  CircleMinus,
-  CopyPlus,
-  Trash2,
-  Loader2Icon,
-  LoaderIcon,
-} from "lucide-react";
-import {
-  updateRecipe,
-  getRecipeById,
-  uploadImg,
-  updateIngredientGroup,
-  updateStepGroup,
-} from "@/api/recipe";
+import { Loader2Icon, LoaderIcon } from "lucide-react";
+import { updateRecipe, getRecipeById, uploadImg } from "@/api/recipe";
 import { useRouter, useParams, redirect } from "next/navigation";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 
 const UpdateRecipe = () => {

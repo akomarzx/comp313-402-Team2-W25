@@ -1,7 +1,7 @@
 "use client";
 // context/AuthContext.js
 import { createContext, useContext, useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import axios from "axios";
 
 // Create Auth Context
@@ -19,6 +19,9 @@ export const AuthProvider = ({ children }) => {
   const login = async (currentUrl = "") => {
     localStorage.setItem("lastUrl", currentUrl);
     router.push(`${bffUrl}/login`);
+    if (user) {
+      redirect("/");
+    }
   };
 
   // Function to log out
@@ -45,10 +48,12 @@ export const AuthProvider = ({ children }) => {
       } else {
         console.log("User is not authenticated");
         setUser(null);
+        redirect("/");
       }
     } catch (error) {
       console.error("Error fetching session:", error);
       setUser(null);
+      redirect("/");
     } finally {
       setLoading(false);
     }
