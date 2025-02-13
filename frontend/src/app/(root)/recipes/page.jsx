@@ -47,7 +47,7 @@ const RecipePage = () => {
     const fetchRecipes = async () => {
       try {
         setIsLoading(true);
-        const fetchData = await getRecipes(currentPage, 10);
+        const fetchData = await getRecipes(currentPage, 12);
         if (fetchData === 401) {
           logout();
           toast("Session expired. Please login again.");

@@ -87,7 +87,7 @@ export async function getMyRecipes(page) {
   try {
     console.log(page);
     const recipes = await axios.get(
-      `${recipeUrl}/kc/v1/recipe/my-recipe?size=${10}&page=${page}`,
+      `${recipeUrl}/kc/v1/recipe/my-recipe?size=${12}&page=${page}`,
       {
         withCredentials: true,
       }
@@ -103,7 +103,7 @@ export async function getSavedRecipes(page) {
   try {
     console.log(page);
     const recipes = await axios.get(
-      `${recipeUrl}/kc/v1/recipe/saved?size=${10}&page=${page}`,
+      `${recipeUrl}/kc/v1/recipe/saved?size=${12}&page=${page}`,
       {
         withCredentials: true,
       }
