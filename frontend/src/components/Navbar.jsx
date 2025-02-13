@@ -178,15 +178,15 @@ const Navbar = () => {
             </Link>
             {user && (
               <Link
-                href="/my-kitchen"
+                href="/cook-book"
                 className={
-                  currentPath === "/my-kitchen"
+                  currentPath === "/cook-book"
                     ? "text-green-600"
                     : "text-slate-600"
                 }
                 onClick={() => setIsOpen(false)}
               >
-                MY KITCHEN
+                MY COOK BOOK
               </Link>
             )}
             <Link
@@ -224,7 +224,7 @@ const Navbar = () => {
                       }}
                       className="hover:text-green-600"
                     >
-                      Logout
+                      LOGOUT
                     </button>
                   </div>
                 )}

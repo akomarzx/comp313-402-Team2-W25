@@ -20,13 +20,13 @@ const MyCookBook = () => {
 
   const fetchMyRecipes = async () => {
     const data = await getMyRecipes(recipePage);
-    console.log(recipePage);
+    console.log(data);
     setMyRecipes((prev) => [...prev, ...data.content]);
     setRecipePage((prev) => prev + 1);
   };
   const fetchSavedRecipes = async () => {
     const data2 = await getSavedRecipes(savedRecipePage);
-    console.log(savedRecipePage);
+    console.log(data2);
     setSavedRecipes((prev) => [...prev, ...data2.content]);
     setSavedRecipePage((prev) => prev + 1);
   };
@@ -77,7 +77,7 @@ const MyCookBook = () => {
             <RecipesResult recipeCardData={myRecipes} version={2} />
           </div>
           <div className="text-center mt-4">
-            {myRecipes && (
+            {myRecipes?.length >= 10 && (
               <button
                 onClick={() => {
                   fetchMyRecipes();
@@ -100,7 +100,7 @@ const MyCookBook = () => {
             <RecipesResult recipeCardData={savedRecipes} version={2} />
           </div>
           <div className="text-center mt-4">
-            {myRecipes && (
+            {savedRecipes?.length >= 10 && (
               <button
                 onClick={() => {
                   fetchSavedRecipes();
