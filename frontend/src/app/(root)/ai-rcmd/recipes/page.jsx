@@ -11,7 +11,7 @@ import { ChefHat } from "lucide-react";
 
 const AIRecipies = () => {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, categories } = useAuth();
   if (!user) {
     redirect("/");
   }
@@ -59,6 +59,7 @@ const AIRecipies = () => {
             <DisplayRecipe
               recipe={recipe.data.result.recipe}
               saveButton={true}
+              categories={categories}
             />
           </>
         ) : (

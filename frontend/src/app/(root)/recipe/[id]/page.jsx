@@ -12,7 +12,7 @@ const Recipe = () => {
   const { id } = useParams();
   const [recipe, setRecipe] = useState(null);
   const [rating, setRating] = useState(null);
-  const { loading, user } = useAuth();
+  const { loading, user, categories } = useAuth();
   if (isNaN(id)) {
     redirect("/recipes");
   }
