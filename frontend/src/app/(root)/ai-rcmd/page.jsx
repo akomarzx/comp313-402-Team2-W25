@@ -95,7 +95,7 @@ const AIReccommend = () => {
 
       setTimeout(() => {
         login(
-          `/ai-rcmd/recipes?data=${encodeURIComponent(
+          `/ai-rcmd/recipe?data=${encodeURIComponent(
             JSON.stringify(requestBody)
           )}`
         );
@@ -104,7 +104,7 @@ const AIReccommend = () => {
       try {
         await new Promise((resolve) => setTimeout(resolve, 1500));
         router.push(
-          `/ai-rcmd/recipes?data=${encodeURIComponent(
+          `/ai-rcmd/recipe?data=${encodeURIComponent(
             JSON.stringify(requestBody)
           )}`
         );

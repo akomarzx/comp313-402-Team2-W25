@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import { redirect, useSearchParams, useRouter } from "next/navigation";
 
@@ -11,6 +11,7 @@ import { ChefHat } from "lucide-react";
 
 const AIRecipies = () => {
   const router = useRouter();
+  const hasRun = useRef(false);
   const { user, categories } = useAuth();
   if (!user) {
     redirect("/");
@@ -26,19 +27,22 @@ const AIRecipies = () => {
       ingredientList: data.ingredients,
       allergiesAndRestrictions: data.allergies,
     };
-    router.push("/ai-rcmd/recipes");
+    router.push("/ai-rcmd/recipe");
 
     console.log(request);
     if (data) {
-      try {
-        const fetchAIRecipe = async () => {
-          const res = await generateRecipe(request);
-          setRecipe(res);
-          console.log(res);
-        };
-        fetchAIRecipe().then(() => setIsQuerying(false));
-      } catch (error) {
-        console.log("Error fetching recipe:", error);
+      if (!hasRun.current) {
+        hasRun.current = true;
+        try {
+          const fetchAIRecipe = async () => {
+            const res = await generateRecipe(request);
+            setRecipe(res);
+            console.log(res);
+          };
+          fetchAIRecipe().then(() => setIsQuerying(false));
+        } catch (error) {
+          console.log("Error fetching recipe:", error);
+        }
       }
     }
   }, []);
