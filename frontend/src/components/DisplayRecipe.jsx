@@ -93,7 +93,7 @@ const DisplayRecipe = ({
           />
         </div>
         <div className="flex">
-          <div className="flex flex-wrap gap-2 mb-2">
+          <div className="flex flex-wrap gap-2 mb-2 w-2/3">
             {recipe.categories
               ?.sort((a, b) => a.id - b.id)
               .map((cat) => {
@@ -108,7 +108,7 @@ const DisplayRecipe = ({
               })}
           </div>
           {rating && (
-            <div className="flex flex-col ml-auto">
+            <div className="flex flex-col ml-auto w-1/3 items-end">
               <div className="flex  ">
                 <RatingAPILayer
                   initialRating={rating?.ratingValue}

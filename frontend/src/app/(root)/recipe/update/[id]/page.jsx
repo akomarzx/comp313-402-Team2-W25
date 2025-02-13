@@ -40,6 +40,7 @@ const UpdateRecipe = () => {
     sugars: "",
     fat: "",
     imageUrl: "",
+    categoryIds: [],
     ingredientGroups: [
       {
         id: null,
@@ -66,7 +67,7 @@ const UpdateRecipe = () => {
     ],
   });
 
-  const { user, loading, fetchSession } = useAuth();
+  const { user, loading, fetchSession, categories } = useAuth();
 
   useEffect(() => {
     fetchSession();
@@ -94,6 +95,7 @@ const UpdateRecipe = () => {
         carbs: recipe.carbsG,
         sugars: recipe.sugarsG,
         fat: recipe.fatG,
+        categoryIds: recipe.categories.map((cat) => cat.id),
         ingredientGroups: recipe.ingredientGroups
           .sort((a, b) => a.ingredientGroupOrder - b.ingredientGroupOrder)
           .map((group) => ({
@@ -191,7 +193,7 @@ const UpdateRecipe = () => {
       fatG: formData.fat,
       prepTimeUnitCd: 100,
       cookTimeUnitCd: 100,
-      categoryIds: [1],
+      categoryIds: formData.categoryIds,
       ingredientGroups: formData.ingredientGroups.map((group) => ({
         ...group,
         ingredients: group.ingredients.map((ingredient, index) => ({
@@ -316,6 +318,60 @@ const UpdateRecipe = () => {
             className="w-full p-2 border rounded-lg"
             onChange={handleFileChange}
           />
+        </div>
+        <div className="mb-6">
+          <div className="mb-6">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Categories
+            </label>
+            <select
+              multiple
+              value={formData.categoryIds}
+              onChange={(e) => {
+                e.preventDefault();
+              }}
+              className="w-full p-2 border rounded-lg"
+            >
+              {categories?.data.map((cat) => (
+                <option
+                  key={cat.id}
+                  value={cat.id}
+                  onClick={() => {
+                    !formData.categoryIds?.includes(cat.id) &&
+                      setFormData((prev) => ({
+                        ...prev,
+                        categoryIds: [...prev.categoryIds, cat.id],
+                      }));
+                  }}
+                >
+                  {cat.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {formData.categoryIds?.map((catId, index) => {
+              const category = categories?.data.find((cat) => cat.id === catId);
+              if (!category) return null;
+              return (
+                <div
+                  key={index}
+                  className="flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full cursor-pointer"
+                  onClick={() =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      categoryIds: prev.categoryIds.filter(
+                        (id) => id !== catId
+                      ),
+                    }))
+                  }
+                >
+                  <span>{category.label}</span>
+                  <span>&times;</span>
+                </div>
+              );
+            })}
+          </div>
         </div>
         {/* Times and Servings */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
