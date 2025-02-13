@@ -109,7 +109,7 @@ export async function getSavedRecipes(page) {
       }
     );
     console.log(recipes);
-    return recipes.data;
+    return recipes.data.result;
   } catch (error) {
     console.log("Error fetching saved recipes:", error);
   }
@@ -119,7 +119,7 @@ export async function saveRecipe(recipeId) {
   try {
     const recipeResponse = await axios.post(
       `${recipeUrl}/kc/v1/recipe/save`,
-      { recipeId },
+      { recipeId: recipeId },
       {
         withCredentials: true,
       }
