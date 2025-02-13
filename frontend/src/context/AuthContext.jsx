@@ -48,12 +48,10 @@ export const AuthProvider = ({ children }) => {
       } else {
         console.log("User is not authenticated");
         setUser(null);
-        redirect("/");
       }
     } catch (error) {
-      console.error("Error fetching session:", error);
+      console.log("Error fetching session:", error);
       setUser(null);
-      redirect("/");
     } finally {
       setLoading(false);
     }
