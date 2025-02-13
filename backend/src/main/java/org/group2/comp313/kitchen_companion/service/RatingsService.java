@@ -11,6 +11,7 @@ import org.group2.comp313.kitchen_companion.repository.RatingRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 import java.util.Optional;
 
@@ -92,7 +93,7 @@ public class RatingsService extends BaseService {
         }
 
         Long currentCount = ratingRepository.countByRecipe(recipeId);
-        BigDecimal ratingValue = ratingRepository.getAverageRatingByRecipe(recipeId);
+        BigDecimal ratingValue = ratingRepository.getAverageRatingByRecipe(recipeId).setScale(1, RoundingMode.CEILING);
 
         Optional<RatingCalculated> calculated = ratingCalculatedRepository.findById(recipeId);
 

@@ -235,7 +235,7 @@ public class RecipeService extends BaseService {
             SavedRecipe newSavedRecipe = new SavedRecipe();
             newSavedRecipe.setCreatedBy(userEmail);
             newSavedRecipe.setCreatedAt(Instant.now());
-            //newSavedRecipe.setRecipe(recipeId);
+            newSavedRecipe.setRecipe(recipeId);
             this.savedRecipeRepository.save(newSavedRecipe);
         }
     }

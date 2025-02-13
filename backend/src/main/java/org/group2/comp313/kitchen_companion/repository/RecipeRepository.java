@@ -41,7 +41,7 @@ public interface RecipeRepository extends PagingAndSortingRepository<Recipe, Int
     Page<RecipeSummaryCardWithCategory> findAllRecipeSummaryCards(Pageable pageable);
 
     @Query(value = "SELECT r.recipe_id as id, r.title, r.summary, r.thumbnail_url " +
-            "FROM recipe r LEFT JOIN saved_recipe sr ON r.recipe_id = sr.saved_recipe_id " +
+            "FROM recipe r LEFT JOIN saved_recipe sr ON r.recipe_id = sr.recipe_id " +
             "WHERE sr.created_by = :username", nativeQuery = true)
     Page<RecipeSummaryForCards> findSavedRecipeSummaryCardsByUser(@Param("username") String username, Pageable pageable);
 
