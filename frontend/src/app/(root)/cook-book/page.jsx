@@ -70,14 +70,14 @@ const MyCookBook = () => {
       <div>
         <fieldset className="border mx-2 my-5 border-gray-200 rounded-lg p-4">
           <legend>
-            <h2 className="font-semibold">MY RECIPIES</h2>
+            <h2 className="font-semibold">MY RECIPES</h2>
           </legend>
           {isLoading && <LoaderIcon className="animate-spin m-auto" />}
           <div className=" mx-auto max-w-[1200px]">
             <RecipesResult recipeCardData={myRecipes} version={2} />
           </div>
           <div className="text-center mt-4">
-            {myRecipes?.length >= 10 && (
+            {myRecipes?.length >= 12 && (
               <button
                 onClick={() => {
                   fetchMyRecipes();
@@ -100,7 +100,7 @@ const MyCookBook = () => {
             <RecipesResult recipeCardData={savedRecipes} version={2} />
           </div>
           <div className="text-center mt-4">
-            {savedRecipes?.length >= 10 && (
+            {savedRecipes?.length >= 12 && (
               <button
                 onClick={() => {
                   fetchSavedRecipes();

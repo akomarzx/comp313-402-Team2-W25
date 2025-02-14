@@ -213,7 +213,7 @@ const Navbar = () => {
                     <Link
                       href="/profile"
                       onClick={() => setIsOpen(false)}
-                      className="hover:text-green-600"
+                      className="hover:text-green-600 text-left"
                     >
                       MY PROFILE
                     </Link>
@@ -222,7 +222,7 @@ const Navbar = () => {
                         logout();
                         setIsOpen(false);
                       }}
-                      className="hover:text-green-600"
+                      className="hover:text-green-600 text-left"
                     >
                       LOGOUT
                     </button>

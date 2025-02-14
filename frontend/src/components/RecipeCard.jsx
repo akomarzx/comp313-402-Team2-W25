@@ -8,7 +8,7 @@ import { saveRecipe } from "@/api/recipe";
 const RecipeCard = ({ data, version = 1, user = {} }) => {
   const cardStyle =
     version === 2
-      ? "w-[170px] min-h-[180px] p-2"
+      ? "w-[190px] min-h-[220px] p-2"
       : "w-[300px] min-h-[300px] p-4";
 
   const imageStyle = version === 2 ? "h-[150px]" : "h-[200px]";
@@ -23,7 +23,7 @@ const RecipeCard = ({ data, version = 1, user = {} }) => {
 
   return (
     <div
-      className={` relative hover:scale-[101%] border ${cardStyle} max-h-[500px]  bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-700 mx-auto`}
+      className={` relative hover:scale-[101%] border ${cardStyle} max-h-[400px]  bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-700 mx-auto`}
     >
       {user && version !== 2 && (
         <div className="absolute top-5 right-5 z-10">
@@ -56,20 +56,27 @@ const RecipeCard = ({ data, version = 1, user = {} }) => {
         <div className="pt-4">
           <h3
             className={`${
-              version === 2 ? "font-bold" : "font-semibold"
-            } font-bold text-gray-800 truncate`}
+              version === 2
+                ? "font-bold line-clamp-2"
+                : "font-semibold truncate"
+            } font-bold text-gray-800 `}
           >
             {data?.title}
           </h3>
           {version === 1 && (
             <div className="flex mt-2 w-full justify-between">
-              <p className="text-sm text-gray-600 line-clamp-1 flex">
-                <span className="border rounded-full px-2 bg-blue-100">
-                  {data?.category}
-                </span>
+              <p className="text-sm line-clamp-1">
+                {data?.category?.split(",").map((cat, i) => (
+                  <span key={i}>
+                    <span className="text-blue-600 border rounded-full px-2 bg-blue-100">
+                      {cat}
+                    </span>
+                    &nbsp;{" "}
+                  </span>
+                ))}
               </p>
               <p className="text-sm text-gray-600 flex items-right font-semibold">
-                {data?.ratingValue && (
+                {data?.ratingValue !== null && data?.ratingCount > 0 && (
                   <span className="flex items-center">
                     <ChefHatIcon
                       size={20}

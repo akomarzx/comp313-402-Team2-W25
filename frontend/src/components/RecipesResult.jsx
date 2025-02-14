@@ -48,9 +48,7 @@ const RecipesResult = ({
     <div className="w-full">
       {version === 1 && (
         <>
-          <h2 className="font-bold text-2xl text-center mt-10 ">
-            All Recipies
-          </h2>
+          <h2 className="font-bold text-2xl text-center mt-10 ">All Recipes</h2>
 
           <div className="flex justify-between items-center my-2 w-[90%] mx-auto">
             <div className="my-4 flex justify-end">

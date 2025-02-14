@@ -50,13 +50,18 @@ const RecipeRow = ({ recipe, user }) => {
               {recipe?.description}
             </p>
             <div className="flex w-full space-between gap-4 text-sm text-gray-500">
-              <p className="text-sm text-gray-600 line-clamp-1 w-1/2">
-                <span className="border rounded-full px-2 bg-blue-100 font-semibold">
-                  {recipe?.category}
-                </span>
+              <p className="text-sm line-clamp-1 w-1/2">
+                {recipe?.category?.split(",").map((cat, i) => (
+                  <span key={i}>
+                    <span className="text-blue-600 border rounded-full px-2 bg-blue-100">
+                      {cat}
+                    </span>
+                    &nbsp;{" "}
+                  </span>
+                ))}
               </p>
               <p className="text-sm text-gray-600  font-semibold w-1/2 text-right">
-                {recipe?.ratingValue && (
+                {recipe?.ratingValue !== null && recipe?.ratingCount > 0 && (
                   <span className="flex items-center  justify-end">
                     <ChefHatIcon
                       size={20}
