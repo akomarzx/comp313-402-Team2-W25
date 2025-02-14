@@ -77,7 +77,7 @@ const MyCookBook = () => {
             <RecipesResult recipeCardData={myRecipes} version={2} />
           </div>
           <div className="text-center mt-4">
-            {myRecipes?.length >= 10 && (
+            {myRecipes?.length >= 12 && (
               <button
                 onClick={() => {
                   fetchMyRecipes();
@@ -100,7 +100,7 @@ const MyCookBook = () => {
             <RecipesResult recipeCardData={savedRecipes} version={2} />
           </div>
           <div className="text-center mt-4">
-            {savedRecipes?.length >= 10 && (
+            {savedRecipes?.length >= 12 && (
               <button
                 onClick={() => {
                   fetchSavedRecipes();
