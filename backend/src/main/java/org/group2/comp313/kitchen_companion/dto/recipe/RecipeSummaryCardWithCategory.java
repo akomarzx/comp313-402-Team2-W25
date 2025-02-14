@@ -10,5 +10,4 @@ public record RecipeSummaryCardWithCategory(
         Long ratingCount,
         BigDecimal ratingValue,
         String category
-) {
-}
+) {}

@@ -58,12 +58,15 @@ public class PublicController extends BaseController {
     }
 
     @GetMapping("/recipe")
-    public ResponseEntity<ApiResult<Page<RecipeSummaryCardWithCategory>>>getAllRecipes(@RequestParam Integer page, @RequestParam Integer size) {
+    public ResponseEntity<ApiResult<Page<RecipeSummaryCardWithCategory>>> getRecipes(@RequestParam(required = false) String search,
+                                                                          @RequestParam(defaultValue = "0") Integer page,
+                                                                          @RequestParam(defaultValue = "10") Integer size,
+                                                                          @RequestParam(required = false) String[] sort) {
 
         log.debug("Request to retrieve all recipe");
 
         try {
-            return ResponseEntity.ok(new ApiResult<>("" ,this.recipeService.getRecipes(page, size)));
+            return ResponseEntity.ok(new ApiResult<>("", recipeService.getRecipes(search, page, size, sort)));
         } catch (Exception e) {
             return new ResponseEntity<>(new ApiResult<>(e.getLocalizedMessage(), null), HttpStatus.INTERNAL_SERVER_ERROR);
         }

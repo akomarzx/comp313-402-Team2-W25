@@ -22,9 +22,11 @@ import org.group2.comp313.kitchen_companion.utility.EntityToBeUpdatedNotFoundExc
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -71,9 +73,26 @@ public class RecipeService extends BaseService {
      * @param size the number of items per page
      * @return a paginated list of recipe summary cards with their categories
      */
-    public Page<RecipeSummaryCardWithCategory> getRecipes(Integer page, Integer size) {
-        Pageable pageRequest = PageRequest.of(page, size);
-        return this.recipeRepository.findAllRecipeSummaryCards(pageRequest);
+    public Page<RecipeSummaryCardWithCategory> getRecipes(String keyword, Integer page, Integer size, String[] sort) {
+
+        Pageable pageable;
+
+        if (sort != null && sort.length > 0) {
+            List<Sort.Order> orders = new ArrayList<>();
+            for (String sortParam : sort) {
+                String[] sortParts = sortParam.split(",");
+                if (sortParts.length == 2) {
+                    String property = sortParts[0];
+                    Sort.Direction direction = Sort.Direction.fromString(sortParts[1]);
+                    orders.add(new Sort.Order(direction, property));
+                }
+            }
+            pageable = PageRequest.of(page, size, Sort.by(orders));
+        } else {
+            pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+        }
+
+        return recipeRepository.findRecipeSummaryCardsByKeywordAndSort(keyword, pageable);
     }
 
     /**
