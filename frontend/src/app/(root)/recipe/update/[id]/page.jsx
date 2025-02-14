@@ -419,7 +419,7 @@ const UpdateRecipe = () => {
                   onChange={(e) =>
                     handleGroupChange(e, groupIndex, "ingredientGroups")
                   }
-                  required
+                  required={formData.ingredientGroups.length > 1}
                 />
                 {group.ingredients
                   .sort((a, b) => a.ingredientOrder - b.ingredientOrder)
@@ -457,7 +457,7 @@ const UpdateRecipe = () => {
                 placeholder={`Group ${groupIndex + 1} Label`}
                 value={group.label}
                 onChange={(e) => handleGroupChange(e, groupIndex, "stepGroups")}
-                required
+                required={formData.stepGroups.length > 1}
               />
               {group.steps.map((step, subIndex) => (
                 <div key={subIndex} className="flex items-center mb-2 mr-8">

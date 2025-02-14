@@ -9,7 +9,7 @@ import { generateRecipe } from "@/api/recipe";
 import DisplayRecipe from "@/components/DisplayRecipe";
 import { ChefHat } from "lucide-react";
 
-const AIRecipies = () => {
+const AIRecipes = () => {
   const router = useRouter();
   const hasRun = useRef(false);
   const { user, categories } = useAuth();
@@ -76,4 +76,4 @@ const AIRecipies = () => {
   );
 };
 
-export default AIRecipies;
+export default AIRecipes;

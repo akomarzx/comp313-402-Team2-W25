@@ -23,8 +23,6 @@ const DisplayRecipe = ({
       setRating({ ...res.data.result, user: rating.user });
     }
   };
-  console.log(categories);
-
   const handleSaveClick = async () => {
     const res = await saveRecipe(recipe.id);
     if (res?.status === 200 || 201) {

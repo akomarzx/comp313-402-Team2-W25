@@ -70,7 +70,7 @@ const MyCookBook = () => {
       <div>
         <fieldset className="border mx-2 my-5 border-gray-200 rounded-lg p-4">
           <legend>
-            <h2 className="font-semibold">MY RECIPIES</h2>
+            <h2 className="font-semibold">MY RECIPES</h2>
           </legend>
           {isLoading && <LoaderIcon className="animate-spin m-auto" />}
           <div className=" mx-auto max-w-[1200px]">

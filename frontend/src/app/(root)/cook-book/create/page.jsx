@@ -371,6 +371,7 @@ const RecipeForm = () => {
                 placeholder={field === "yield" ? "4 portions" : ""}
                 value={formData[field]}
                 onChange={handleChange}
+                required
               />
             </div>
           ))}
@@ -390,6 +391,7 @@ const RecipeForm = () => {
                 placeholder={field === "calories" ? "650" : ""}
                 value={formData[field]}
                 onChange={handleChange}
+                required
               />
             </div>
           ))}
@@ -408,7 +410,7 @@ const RecipeForm = () => {
                 onChange={(e) =>
                   handleGroupChange(e, groupIndex, "ingredientGroups")
                 }
-                required
+                required={formData.ingredientGroups.length > 1}
               />
               {group.ingredients.map((ingredient, subIndex) => (
                 <div key={subIndex} className="flex items-center mb-2">
@@ -484,7 +486,7 @@ const RecipeForm = () => {
                 placeholder={`Group ${groupIndex + 1} Label`}
                 value={group.label}
                 onChange={(e) => handleGroupChange(e, groupIndex, "stepGroups")}
-                required
+                required={formData.stepGroups.length > 1}
               />
               {group.steps.map((step, subIndex) => (
                 <div key={subIndex} className="flex items-center mb-2">
