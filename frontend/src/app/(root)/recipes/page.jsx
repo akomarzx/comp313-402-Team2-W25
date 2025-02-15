@@ -13,18 +13,25 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { cn } from "@/lib/utils";
-import { redirect, useRouter, useSearchParams } from "next/navigation";
+import {
+  redirect,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 import RecipeCarousel from "@/components/RecipeCarousel";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
-import { ArrowBigUp } from "lucide-react";
+import { ArrowBigUp, Search } from "lucide-react";
+import path from "path";
 
 const RecipePage = () => {
   const { user, logout } = useAuth();
   const searchParams = useSearchParams();
   const displayType = searchParams.get("displayType") || "default";
   let page = searchParams.get("page") || 1;
-
+  const sortParam = searchParams.get("sort") || "default";
+  const searchKeyParam = searchParams.get("search") || "";
   if (typeof page !== "number") {
     try {
       page = parseInt(page);
@@ -41,38 +48,50 @@ const RecipePage = () => {
   const [recipeCardData, setRecipeCardData] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(parseInt(page));
+  const [searchKey, setSearchKey] = useState(searchKeyParam);
   const router = useRouter();
-
-  useEffect(() => {
-    const fetchRecipes = async () => {
-      try {
-        setIsLoading(true);
-        const fetchData = await getRecipes(currentPage, 12);
-        if (fetchData === 401) {
-          logout();
-          toast("Session expired. Please login again.");
-          setTimeout(() => {
-            router.push("/");
-          }, 2000);
-          return;
-        }
-        setRecipeCardData(fetchData?.content);
-        setTotalPages(fetchData?.page?.totalPages);
-        console.log(fetchData);
-      } catch (error) {
-        console.error("Error fetching recipes:", error);
-      } finally {
-        setIsLoading(false);
+  const fetchRecipes = async () => {
+    try {
+      setIsLoading(true);
+      const fetchData = await getRecipes(currentPage, 12, searchKey, [
+        sortParam?.split("-"),
+      ]);
+      if (fetchData === 401) {
+        logout();
+        toast("Session expired. Please login again.");
+        setTimeout(() => {
+          router.push("/");
+        }, 2000);
+        return;
       }
-    };
+      setRecipeCardData(fetchData?.content);
+      setTotalPages(fetchData?.page?.totalPages);
+      console.log(fetchData);
+    } catch (error) {
+      console.error("Error fetching recipes:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  useEffect(() => {
     fetchRecipes();
-  }, [currentPage]);
+  }, [currentPage, searchKey, sortParam]);
 
   const handleSearch = (e) => {
-    e?.key === "Enter" && setIsSearching(true);
-    setTimeout(() => {
-      setIsSearching(false);
-    }, 2000);
+    if (e?.key === "Enter" && e?.target?.value) {
+      setSearchKey(e.target.value);
+      router.push(`/recipes?search=${e.target.value}&page=1`);
+      setCurrentPage(1);
+    }
+  };
+
+  const handleSearchClick = () => {
+    const searchBox = document.querySelector("input[name=searchBox]");
+    if (searchBox?.value) {
+      setSearchKey(searchBox.value);
+      router.push(`/recipes?search=${searchBox.value}&page=1`);
+      setCurrentPage(1);
+    }
   };
 
   let pages = [1, 2, 3];
@@ -91,12 +110,23 @@ const RecipePage = () => {
         <h3 className="font-semibold text-normal p-2 mt-6">
           What are you craving for today?
         </h3>
-        <input
-          type="text"
-          placeholder="Search recipes..."
-          className="border p-2 w-full rounded-full "
-          onKeyDownCapture={handleSearch}
-        />
+        <div className="flex">
+          <input
+            type="text"
+            placeholder="Search recipes..."
+            name="searchBox"
+            className="border p-2 w-full rounded-full "
+            onKeyDownCapture={handleSearch}
+            disabled={isLoading}
+          />
+          <button>
+            <Search
+              size={20}
+              className="align-center mx-2"
+              onClick={handleSearchClick}
+            />
+          </button>
+        </div>
       </div>
 
       <div className="border-t-2">
@@ -106,10 +136,12 @@ const RecipePage = () => {
             recipeCardData={recipeCardData}
             displayType={displayType}
             isLoading={isLoading}
+            sort={sortParam}
+            searchKey={searchKey}
             user={user}
           />
 
-          {!isLoading && (
+          {!isLoading && recipeCardData.length == 12 && (
             <Pagination>
               <PaginationContent className="gap-0 border mt-8 rounded-lg divide-x overflow-hidden">
                 <PaginationItem>
@@ -118,7 +150,9 @@ const RecipePage = () => {
                     onClick={(e) => {
                       e.preventDefault();
                       router.push(
-                        `/recipes?page=${currentPage > 1 ? currentPage - 1 : 1}`
+                        `/recipes?page=${
+                          currentPage > 1 ? currentPage - 1 : 1
+                        }&sort=${sortParam}&search=${searchKey}`
                       );
                       setCurrentPage((prev) => {
                         if (prev > 1) {
@@ -149,7 +183,9 @@ const RecipePage = () => {
                         )}
                         isActive={isActive}
                         onClick={(e) => {
-                          router.push(`/recipes?page=${page}`);
+                          router.push(
+                            `/recipes?page=${page}&sort=${sortParam}&search=${searchKey}`
+                          );
                           e.preventDefault();
                           setCurrentPage(page);
                         }}
@@ -169,7 +205,7 @@ const RecipePage = () => {
                           currentPage < totalPages
                             ? currentPage + 1
                             : totalPages
-                        }`
+                        }&sort=${sortParam}&search=${searchKey}`
                       );
                       setCurrentPage((prev) => {
                         if (prev < totalPages) {

@@ -18,10 +18,10 @@ export async function getRecipeById(recipeId) {
   }
 }
 
-export async function getRecipes(page, size) {
+export async function getRecipes(page, size, search = "", sort = []) {
   try {
     const recipes = await axios.get(
-      `${recipeUrl}/kc/v1/public/recipe?size=${size}&page=${page}`
+      `${recipeUrl}/kc/v1/public/recipe?size=${size}&page=${page}&search=${search}&sort=${sort}`
     );
     console.log(recipes.data.result);
     return recipes.data.result;
