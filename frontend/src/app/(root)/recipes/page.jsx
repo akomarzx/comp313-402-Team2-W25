@@ -23,7 +23,6 @@ import RecipeCarousel from "@/components/RecipeCarousel";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import { ArrowBigUp, Search } from "lucide-react";
-import path from "path";
 
 const RecipePage = () => {
   const { user, logout } = useAuth();
@@ -50,6 +49,7 @@ const RecipePage = () => {
   const [currentPage, setCurrentPage] = useState(parseInt(page));
   const [searchKey, setSearchKey] = useState(searchKeyParam);
   const router = useRouter();
+
   const fetchRecipes = async () => {
     try {
       setIsLoading(true);
