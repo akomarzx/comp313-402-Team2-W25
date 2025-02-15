@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 
 import { BarLoader } from "react-spinners";
 import RecipeCard from "@/components/RecipeCard";
-import { Circle, Grid, List } from "lucide-react";
+import { Circle, Grid, List, RefreshCwIcon } from "lucide-react";
 import RecipeRow from "./RecipeRow";
 import {
   Select,
@@ -24,6 +24,7 @@ const RecipesResult = ({
   user = {},
 }) => {
   const [viewMode, setViewMode] = useState(displayType);
+  const router = useRouter();
 
   useEffect(() => {
     const lastView = sessionStorage.getItem("view");
@@ -102,6 +103,14 @@ const RecipesResult = ({
                     </SelectItem>
                   </SelectContent>
                 </Select>
+                <button
+                  className="px-2 py-2 border rounded ml-2"
+                  onClick={() => {
+                    window.location.replace("/recipes?page=1");
+                  }}
+                >
+                  <RefreshCwIcon size={20} />
+                </button>
               </div>
 
               <div>
