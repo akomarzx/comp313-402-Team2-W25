@@ -78,7 +78,7 @@ const RecipePage = () => {
   }, [currentPage, searchKey, sortParam]);
 
   const handleSearch = (e) => {
-    if (e?.target?.value.length < 3) {
+    if (e?.key === "Enter" && e?.target?.value.length < 3) {
       toast("Search key must be at least 3 characters long.");
     } else if (e?.key === "Enter" && e?.target?.value) {
       setSearchKey(e.target.value);
