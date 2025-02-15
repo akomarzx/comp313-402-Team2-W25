@@ -22,9 +22,11 @@ import org.group2.comp313.kitchen_companion.utility.EntityToBeUpdatedNotFoundExc
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -65,15 +67,46 @@ public class RecipeService extends BaseService {
     }
 
     /**
-     * Retrieves a paginated list of recipe summary cards along with their categories.
+     * Retrieves a paginated list of recipe summaries filtered by a keyword and sorted based on the provided parameters.
      *
-     * @param page the page number to retrieve, starting from 0
-     * @param size the number of items per page
-     * @return a paginated list of recipe summary cards with their categories
+     * @param keyword the search keyword to filter recipes; can be null or empty for no keyword filtering.
+     * @param page the page number for pagination, starting from 0.
+     * @param size the number of records per page.
+     * @param sort an array of sorting parameters where the first element specifies the property name,
+     *             and the second element (optional) specifies the direction ("asc" or "desc").
+     * @return a paginated {@code Page<RecipeSummaryCardWithCategory>} containing recipe summaries filtered
+     *         by the given keyword and sorted as specified.
      */
-    public Page<RecipeSummaryCardWithCategory> getRecipes(Integer page, Integer size) {
-        Pageable pageRequest = PageRequest.of(page, size);
-        return this.recipeRepository.findAllRecipeSummaryCards(pageRequest);
+    public Page<RecipeSummaryCardWithCategory> getRecipes(String keyword, Integer page, Integer size, String[] sort) {
+
+        Pageable pageable;
+
+        if (sort != null && sort.length > 0) {
+
+            List<Sort.Order> orders = new ArrayList<>();
+
+            if (sort.length == 2 &&
+                    ("asc".equalsIgnoreCase(sort[1]) || "desc".equalsIgnoreCase(sort[1]))) {
+                String combined = sort[0] + "," + sort[1];
+                sort = new String[] { combined };
+            }
+
+            for (String sortParam : sort) {
+                String[] sortParts = sortParam.split(",");
+                if (sortParts.length == 2) {
+                    String property = sortParts[0];
+                    Sort.Direction direction = Sort.Direction.fromString(sortParts[1]);
+                    orders.add(new Sort.Order(direction, property));
+                }
+            }
+
+            pageable = PageRequest.of(page, size, Sort.by(orders));
+
+        } else {
+            pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+        }
+
+        return recipeRepository.findRecipeSummaryCardsByKeywordAndSort(keyword, pageable);
     }
 
     /**

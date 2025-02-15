@@ -8,6 +8,8 @@ import org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryCardWithCate
 import org.group2.comp313.kitchen_companion.service.AWSS3Service;
 import org.group2.comp313.kitchen_companion.service.RatingsService;
 import org.group2.comp313.kitchen_companion.service.RecipeService;
+import org.hibernate.JDBCException;
+import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,6 +18,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/public")
@@ -58,12 +62,17 @@ public class PublicController extends BaseController {
     }
 
     @GetMapping("/recipe")
-    public ResponseEntity<ApiResult<Page<RecipeSummaryCardWithCategory>>>getAllRecipes(@RequestParam Integer page, @RequestParam Integer size) {
+    public ResponseEntity<ApiResult<Page<RecipeSummaryCardWithCategory>>> getRecipes(@RequestParam(required = false) String search,
+                                                                          @RequestParam(defaultValue = "0") Integer page,
+                                                                          @RequestParam(defaultValue = "10") Integer size,
+                                                                          @RequestParam(required = false) String[] sort) {
 
         log.debug("Request to retrieve all recipe");
 
         try {
-            return ResponseEntity.ok(new ApiResult<>("" ,this.recipeService.getRecipes(page, size)));
+            return ResponseEntity.ok(new ApiResult<>("", recipeService.getRecipes(search, page, size, sort)));
+        } catch (InvalidDataAccessResourceUsageException exception) {
+                return new ResponseEntity<>(new ApiResult<>("Sort Criteria might be invalid please verify", null), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
             return new ResponseEntity<>(new ApiResult<>(e.getLocalizedMessage(), null), HttpStatus.INTERNAL_SERVER_ERROR);
         }

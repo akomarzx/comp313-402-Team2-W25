@@ -24,21 +24,44 @@ public interface RecipeRepository extends PagingAndSortingRepository<Recipe, Int
     @Query("SELECT c FROM Recipe r JOIN r.categories c WHERE r.id = :recipeId")
     Set<Category> findCategoriesByRecipeId(@Param("recipeId") Integer recipeId);
 
-    @Query(value = "SELECT r.recipe_id AS id, " +
-            "r.title, " +
-            "r.summary AS description, " +
-            "r.thumbnail_url AS thumbnailUrl, " +
-            "CAST(IFNULL(r_calc.rating_count, 0) AS SIGNED) AS ratingCount, " +
-            "CAST(IFNULL(r_calc.rating_value, 0.0) AS DECIMAL(4,2)) AS ratingValue, " +
-            "GROUP_CONCAT(c.label SEPARATOR ', ') AS category " +
-            "FROM recipe r " +
-            "LEFT JOIN recipe_category rc ON r.recipe_id = rc.recipe_id " +
-            "LEFT JOIN category c ON rc.category_id = c.category_id " +
-            "LEFT JOIN rating_calculated r_calc ON r.recipe_id = r_calc.recipe_id " +
-            "GROUP BY r.recipe_id, r.title, r.summary, r.thumbnail_url, r_calc.rating_count, r_calc.rating_value",
-            countQuery = "SELECT COUNT(*) FROM recipe",
+    /**
+     * Finds a paginated list of recipe summary cards, including their categories,
+     * based on the provided search keyword. The results are sorted according to the {@link Pageable} parameter.
+     * If the keyword is null or empty, all recipes are retrieved.
+     *
+     * @param keyword the search keyword to match against the recipe titles and summaries;
+     *                if null or empty, all recipes are included.
+     * @param pageable the pagination and sorting information.
+     * @return a paginated list of {@link RecipeSummaryCardWithCategory} that matches the search criteria.
+     */
+    @Query(
+            value = "SELECT * FROM ( " +
+                    "  SELECT r.recipe_id AS id, " +
+                    "         r.title, " +
+                    "         r.summary AS description, " +
+                    "         r.thumbnail_url AS thumbnailUrl, " +
+                    "         CAST(IFNULL(r_calc.rating_count, 0) AS SIGNED) AS ratingCount, " +
+                    "         CAST(IFNULL(r_calc.rating_value, 0.0) AS DECIMAL(4,2)) AS rating, " +
+                    "         GROUP_CONCAT(DISTINCT c.label SEPARATOR ', ') AS category " +
+                    "  FROM recipe r " +
+                    "       LEFT JOIN recipe_category rc ON r.recipe_id = rc.recipe_id " +
+                    "       LEFT JOIN category c ON rc.category_id = c.category_id " +
+                    "       LEFT JOIN rating_calculated r_calc ON r.recipe_id = r_calc.recipe_id " +
+                    "  WHERE (:keyword IS NULL OR :keyword = '' " +
+                    "         OR MATCH(r.title, r.summary) AGAINST(:keyword IN NATURAL LANGUAGE MODE)) " +
+                    "  GROUP BY r.recipe_id, r.title, r.summary, r.thumbnail_url, " +
+                    "           r_calc.rating_count, r_calc.rating_value " +
+                    ") AS x",
+            countQuery = "SELECT COUNT(*) FROM ( " +
+                    "  SELECT r.recipe_id " +
+                    "  FROM recipe r " +
+                    "  WHERE (:keyword IS NULL OR :keyword = '' " +
+                    "         OR MATCH(r.title, r.summary) AGAINST(:keyword IN NATURAL LANGUAGE MODE)) " +
+                    "  GROUP BY r.recipe_id " +
+                    ") AS countTable",
             nativeQuery = true)
-    Page<RecipeSummaryCardWithCategory> findAllRecipeSummaryCards(Pageable pageable);
+    Page<RecipeSummaryCardWithCategory> findRecipeSummaryCardsByKeywordAndSort(@Param("keyword") String keyword,
+                                                                        Pageable pageable);
 
     @Query(value = "SELECT r.recipe_id as id, r.title, r.summary, r.thumbnail_url " +
             "FROM recipe r LEFT JOIN saved_recipe sr ON r.recipe_id = sr.recipe_id " +
