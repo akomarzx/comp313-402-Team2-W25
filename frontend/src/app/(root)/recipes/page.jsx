@@ -78,7 +78,9 @@ const RecipePage = () => {
   }, [currentPage, searchKey, sortParam]);
 
   const handleSearch = (e) => {
-    if (e?.key === "Enter" && e?.target?.value) {
+    if (e?.target?.value.length < 3) {
+      toast("Search key must be at least 3 characters long.");
+    } else if (e?.key === "Enter" && e?.target?.value) {
       setSearchKey(e.target.value);
       router.push(`/recipes?search=${e.target.value}&page=1`);
       setCurrentPage(1);
@@ -87,7 +89,9 @@ const RecipePage = () => {
 
   const handleSearchClick = () => {
     const searchBox = document.querySelector("input[name=searchBox]");
-    if (searchBox?.value) {
+    if (searchBox?.value?.length < 3) {
+      toast("Search key must be at least 3 characters long.");
+    } else if (searchBox?.value) {
       setSearchKey(searchBox.value);
       router.push(`/recipes?search=${searchBox.value}&page=1`);
       setCurrentPage(1);
