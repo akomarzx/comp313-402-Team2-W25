@@ -20,6 +20,11 @@ export async function getRecipeById(recipeId) {
 
 export async function getRecipes(page, size, search = "", sort = []) {
   try {
+    if (page < 0) {
+      page = 0;
+    } else {
+      page -= 1;
+    }
     const recipes = await axios.get(
       `${recipeUrl}/kc/v1/public/recipe?size=${size}&page=${page}&search=${search}&sort=${sort}`
     );
