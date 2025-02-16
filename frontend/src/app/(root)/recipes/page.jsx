@@ -106,15 +106,15 @@ const RecipePage = () => {
   }
 
   return (
-    <div className="py-10">
+    <div className="py-10 px">
       <div>
         {!isLoading && <RecipeCarousel data={recipeCardData?.slice(0, 5)} />}
       </div>
       <div className="mx-auto max-w-[600px] mb-5">
-        <h3 className="font-semibold text-normal p-2 mt-6">
+        <h3 className="font-semibold text-normal p-4 mt-6">
           What are you craving for today?
         </h3>
-        <div className="flex">
+        <div className="flex px-2">
           <input
             type="text"
             placeholder="Search recipes..."

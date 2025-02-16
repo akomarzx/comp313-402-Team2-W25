@@ -61,8 +61,8 @@ const RecipeCarousel = ({ data }) => {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
+        <CarouselPrevious className="hidden sm:flex mx-2" />
+        <CarouselNext className="hidden sm:flex mx-2" />
       </Carousel>
     </>
   );
