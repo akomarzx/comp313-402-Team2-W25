@@ -17,6 +17,7 @@ export const AuthProvider = ({ children }) => {
   const [categories, setCategories] = useState(null);
   // Function to log in
   const login = async (currentUrl = "") => {
+    setLoading(true);
     localStorage.setItem("lastUrl", currentUrl);
     router.push(`${bffUrl}/login`);
     if (user) {

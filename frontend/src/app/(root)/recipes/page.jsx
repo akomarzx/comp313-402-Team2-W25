@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import RecipesResult from "@/components/RecipesResult";
 import { getRecipes } from "@/api/recipe";
-
 import { buttonVariants } from "@/components/ui/button";
 import {
   Pagination,
@@ -13,19 +12,14 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { cn } from "@/lib/utils";
-import {
-  redirect,
-  usePathname,
-  useRouter,
-  useSearchParams,
-} from "next/navigation";
+import { redirect, useRouter, useSearchParams } from "next/navigation";
 import RecipeCarousel from "@/components/RecipeCarousel";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
-import { ArrowBigUp, Search } from "lucide-react";
+import { ArrowBigUp, LoaderIcon, Search } from "lucide-react";
 
 const RecipePage = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, loading } = useAuth();
   const searchParams = useSearchParams();
   const displayType = searchParams.get("displayType") || "default";
   let page = searchParams.get("page") || 1;
@@ -107,6 +101,11 @@ const RecipePage = () => {
 
   return (
     <div className="py-10 px">
+      {loading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <LoaderIcon size={50} className="animate-spin m-auto" />
+        </div>
+      )}
       <div>
         {!isLoading && <RecipeCarousel data={recipeCardData?.slice(0, 5)} />}
       </div>

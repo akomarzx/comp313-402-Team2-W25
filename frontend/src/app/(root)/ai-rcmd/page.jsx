@@ -20,6 +20,7 @@ import {
   UtensilsCrossed,
   Apple,
   Calendar,
+  LoaderIcon,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -35,7 +36,7 @@ const AIReccommend = () => {
   const [caloriesGoal, setCaloriesGoal] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { user, login } = useAuth();
+  const { user, login, loading } = useAuth();
 
   const handleGenerateMealPlan = async () => {
     if (ingredients.length === 0) {
@@ -118,6 +119,11 @@ const AIReccommend = () => {
   };
   return (
     <div className="min-h-screen ">
+      {loading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <LoaderIcon size={50} className="animate-spin m-auto" />
+        </div>
+      )}
       <div className="container max-w-4xl mx-auto px-4 py-12 md:py-20">
         <div className="text-center space-y-6 mb-16">
           <div className="relative inline-flex">
