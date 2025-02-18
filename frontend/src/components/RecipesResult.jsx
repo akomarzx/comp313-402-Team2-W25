@@ -106,7 +106,7 @@ const RecipesResult = ({
                 <button
                   className="px-2 py-2 md:px-4 border rounded ml-2"
                   onClick={() => {
-                    window.location.replace("/recipes?page=1");
+                    window.location.assign("/recipes?page=1");
                   }}
                 >
                   <RefreshCwIcon size={20} />
