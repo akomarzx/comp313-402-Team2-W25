@@ -21,6 +21,10 @@ export const AuthProvider = ({ children }) => {
       window.location.assign(`${bffUrl}/login`);
 
       setLoading(true);
+      setTimeout(() => {
+        console.log("Redirecting to login page...");
+        setLoading(false);
+      }, 5000);
       if (user) {
         redirect("/");
       }
