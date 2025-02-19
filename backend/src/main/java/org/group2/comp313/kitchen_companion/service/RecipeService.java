@@ -62,8 +62,17 @@ public class RecipeService extends BaseService {
      * @return the Recipe object if found, or null if no recipe is found with the given identifier
      */
     @Transactional
-    public Recipe getRecipeById(@NotNull Integer id) {
-        return recipeRepository.findById(id).orElse(null);
+    public Recipe getRecipeById(@NotNull Integer id, String userEmail) {
+
+         Recipe recipe = recipeRepository.findById(id).orElse(null);
+
+         if (recipe != null) {
+             SavedRecipe savedRecipe = savedRecipeRepository.findOneByRecipeAndCreatedBy(id, userEmail).orElse(null);
+             recipe.setIsFavorite(savedRecipe != null);
+             return recipe;
+         } else {
+             return null;
+         }
     }
 
     /**
@@ -77,7 +86,7 @@ public class RecipeService extends BaseService {
      * @return a paginated {@code Page<RecipeSummaryCardWithCategory>} containing recipe summaries filtered
      *         by the given keyword and sorted as specified.
      */
-    public Page<RecipeSummaryCardWithCategory> getRecipes(String keyword, Integer page, Integer size, String[] sort) {
+    public Page<RecipeSummaryCardWithCategory> getRecipes(String keyword, Integer page, Integer size, String[] sort, String currentUserEmail) {
 
         Pageable pageable;
 
@@ -106,7 +115,7 @@ public class RecipeService extends BaseService {
             pageable = PageRequest.of(page, size, Sort.by("id").ascending());
         }
 
-        return recipeRepository.findRecipeSummaryCardsByKeywordAndSort(keyword, pageable);
+        return recipeRepository.findRecipeSummaryCardsByKeywordAndSort(keyword, currentUserEmail, pageable);
     }
 
     /**

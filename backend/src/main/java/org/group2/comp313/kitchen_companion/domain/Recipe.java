@@ -109,4 +109,7 @@ public class Recipe {
     )
     @Fetch(FetchMode.JOIN)
     private Set<Category> categories = new HashSet<>();
+
+    @Transient
+    private Boolean isFavorite;
 }
