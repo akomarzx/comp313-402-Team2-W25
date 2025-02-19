@@ -3,7 +3,10 @@ const recipeUrl = process.env.NEXT_PUBLIC_RECIPE_API;
 export async function getRecipeById(recipeId) {
   try {
     const recipe = await axios.get(
-      `${recipeUrl}/kc/v1/public/recipe/${recipeId}`
+      `${recipeUrl}/kc/v1/public/recipe/${recipeId}`,
+      {
+        withCredentials: true,
+      }
     );
     return recipe.data.result;
   } catch (error) {
@@ -26,7 +29,10 @@ export async function getRecipes(page, size, search = "", sort = []) {
       page -= 1;
     }
     const recipes = await axios.get(
-      `${recipeUrl}/kc/v1/public/recipe?size=${size}&page=${page}&search=${search}&sort=${sort}`
+      `${recipeUrl}/kc/v1/public/recipe?size=${size}&page=${page}&search=${search}&sort=${sort}`,
+      {
+        withCredentials: true,
+      }
     );
     console.log(recipes.data.result);
     return recipes.data.result;
