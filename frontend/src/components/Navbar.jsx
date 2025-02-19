@@ -33,126 +33,124 @@ const Navbar = () => {
             <span>Kitchen Companion</span>
           </Link>
         </div>
-        {!loading && (
-          <>
-            <div className="hidden md:flex gap-10 text-slate-600 font-bold font-sans">
+        <>
+          <div className="hidden md:flex gap-10 text-slate-600 font-bold font-sans">
+            <Link
+              href="/recipes"
+              className={
+                currentPath === "/recipes"
+                  ? "text-green-600 flex gap-2"
+                  : "text-slate-600 flex gap-2"
+              }
+            >
+              <Home size={22} />
+              <span>HOME</span>
+            </Link>
+            {!loading && user && (
               <Link
-                href="/recipes"
+                href="/cook-book"
                 className={
-                  currentPath === "/recipes"
+                  currentPath === "/cook-book"
                     ? "text-green-600 flex gap-2"
                     : "text-slate-600 flex gap-2"
                 }
               >
-                <Home size={22} />
-                <span>HOME</span>
+                <Book size={22} />
+                <span>MY COOK BOOK</span>
               </Link>
-              {user && (
-                <Link
-                  href="/cook-book"
-                  className={
-                    currentPath === "/cook-book"
-                      ? "text-green-600 flex gap-2"
-                      : "text-slate-600 flex gap-2"
-                  }
-                >
-                  <Book size={22} />
-                  <span>MY COOK BOOK</span>
-                </Link>
-              )}
-              <Link
-                href="/ai-rcmd"
-                className={
-                  currentPath === "/ai-rcmd"
-                    ? "text-green-600 flex gap-2"
-                    : "text-slate-600 flex gap-2"
-                }
-              >
-                <WandSparkles size={22} />
-                <span>AI</span>
-              </Link>
+            )}
+            <Link
+              href="/ai-rcmd"
+              className={
+                currentPath === "/ai-rcmd"
+                  ? "text-green-600 flex gap-2"
+                  : "text-slate-600 flex gap-2"
+              }
+            >
+              <WandSparkles size={22} />
+              <span>AI</span>
+            </Link>
 
-              {/* Profile Dropdown */}
-              {user ? (
-                <div
-                  className="relative"
-                  onBlur={() =>
-                    setTimeout(() => {
-                      setIsProfileDropdownOpen(false);
-                    }, 100)
-                  }
+            {/* Profile Dropdown */}
+            {user ? (
+              <div
+                className="relative"
+                onBlur={() =>
+                  setTimeout(() => {
+                    setIsProfileDropdownOpen(false);
+                  }, 100)
+                }
+              >
+                <button
+                  onClick={() => setIsProfileDropdownOpen((prev) => !prev)}
+                  className="flex items-center gap-2 hover:text-green-600 focus:outline-none"
                 >
-                  <button
-                    onClick={() => setIsProfileDropdownOpen((prev) => !prev)}
-                    className="flex items-center gap-2 hover:text-green-600 focus:outline-none"
+                  <span>PROFILE</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
                   >
-                    <span>PROFILE</span>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+
+                {isProfileDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg">
+                    <Link
+                      href="/profile"
+                      className="block px-4 py-2 hover:bg-gray-100 text-slate-600"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
-                  </button>
-
-                  {isProfileDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg">
-                      <Link
-                        href="/profile"
-                        className="block px-4 py-2 hover:bg-gray-100 text-slate-600"
-                      >
-                        <div className="flex gap-2 items-center">
-                          <UserRound size={22} />
-                          <span>MY PROFILE</span>
-                        </div>
-                      </Link>
-                      <button
-                        onClick={async () => {
-                          await logout();
-                        }}
-                        className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-slate-600"
-                      >
-                        <div className="flex gap-2 items-center">
-                          <LogOut size={22} />
-                          <span>LOG OUT</span>
-                        </div>
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="flex min-w-[69px]">
-                  {" "}
-                  <Link
-                    href="/"
-                    onClick={async (e) => {
-                      e.preventDefault();
-                      await login();
-                      setIsOpen(false);
-                    }}
-                    className="hover:text-green-600 text-left flex gap-2"
-                  >
-                    <LogIn size={22} />
-                    <span>LOGIN</span>
-                  </Link>{" "}
-                  {loading && (
-                    <div className=" flex items-center justify-center z-50">
-                      <LoaderIcon size={20} className="animate-spin m-auto" />
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </>
-        )}
+                      <div className="flex gap-2 items-center">
+                        <UserRound size={22} />
+                        <span>MY PROFILE</span>
+                      </div>
+                    </Link>
+                    <button
+                      onClick={async () => {
+                        await logout();
+                      }}
+                      className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-slate-600"
+                    >
+                      <div className="flex gap-2 items-center">
+                        <LogOut size={22} />
+                        <span>LOG OUT</span>
+                      </div>
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex min-w-[69px]">
+                {" "}
+                <Link
+                  href="/"
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    await login();
+                    setIsOpen(false);
+                  }}
+                  className="hover:text-green-600 text-left flex gap-2"
+                >
+                  <LogIn size={22} />
+                  <span>LOGIN</span>
+                </Link>{" "}
+                {loading && (
+                  <div className=" flex items-center justify-center z-50">
+                    <LoaderIcon size={20} className="animate-spin m-auto" />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </>
         {/* Mobile Menu Button */}
         <div className="md:hidden">
           <button

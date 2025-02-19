@@ -3,11 +3,15 @@ import React from "react";
 import { useAuth } from "../../context/AuthContext";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { BookmarkPlus, ChefHat, Sparkles, Star } from "lucide-react";
+import {
+  ArrowBigUp,
+  BookmarkPlus,
+  ChefHat,
+  Sparkles,
+  Star,
+} from "lucide-react";
 const Home = () => {
   const { user, loading, login } = useAuth();
-
-  if (loading) return <p>Loading...</p>;
 
   if (user && localStorage.getItem("lastUrl")) {
     const redirectUrl = localStorage.getItem("lastUrl");
@@ -47,7 +51,7 @@ const Home = () => {
               rate recipes while getting intelligent suggestions.
             </p>
             <div className="flex flex-wrap gap-4 justify-center slide-up">
-              {!user && (
+              {!user && !loading && (
                 <Button
                   size="lg"
                   className="text-lg"
@@ -215,6 +219,13 @@ const Home = () => {
           </div>
         </section>
       </div>
+      <ArrowBigUp
+        size={50}
+        className="fixed bottom-10 right-5 md:right-10 2xl:right-[100px] p-2 bg-white text-gray-600 rounded-full cursor-pointer z-20"
+        onClick={() => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+      />
     </div>
   );
 };
