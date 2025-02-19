@@ -9,5 +9,6 @@ public record RecipeSummaryCardWithCategory(
         String thumbnailUrl,
         Long ratingCount,
         BigDecimal ratingValue,
-        String category
+        String category,
+        Integer isFavorite
 ) {}

@@ -5,19 +5,15 @@ import org.group2.comp313.kitchen_companion.domain.Recipe;
 import org.group2.comp313.kitchen_companion.dto.ApiResult;
 import org.group2.comp313.kitchen_companion.dto.rating.RecipeRatingDto;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryCardWithCategory;
-import org.group2.comp313.kitchen_companion.service.AWSS3Service;
 import org.group2.comp313.kitchen_companion.service.RatingsService;
 import org.group2.comp313.kitchen_companion.service.RecipeService;
-import org.hibernate.JDBCException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -35,16 +31,23 @@ public class PublicController extends BaseController {
     }
 
     @GetMapping("/recipe/{id}")
-    public ResponseEntity<ApiResult<Recipe>> getRecipe(@PathVariable Integer id) {
+    public ResponseEntity<ApiResult<Recipe>> getRecipe(@PathVariable Integer id,
+                                                       @AuthenticationPrincipal Jwt jwt) {
 
         log.info("Get recipe with id {}", id);
+
+        String email = null;
+
+        if(jwt != null) {
+            email = jwt.getClaimAsString("email");
+        }
 
         ApiResult<Recipe> apiResult;
         HttpStatus status;
 
         try {
 
-            Recipe recipe = this.recipeService.getRecipeById(id);
+            Recipe recipe = this.recipeService.getRecipeById(id, email);
 
             if(recipe == null) {
                 status = HttpStatus.NOT_FOUND;
@@ -65,12 +68,18 @@ public class PublicController extends BaseController {
     public ResponseEntity<ApiResult<Page<RecipeSummaryCardWithCategory>>> getRecipes(@RequestParam(required = false) String search,
                                                                           @RequestParam(defaultValue = "0") Integer page,
                                                                           @RequestParam(defaultValue = "10") Integer size,
-                                                                          @RequestParam(required = false) String[] sort) {
+                                                                          @RequestParam(required = false) String[] sort, @AuthenticationPrincipal Jwt jwt) {
 
         log.debug("Request to retrieve all recipe");
 
+        String email = null;
+
+        if(jwt != null) {
+            email = jwt.getClaimAsString("email");
+        }
+
         try {
-            return ResponseEntity.ok(new ApiResult<>("", recipeService.getRecipes(search, page, size, sort)));
+            return ResponseEntity.ok(new ApiResult<>("", recipeService.getRecipes(search, page, size, sort, email)));
         } catch (InvalidDataAccessResourceUsageException exception) {
                 return new ResponseEntity<>(new ApiResult<>("Sort Criteria might be invalid please verify", null), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
