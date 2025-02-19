@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { ChefHatIcon, HeartIcon } from "lucide-react";
 import { toast } from "sonner";
-import { saveRecipe } from "@/api/recipe";
+import { saveRecipe, unsaveRecipe } from "@/api/recipe";
 
 const RecipeCard = ({ data, version = 1, user = {} }) => {
   const cardStyle =
@@ -12,12 +12,20 @@ const RecipeCard = ({ data, version = 1, user = {} }) => {
       : "w-[300px] min-h-[300px] p-4";
 
   const imageStyle = version === 2 ? "h-[150px]" : "h-[200px]";
-  const [saved, setSaved] = useState(false);
+  const [saved, setSaved] = useState(data?.isFavorite);
   const handleSaveClick = async () => {
-    const res = await saveRecipe(data.id);
-    if (res?.status === 200 || 201) {
-      setSaved(!saved);
-      toast("Recipe saved successfully");
+    if (!data.isFavorite) {
+      const res = await saveRecipe(data.id);
+      if (res?.status === 200 || 201) {
+        setSaved(!saved);
+        toast("Recipe saved successfully");
+      }
+    } else {
+      const res = await unsaveRecipe(data.id);
+      if (res?.status === 200) {
+        setSaved(!saved);
+        toast("Removed from saved recipes");
+      }
     }
   };
 

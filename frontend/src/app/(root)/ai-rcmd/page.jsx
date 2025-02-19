@@ -119,11 +119,6 @@ const AIReccommend = () => {
   };
   return (
     <div className="min-h-screen ">
-      {loading && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <LoaderIcon size={50} className="animate-spin m-auto" />
-        </div>
-      )}
       <div className="container max-w-4xl mx-auto px-4 py-12 md:py-20">
         <div className="text-center space-y-6 mb-16">
           <div className="relative inline-flex">

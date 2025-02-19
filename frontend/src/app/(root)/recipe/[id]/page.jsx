@@ -19,6 +19,7 @@ const Recipe = () => {
   const fetchRecipe = async () => {
     setIsLoading(true);
     const data = await getRecipeById(id);
+    console.log(data);
     const data2 = await getRatingById(id, user !== null);
 
     if (data && data2) {

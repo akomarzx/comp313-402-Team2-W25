@@ -2,7 +2,12 @@ import React, { useState } from "react";
 import { Edit, SaveIcon, ChefHatIcon, HeartIcon } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { createRecipe, saveRecipe, sendRating } from "@/api/recipe";
+import {
+  createRecipe,
+  saveRecipe,
+  sendRating,
+  unsaveRecipe,
+} from "@/api/recipe";
 import { toast } from "sonner";
 import RatingAPILayer from "@/rating_component/react-rating";
 const DisplayRecipe = ({
@@ -14,7 +19,7 @@ const DisplayRecipe = ({
 }) => {
   const router = useRouter();
   const [rating, setRating] = useState(ratingCurrent);
-  const [saved, setSaved] = useState(false);
+  const [saved, setSaved] = useState(recipe.isFavorite);
   const handleRatingChange = async (e) => {
     const res = await sendRating(recipe.id, e);
     if (res?.status === 200 || 201) {
@@ -24,10 +29,18 @@ const DisplayRecipe = ({
     }
   };
   const handleSaveClick = async () => {
-    const res = await saveRecipe(recipe.id);
-    if (res?.status === 200 || 201) {
-      setSaved(!saved);
-      toast("Recipe saved successfully");
+    if (saved) {
+      const res = await unsaveRecipe(recipe.id);
+      if (res?.status === 200) {
+        setSaved(!saved);
+        toast("Removed from saved recipes");
+      }
+    } else {
+      const res = await saveRecipe(recipe.id);
+      if (res?.status === 200 || 201) {
+        setSaved(!saved);
+        toast("Recipe saved successfully");
+      }
     }
   };
   return (

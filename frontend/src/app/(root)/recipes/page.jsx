@@ -101,11 +101,6 @@ const RecipePage = () => {
 
   return (
     <div className="py-10 px">
-      {loading && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <LoaderIcon size={50} className="animate-spin m-auto" />
-        </div>
-      )}
       <div>
         {!isLoading && <RecipeCarousel data={recipeCardData?.slice(0, 5)} />}
       </div>

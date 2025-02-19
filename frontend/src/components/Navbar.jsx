@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { LoaderIcon } from "lucide-react";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -107,17 +108,25 @@ const Navbar = () => {
                   )}
                 </div>
               ) : (
-                <Link
-                  href="/"
-                  onClick={async (e) => {
-                    e.preventDefault();
-                    await login();
-                    setIsOpen(false);
-                  }}
-                  className="hover:text-green-600"
-                >
-                  LOGIN
-                </Link>
+                <div className="flex min-w-[69px]">
+                  {" "}
+                  <Link
+                    href="/"
+                    onClick={async (e) => {
+                      e.preventDefault();
+                      await login();
+                      setIsOpen(false);
+                    }}
+                    className="hover:text-green-600 text-left"
+                  >
+                    LOGIN
+                  </Link>{" "}
+                  {loading && (
+                    <div className=" flex items-center justify-center z-50">
+                      <LoaderIcon size={20} className="animate-spin m-auto" />
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           </>
