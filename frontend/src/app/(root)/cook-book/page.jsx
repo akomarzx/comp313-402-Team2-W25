@@ -54,9 +54,9 @@ const MyCookBook = () => {
   if (!user) {
     router.push("/");
   }
-  const favoriteRecipes = [];
+
   return (
-    <div className="py-10 px-6">
+    <div className="py-10 px-6 max-w-[1200px] mx-auto bg-white">
       <h2 className="mx-2 font-bold text-2xl ">MY COOK BOOK</h2>
       <div className="text-right">
         <button

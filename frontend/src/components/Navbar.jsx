@@ -3,7 +3,16 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { LoaderIcon } from "lucide-react";
+import {
+  Book,
+  ChefHat,
+  Home,
+  LoaderIcon,
+  LogIn,
+  LogOut,
+  UserRound,
+  WandSparkles,
+} from "lucide-react";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,8 +27,11 @@ const Navbar = () => {
   return (
     <nav className="w-full h-fit mx-0 border-b bg-white">
       <div className="container flex justify-between h-[8vh] items-center mx-auto min-w-[80%] px-4">
-        <div className="text-xl font-bold text-green-600">
-          <Link href="/recipes">Kitchen Companion</Link>
+        <div className=" text-xl font-bold text-green-600">
+          <Link href="/" className="flex items-center gap-2">
+            <ChefHat size={25} />
+            <span>Kitchen Companion</span>
+          </Link>
         </div>
         {!loading && (
           <>
@@ -28,33 +40,36 @@ const Navbar = () => {
                 href="/recipes"
                 className={
                   currentPath === "/recipes"
-                    ? "text-green-600"
-                    : "text-slate-600"
+                    ? "text-green-600 flex gap-2"
+                    : "text-slate-600 flex gap-2"
                 }
               >
-                HOME
+                <Home size={22} />
+                <span>HOME</span>
               </Link>
               {user && (
                 <Link
                   href="/cook-book"
                   className={
                     currentPath === "/cook-book"
-                      ? "text-green-600"
-                      : "text-slate-600"
+                      ? "text-green-600 flex gap-2"
+                      : "text-slate-600 flex gap-2"
                   }
                 >
-                  MY COOK BOOK
+                  <Book size={22} />
+                  <span>MY COOK BOOK</span>
                 </Link>
               )}
               <Link
                 href="/ai-rcmd"
                 className={
                   currentPath === "/ai-rcmd"
-                    ? "text-green-600"
-                    : "text-slate-600"
+                    ? "text-green-600 flex gap-2"
+                    : "text-slate-600 flex gap-2"
                 }
               >
-                AI RECOMMENDATIONS
+                <WandSparkles size={22} />
+                <span>AI</span>
               </Link>
 
               {/* Profile Dropdown */}
@@ -94,7 +109,10 @@ const Navbar = () => {
                         href="/profile"
                         className="block px-4 py-2 hover:bg-gray-100 text-slate-600"
                       >
-                        MY PROFILE
+                        <div className="flex gap-2 items-center">
+                          <UserRound size={22} />
+                          <span>MY PROFILE</span>
+                        </div>
                       </Link>
                       <button
                         onClick={async () => {
@@ -102,7 +120,10 @@ const Navbar = () => {
                         }}
                         className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-slate-600"
                       >
-                        LOG OUT
+                        <div className="flex gap-2 items-center">
+                          <LogOut size={22} />
+                          <span>LOG OUT</span>
+                        </div>
                       </button>
                     </div>
                   )}
@@ -117,9 +138,10 @@ const Navbar = () => {
                       await login();
                       setIsOpen(false);
                     }}
-                    className="hover:text-green-600 text-left"
+                    className="hover:text-green-600 text-left flex gap-2"
                   >
-                    LOGIN
+                    <LogIn size={22} />
+                    <span>LOGIN</span>
                   </Link>{" "}
                   {loading && (
                     <div className=" flex items-center justify-center z-50">
@@ -179,33 +201,40 @@ const Navbar = () => {
             <Link
               href="/recipes"
               className={
-                currentPath === "/recipes" ? "text-green-600" : "text-slate-600"
+                currentPath === "/recipes"
+                  ? "text-green-600 flex gap-1"
+                  : "text-slate-600 flex gap-1"
               }
               onClick={() => setIsOpen(false)}
             >
-              HOME
+              <Home size={22} />
+              <span>Home</span>
             </Link>
             {user && (
               <Link
                 href="/cook-book"
                 className={
                   currentPath === "/cook-book"
-                    ? "text-green-600"
-                    : "text-slate-600"
+                    ? "text-green-600 flex gap-1"
+                    : "text-slate-600 flex gap-1"
                 }
                 onClick={() => setIsOpen(false)}
               >
-                MY COOK BOOK
+                <Book size={22} />
+                <span>My Cook Book</span>
               </Link>
             )}
             <Link
               href="/ai-rcmd"
               className={
-                currentPath === "/ai-rcmd" ? "text-green-600" : "text-slate-600"
+                currentPath === "/ai-rcmd"
+                  ? "text-green-600 flex gap-1"
+                  : "text-slate-600 flex gap-1"
               }
               onClick={() => setIsOpen(false)}
             >
-              AI RECOMMENDATIONS
+              <WandSparkles size={22} />
+              <span>AI</span>
             </Link>
 
             {/* Mobile Profile Dropdown */}
@@ -215,25 +244,27 @@ const Navbar = () => {
                   onClick={() => setIsProfileDropdownOpen((prev) => !prev)}
                   className="block w-full text-left py-2 hover:text-green-600 focus:outline-none"
                 >
-                  PROFILE
+                  Profile
                 </button>
                 {isProfileDropdownOpen && (
                   <div className="ml-4 border-l pl-4 flex flex-col gap-2">
                     <Link
                       href="/profile"
                       onClick={() => setIsOpen(false)}
-                      className="hover:text-green-600 text-left"
+                      className="hover:text-green-600 text-left flex gap-1"
                     >
-                      MY PROFILE
+                      <UserRound size={22} />
+                      <span>My Profile</span>
                     </Link>
                     <button
                       onClick={() => {
                         logout();
                         setIsOpen(false);
                       }}
-                      className="hover:text-green-600 text-left"
+                      className="hover:text-green-600 text-left flex gap-1"
                     >
-                      LOGOUT
+                      <LogOut size={22} />
+                      <span>Logout</span>
                     </button>
                   </div>
                 )}
@@ -246,9 +277,10 @@ const Navbar = () => {
                   await login();
                   setIsOpen(false);
                 }}
-                className="hover:text-green-600"
+                className="hover:text-green-600 flex gap-1"
               >
-                LOGIN
+                <LogIn size={22} />
+                <span>Login</span>
               </Link>
             )}
           </div>

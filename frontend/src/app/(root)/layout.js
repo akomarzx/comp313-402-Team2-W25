@@ -8,14 +8,14 @@ export default function RootLayout({ children }) {
   return (
     <>
       <Navbar />
-      <main className="sm:w-[80%] mx-auto max-w-[1200px] bg-white min-h-screen">
+      <main className=" mx-auto  hero-gradient min-h-screen">
         <TooltipProvider>
           <Toaster />
           <Sonner />
           {children}
         </TooltipProvider>
       </main>
-      <footer className=" sm:w-[80%] mx-auto max-w-[1200px] text-center p-4">
+      <footer className="  mx-auto max-w-[1200px] text-center p-4">
         <p>
           &copy; {new Date().getFullYear()} Kitchen Companion - Group 2 -
           COMP313 - SEC402

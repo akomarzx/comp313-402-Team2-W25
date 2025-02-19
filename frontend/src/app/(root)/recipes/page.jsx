@@ -100,7 +100,7 @@ const RecipePage = () => {
   }
 
   return (
-    <div className="py-10 px">
+    <div className="py-10 px max-w-[80%] mx-auto bg-white min-h-lvh">
       <div>
         {!isLoading && <RecipeCarousel data={recipeCardData?.slice(0, 5)} />}
       </div>
