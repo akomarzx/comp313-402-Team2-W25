@@ -35,7 +35,8 @@ public interface RecipeRepository extends PagingAndSortingRepository<Recipe, Int
      * @return a paginated list of {@link RecipeSummaryCardWithCategory} that matches the search criteria.
      */
     @Query(
-            value = "SELECT r.recipe_id AS id, " +
+            value = "Select * From (" +
+                    "SELECT r.recipe_id AS id, " +
                     "       r.title, " +
                     "       r.summary AS description, " +
                     "       r.thumbnail_url AS thumbnailUrl, " +
@@ -51,7 +52,7 @@ public interface RecipeRepository extends PagingAndSortingRepository<Recipe, Int
                     "  WHERE (:keyword IS NULL OR :keyword = '' " +
                     "         OR MATCH(r.title, r.summary) AGAINST(:keyword IN NATURAL LANGUAGE MODE)) " +
                     "  GROUP BY r.recipe_id, r.title, r.summary, r.thumbnail_url, " +
-                    "           r_calc.rating_count, r_calc.rating_value ",
+                    "           r_calc.rating_count, r_calc.rating_value ) as x ",
             countQuery = "SELECT COUNT(*) FROM ( " +
                     "  SELECT r.recipe_id " +
                     "  FROM recipe r " +
