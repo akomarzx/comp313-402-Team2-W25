@@ -51,7 +51,7 @@ const RecipesResult = ({
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full max-w-[1600px] mx-auto">
       {version === 1 && (
         <>
           <h2 className="font-bold text-2xl text-center mt-10 ">All Recipes</h2>
