@@ -2,16 +2,24 @@ import { ChefHat, ChefHatIcon, Clock, HeartIcon } from "lucide-react";
 import Image from "next/image";
 import React, { useState } from "react";
 import Link from "next/link";
-import { saveRecipe } from "@/api/recipe";
+import { saveRecipe, unsaveRecipe } from "@/api/recipe";
 import { toast } from "sonner";
 
 const RecipeRow = ({ recipe, user }) => {
-  const [saved, setSaved] = useState(false);
+  const [saved, setSaved] = useState(recipe?.isFavorite);
   const handleSaveClick = async () => {
-    const res = await saveRecipe(recipe.id);
-    if (res?.status === 200 || 201) {
-      toast("Recipe saved successfully");
-      setSaved(!saved);
+    if (!data.isFavorite) {
+      const res = await saveRecipe(recipe.id);
+      if (res?.status === 200 || 201) {
+        setSaved(!saved);
+        toast("Recipe saved successfully");
+      }
+    } else {
+      const res = await unsaveRecipe(recipe.id);
+      if (res?.status === 200) {
+        setSaved(!saved);
+        toast("Removed from saved recipes");
+      }
     }
   };
   return (

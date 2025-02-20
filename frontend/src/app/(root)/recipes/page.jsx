@@ -139,7 +139,7 @@ const RecipePage = () => {
             user={user}
           />
 
-          {!isLoading && recipeCardData.length == 12 && (
+          {!isLoading && recipeCardData?.length == 12 && (
             <Pagination>
               <PaginationContent className="gap-0 border mt-8 rounded-lg divide-x overflow-hidden">
                 <PaginationItem>
