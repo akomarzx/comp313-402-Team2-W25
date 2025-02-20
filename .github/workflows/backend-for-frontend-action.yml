@@ -1,6 +1,9 @@
 name: Build and Push BFF to ECR
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - bff/**
 jobs:
   build-and-push:
     name: Build and Push to ECR
@@ -42,4 +45,4 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         instance-ids: ${{ secrets.INSTANCE_ID }}
         working-directory: /home/ec2-user
-        command: /bin/bash ./kitchen-comp/deployment-bff.sh 
+        command: /bin/bash ./kitchen-comp/deployment.sh 
