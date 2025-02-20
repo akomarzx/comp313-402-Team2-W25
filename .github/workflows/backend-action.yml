@@ -2,6 +2,8 @@ name: Build and Push Backend to ecr
 on:
   workflow_dispatch:
   push:
+    branches:
+      - master
     paths:
       - backend/**
 
