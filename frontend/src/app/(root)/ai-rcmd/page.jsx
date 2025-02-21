@@ -118,7 +118,7 @@ const AIReccommend = () => {
     }
   };
   return (
-    <div className="min-h-screen ">
+    <div className="min-h-screen fade-in">
       <div className="container max-w-4xl mx-auto px-4 py-12 md:py-20">
         <div className="text-center space-y-6 mb-16">
           <div className="relative inline-flex">

@@ -31,7 +31,7 @@ const RecipeCard = ({ data, version = 1, user = {} }) => {
 
   return (
     <div
-      className={` relative hover:scale-[101%] border ${cardStyle} max-h-[400px]  bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-700 mx-auto`}
+      className={`slide-up relative hover:scale-[101%] border ${cardStyle} max-h-[400px]  bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-700 mx-auto`}
     >
       {user && version !== 2 && (
         <div className="absolute top-5 right-5 z-10">

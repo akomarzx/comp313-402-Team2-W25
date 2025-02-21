@@ -100,8 +100,8 @@ const RecipePage = () => {
   }
 
   return (
-    <div className="py-10 px max-w-[80%] mx-auto bg-white min-h-lvh">
-      <div>
+    <div className="py-10 px max-w-[80%] mx-auto bg-white min-h-lvh transition-all duration-300">
+      <div className="fade-in">
         {!isLoading && <RecipeCarousel data={recipeCardData?.slice(0, 5)} />}
       </div>
       <div className="mx-auto max-w-[600px] mb-5">

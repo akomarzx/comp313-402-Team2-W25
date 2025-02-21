@@ -23,7 +23,7 @@ const RecipeRow = ({ recipe, user }) => {
     }
   };
   return (
-    <div className="relative">
+    <div className="relative slide-up">
       {" "}
       {user && (
         <div className="absolute top-5 right-5 z-10">
