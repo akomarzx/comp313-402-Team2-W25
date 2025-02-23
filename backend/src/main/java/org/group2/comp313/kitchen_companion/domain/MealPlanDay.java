@@ -22,29 +22,23 @@ public class MealPlanDay {
     @Column(name = "meal_plan_group_id", nullable = false)
     private Integer mealPlanGroup;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "breakfast_recipe_id")
-    private Recipe breakfastRecipe;
+    @Column(name = "breakfast_recipe_id")
+    private Integer breakfastRecipe;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "breakfast_recipe_substitute_cd")
-    private CodeValue breakfastRecipeSubstituteCd;
+    @Column(name = "breakfast_recipe_substitute_cd")
+    private Integer breakfastRecipeSubstituteCd;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "lunch_recipe_id")
-    private Recipe lunchRecipe;
+    @Column(name = "lunch_recipe_id")
+    private Integer lunchRecipe;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "lunch_recipe_substitute_cd")
-    private CodeValue lunchRecipeSubstituteCd;
+    @Column(name = "lunch_recipe_substitute_cd")
+    private Integer lunchRecipeSubstituteCd;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "dinner_recipe_id")
-    private Recipe dinnerRecipe;
+    @Column(name = "dinner_recipe_id")
+    private Integer dinnerRecipe;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "dinner_recipe_substitute_cd")
-    private CodeValue dinnerRecipeSubstituteCd;
+    @Column(name = "dinner_recipe_substitute_cd")
+    private Integer dinnerRecipeSubstituteCd;
 
     @NotNull
     @Column(name = "day_of_week_code", nullable = false)
