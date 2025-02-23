@@ -5,13 +5,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.group2.comp313.kitchen_companion.domain.Recipe;
-import org.group2.comp313.kitchen_companion.domain.projection.RecipeSummaryForCards;
 import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationResult;
 import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationRequest;
 import org.group2.comp313.kitchen_companion.dto.ApiResult;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeComponentUpdateDto;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeDto;
-import org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryCardWithCategory;
+import org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryForCards;
 import org.group2.comp313.kitchen_companion.dto.recipe.SaveRecipeDto;
 import org.group2.comp313.kitchen_companion.service.AWSS3Service;
 import org.group2.comp313.kitchen_companion.service.IngredientGroupService;
@@ -28,8 +27,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/recipe")

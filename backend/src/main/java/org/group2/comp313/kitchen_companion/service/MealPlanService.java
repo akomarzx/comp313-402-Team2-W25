@@ -1,6 +1,5 @@
 package org.group2.comp313.kitchen_companion.service;
 
-import org.group2.comp313.kitchen_companion.domain.projection.MealPlanSummary;
 import org.group2.comp313.kitchen_companion.repository.MealPlanDayRepository;
 import org.group2.comp313.kitchen_companion.repository.MealPlanGroupRepository;
 import org.group2.comp313.kitchen_companion.repository.MealPlanRepository;
@@ -21,7 +20,4 @@ public class MealPlanService extends BaseService {
         this.mealPlanDayRepository = mealPlanDayRepository;
     }
 
-    public Optional<MealPlanSummary> getMealPlanSummary(Integer mealPlanId) {
-        return this.mealPlanRepository.findOneProjectedById(mealPlanId);
-    }
 }

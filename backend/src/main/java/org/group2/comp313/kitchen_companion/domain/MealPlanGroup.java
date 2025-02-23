@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
 
 import java.time.Instant;
 import java.util.LinkedHashSet;
@@ -45,7 +46,7 @@ public class MealPlanGroup {
     @Column(name = "updated_by", length = 256)
     private String updatedBy;
 
-    @OneToMany(mappedBy = "mealPlanGroup")
+    @OneToMany(mappedBy = "mealPlanGroup", fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     private Set<MealPlanDay> mealPlanDays = new LinkedHashSet<>();
 
 }

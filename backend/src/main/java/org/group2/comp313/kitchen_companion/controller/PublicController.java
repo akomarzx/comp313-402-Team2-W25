@@ -2,7 +2,6 @@ package org.group2.comp313.kitchen_companion.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.group2.comp313.kitchen_companion.domain.Recipe;
-import org.group2.comp313.kitchen_companion.domain.projection.MealPlanSummary;
 import org.group2.comp313.kitchen_companion.dto.ApiResult;
 import org.group2.comp313.kitchen_companion.dto.rating.RecipeRatingDto;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryCardWithCategory;
@@ -17,8 +16,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/public")
@@ -107,11 +104,5 @@ public class PublicController extends BaseController {
             this.log.error(e.getMessage());
             return new ResponseEntity<>(new ApiResult<>("Failed to retrieve user rating for this recipe. ", null), HttpStatus.BAD_REQUEST);
         }
-    }
-
-    @Transactional
-    @GetMapping("/meal-plan/{mealPlanId}")
-    public ResponseEntity<MealPlanSummary> getMealPlanSummary(@PathVariable(name = "mealPlanId") Integer mealPlanId) {
-        return new ResponseEntity<>(this.mealPlanService.getMealPlanSummary(mealPlanId).orElse(null), HttpStatus.OK);
     }
 }
