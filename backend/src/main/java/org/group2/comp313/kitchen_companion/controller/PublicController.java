@@ -1,12 +1,14 @@
 package org.group2.comp313.kitchen_companion.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.group2.comp313.kitchen_companion.domain.Recipe;
 import org.group2.comp313.kitchen_companion.dto.ApiResult;
+import org.group2.comp313.kitchen_companion.dto.ai.AIMealPlanRecommendationRequest;
+import org.group2.comp313.kitchen_companion.dto.ai.AIMealPlanRecommendationResult;
 import org.group2.comp313.kitchen_companion.dto.meal_plan.MealPlanDaysSummaryDto;
 import org.group2.comp313.kitchen_companion.dto.rating.RecipeRatingDto;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryCardWithCategory;
-import org.group2.comp313.kitchen_companion.service.MealPlanService;
 import org.group2.comp313.kitchen_companion.service.RatingsService;
 import org.group2.comp313.kitchen_companion.service.RecipeService;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
@@ -15,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,12 +28,10 @@ public class PublicController extends BaseController {
 
     private final RecipeService recipeService;
     private final RatingsService ratingsService;
-    private final MealPlanService mealPlanService;
 
-    public PublicController(RecipeService recipeService, RatingsService ratingsService, MealPlanService mealPlanService) {
+    public PublicController(RecipeService recipeService, RatingsService ratingsService) {
         this.recipeService = recipeService;
         this.ratingsService = ratingsService;
-        this.mealPlanService = mealPlanService;
     }
 
     @GetMapping("/recipe/{id}")
@@ -109,8 +108,8 @@ public class PublicController extends BaseController {
         }
     }
 
-    @GetMapping("/meal-plan/{id}")
-    public ResponseEntity<List<MealPlanDaysSummaryDto>> getMealPlanById(@PathVariable(name = "id") Integer id) {
-        return new ResponseEntity<>(this.mealPlanService.findAllMealPlanDaySummaryDtoById(id), HttpStatus.OK);
+    @PostMapping("/meal-plan/ai")
+    public ResponseEntity<AIMealPlanRecommendationResult> getMealPlanById(@RequestBody @Valid AIMealPlanRecommendationRequest request) throws Exception {
+        return ResponseEntity.ok(this.recipeService.getAiMealPlanRecommendation(request));
     }
 }

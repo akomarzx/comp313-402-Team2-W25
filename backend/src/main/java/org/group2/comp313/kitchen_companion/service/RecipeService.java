@@ -9,9 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import org.group2.comp313.kitchen_companion.domain.Category;
 import org.group2.comp313.kitchen_companion.domain.Recipe;
 import org.group2.comp313.kitchen_companion.domain.SavedRecipe;
-import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationResult;
-import org.group2.comp313.kitchen_companion.dto.ai.ChatCompletionResponse;
-import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationRequest;
+import org.group2.comp313.kitchen_companion.dto.ai.*;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeDto;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryCardWithCategory;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryForCards;
@@ -181,22 +179,22 @@ public class RecipeService extends BaseService {
      * @return an AIRecipeRecommendationResult object containing the recommended recipes and related information
      * @throws JsonProcessingException if there is an error processing the JSON response
      */
-    public AIRecipeRecommendationResult getAiRecipeRecommendation(AIRecipeRecommendationRequest aiRecipeRecommendationRequest) throws JsonProcessingException {
+    public AIRecipeRecommendationResult getAiRecipeRecommendation(AIRecipeRecommendationRequest aiRecipeRecommendationRequest) throws Exception {
 
         ChatCompletionResponse response = this.chatGptClientService.getRecipeRecommendations(aiRecipeRecommendationRequest);
+        return deserializeChatResponse(response, AIRecipeRecommendationResult.class);
+    }
 
-        ObjectMapper mapper = new ObjectMapper();
-
-        String jsonDirty = response.choices().getFirst().message().content();
-        String cleanedJson = jsonDirty.replaceAll("^```json\\s*", "").replaceAll("```$", "");
-
-        try {
-            return mapper.readValue(cleanedJson, AIRecipeRecommendationResult.class);
-        }
-        catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw e;
-        }
+    /**
+     * Retrieves AI-generated Meal plan recommendations based on the provided request.
+     *
+     * @param aiMealPlanRecommendationRequest the request object containing the parameters for generating meal plan recommendations
+     * @return an AIRecipeRecommendationResult object containing the recommended recipes and related information
+     * @throws JsonProcessingException if there is an error processing the JSON response
+     */
+    public AIMealPlanRecommendationResult getAiMealPlanRecommendation(AIMealPlanRecommendationRequest aiMealPlanRecommendationRequest) throws Exception {
+        ChatCompletionResponse response = this.chatGptClientService.getMealPlanAIRecommendation(aiMealPlanRecommendationRequest);
+        return deserializeChatResponse(response, AIMealPlanRecommendationResult.class);
     }
 
     /**
@@ -308,5 +306,20 @@ public class RecipeService extends BaseService {
     public Page<RecipeSummaryForCards> getSavedRecipeForUser(Integer page, Integer size, String userEmail) {
         Pageable pageRequest = PageRequest.of(page, size);
         return this.recipeRepository.findSavedRecipeSummaryCardsByUser(userEmail, pageRequest);
+    }
+
+    private <T> T deserializeChatResponse(ChatCompletionResponse response, Class<T> clazz) throws Exception {
+
+        String jsonDirty = response.choices().getFirst().message().content();
+        String cleanedJson = jsonDirty.replaceAll("^```json\\s*", "").replaceAll("```$", "");
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            return mapper.readValue(cleanedJson, clazz);
+        }
+        catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw e;
+        }
     }
 }
