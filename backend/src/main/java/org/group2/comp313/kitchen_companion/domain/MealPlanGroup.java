@@ -45,8 +45,4 @@ public class MealPlanGroup {
     @Size(max = 256)
     @Column(name = "updated_by", length = 256)
     private String updatedBy;
-
-    @OneToMany(mappedBy = "mealPlanGroup", fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-    private Set<MealPlanDay> mealPlanDays = new LinkedHashSet<>();
-
 }

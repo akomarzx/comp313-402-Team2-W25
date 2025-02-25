@@ -107,9 +107,4 @@ public class PublicController extends BaseController {
             return new ResponseEntity<>(new ApiResult<>("Failed to retrieve user rating for this recipe. ", null), HttpStatus.BAD_REQUEST);
         }
     }
-
-    @PostMapping("/meal-plan/ai")
-    public ResponseEntity<AIMealPlanRecommendationResult> getMealPlanById(@RequestBody @Valid AIMealPlanRecommendationRequest request) throws Exception {
-        return ResponseEntity.ok(this.recipeService.getAiMealPlanRecommendation(request));
-    }
 }

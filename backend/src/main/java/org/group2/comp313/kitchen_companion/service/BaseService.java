@@ -1,5 +1,7 @@
 package org.group2.comp313.kitchen_companion.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.group2.comp313.kitchen_companion.dto.ai.ChatCompletionResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,4 +24,18 @@ import org.slf4j.LoggerFactory;
 public class BaseService {
     protected Logger log = LoggerFactory.getLogger(this.getClass());
 
+    public <T> T deserializeChatResponse(ChatCompletionResponse response, Class<T> clazz) throws Exception {
+
+        String jsonDirty = response.choices().getFirst().message().content();
+        String cleanedJson = jsonDirty.replaceAll("^```json\\s*", "").replaceAll("```$", "");
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            return mapper.readValue(cleanedJson, clazz);
+        }
+        catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw e;
+        }
+    }
 }
