@@ -8,12 +8,12 @@ import java.util.List;
 public record AIMealPlanRecommendationResult(
         @JsonProperty("success") boolean success,
         @JsonProperty("reasonForFail") String reasonForFail,
-        @JsonProperty("mealPlanGroup") List<MealPlanGroup> mealPlanGroup
+        @JsonProperty("mealPlanWeek") List<MealPlanWeek> mealPlanWeek,
+        @JsonProperty("mealPlanTitle") String mealPlanTitle
 ) {
 
-    public record MealPlanGroup(
-            @JsonProperty("label") String label,
-            @JsonProperty("mealPlanDays") List<MealPlanDay> mealPlanDays
+    public record MealPlanWeek(
+            @JsonProperty("mealPlanDay") List<MealPlanDay> mealPlanDays
     ) {}
 
     public record MealPlanDay(

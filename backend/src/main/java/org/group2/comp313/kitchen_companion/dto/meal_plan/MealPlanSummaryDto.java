@@ -6,6 +6,7 @@ import java.util.List;
 public record MealPlanSummaryDto(
         String label,
         Instant createdAt,
+        String createdBy,
         List<MealPlanGroupSummaryDto> mealPlanGroupSummaryDtoList
 ) {
 }

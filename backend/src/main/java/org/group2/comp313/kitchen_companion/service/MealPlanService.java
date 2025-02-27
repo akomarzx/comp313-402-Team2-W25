@@ -3,11 +3,15 @@ package org.group2.comp313.kitchen_companion.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.transaction.Transactional;
 import org.group2.comp313.kitchen_companion.domain.MealPlan;
+import org.group2.comp313.kitchen_companion.domain.MealPlanDay;
+import org.group2.comp313.kitchen_companion.domain.MealPlanGroup;
+import org.group2.comp313.kitchen_companion.domain.Recipe;
 import org.group2.comp313.kitchen_companion.dto.ApiResult;
 import org.group2.comp313.kitchen_companion.dto.ai.AIMealPlanRecommendationRequest;
 import org.group2.comp313.kitchen_companion.dto.ai.AIMealPlanRecommendationResult;
 import org.group2.comp313.kitchen_companion.dto.ai.ChatCompletionResponse;
 import org.group2.comp313.kitchen_companion.dto.meal_plan.MealPlanDaysSummaryDto;
+import org.group2.comp313.kitchen_companion.dto.meal_plan.MealPlanGroupSummaryDto;
 import org.group2.comp313.kitchen_companion.dto.meal_plan.MealPlanSummaryDto;
 import org.group2.comp313.kitchen_companion.repository.MealPlanDayRepository;
 import org.group2.comp313.kitchen_companion.repository.MealPlanGroupRepository;
@@ -15,6 +19,7 @@ import org.group2.comp313.kitchen_companion.repository.MealPlanRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -60,15 +65,71 @@ public class MealPlanService extends BaseService {
         return this.mealPlanRepository.save(mealPlan);
     }
 
+    public MealPlanGroup createMealPlanGroup(Integer mealPlanId ,String createdBy) {
+        MealPlanGroup mealPlanGroup = new MealPlanGroup();
+        mealPlanGroup.setCreatedBy(createdBy);
+        mealPlanGroup.setCreatedAt(Instant.now());
+        mealPlanGroup.setMealPlan(mealPlanId);
+
+        // Get The current Count to create label for the Meal Plan group for ex: Week 1 or something
+        // Meal Plan Are group weekly for easier development
+        // Will Improve Later;
+        Integer countByMealPlanId = this.mealPlanGroupRepository.countByMealPlan(mealPlanId);
+        mealPlanGroup.setLabel("Week " + countByMealPlanId + 1);
+
+        return this.mealPlanGroupRepository.save(mealPlanGroup);
+    }
+
+    /**
+     * Create a meal plan day entity from the AI Result.
+     * **/
+    private void createMealPlanDayFromAIResult(AIMealPlanRecommendationResult.MealPlanDay mealPlanDay, Integer mealPlanGroupId, String createdBy) {
+        MealPlanDay newMealPlanDay = new MealPlanDay();
+
+        newMealPlanDay.setCreatedAt(Instant.now());
+        newMealPlanDay.setCreatedBy(createdBy);
+        newMealPlanDay.setDayOfWeekCode(mealPlanDay.daysOfWeekCd());
+        newMealPlanDay.setMealPlanGroup(mealPlanGroupId);
+
+        Recipe breakFastRecipe = this.recipeService.createRecipe(mealPlanDay.breakfastRecipe(), createdBy);
+        Recipe lunchRecipe = this.recipeService.createRecipe(mealPlanDay.lunchRecipe(), createdBy);
+        Recipe dinnerRecipe = this.recipeService.createRecipe(mealPlanDay.dinnerRecipe(), createdBy);
+
+        newMealPlanDay.setBreakfastRecipe(breakFastRecipe.getId());
+        newMealPlanDay.setLunchRecipe(lunchRecipe.getId());
+        newMealPlanDay.setDinnerRecipe(dinnerRecipe.getId());
+
+        this.mealPlanDayRepository.save(newMealPlanDay);
+    }
+
     private ApiResult<MealPlanSummaryDto> processAiMealPlanResponse(AIMealPlanRecommendationResult aiMealPlanRecommendationResult, String createdBy) {
 
         String mealPlanLabel = null;
+        Instant createdAt = Instant.now();
+
+        List<MealPlanGroupSummaryDto> mealPlanGroupSummaryDtoList = new ArrayList<>();
 
         if(aiMealPlanRecommendationResult.success()) {
-            mealPlanLabel = aiMealPlanRecommendationResult.mealPlanGroup().getFirst().label();
+
+            mealPlanLabel = aiMealPlanRecommendationResult.mealPlanTitle();
             MealPlan createdMealPlan = this.createMealPlan(mealPlanLabel, createdBy);
 
-            return null;
+            for(AIMealPlanRecommendationResult.MealPlanWeek mealPlanWeek : aiMealPlanRecommendationResult.mealPlanWeek()) {
+
+                MealPlanGroup newMealPlanGroup = this.createMealPlanGroup(createdMealPlan.getId(), createdBy);
+
+                for(AIMealPlanRecommendationResult.MealPlanDay mealPlanDay : mealPlanWeek.mealPlanDays()) {
+                    createMealPlanDayFromAIResult(mealPlanDay, newMealPlanGroup.getId(), createdBy);
+                }
+
+                // Retrieve all meal plan days summary for the meal plan summary group.
+                List<MealPlanDaysSummaryDto> mealPlanDaysSummaryDtoList = this.mealPlanDayRepository.findMealPlanDaySummaryDtoByMealPlanGroup(newMealPlanGroup.getId());
+                mealPlanGroupSummaryDtoList.add(new MealPlanGroupSummaryDto(newMealPlanGroup.getId(), newMealPlanGroup.getLabel(), mealPlanDaysSummaryDtoList));
+            }
+
+            // After all records are inserted query the database for the meal Plan Days
+            return new ApiResult<MealPlanSummaryDto>("Meal plan created successfully.", new MealPlanSummaryDto(mealPlanLabel, createdAt, createdBy, mealPlanGroupSummaryDtoList));
+
         } else {
             return new ApiResult<>("AI Failed to generate meal plan - " + aiMealPlanRecommendationResult.reasonForFail() , null);
         }
