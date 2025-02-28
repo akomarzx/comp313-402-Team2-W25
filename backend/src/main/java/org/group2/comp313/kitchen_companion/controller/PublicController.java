@@ -1,8 +1,12 @@
 package org.group2.comp313.kitchen_companion.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.group2.comp313.kitchen_companion.domain.Recipe;
 import org.group2.comp313.kitchen_companion.dto.ApiResult;
+import org.group2.comp313.kitchen_companion.dto.ai.AIMealPlanRecommendationRequest;
+import org.group2.comp313.kitchen_companion.dto.ai.AIMealPlanRecommendationResult;
+import org.group2.comp313.kitchen_companion.dto.meal_plan.MealPlanDaysSummaryDto;
 import org.group2.comp313.kitchen_companion.dto.rating.RecipeRatingDto;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryCardWithCategory;
 import org.group2.comp313.kitchen_companion.service.RatingsService;
@@ -103,5 +107,4 @@ public class PublicController extends BaseController {
             return new ResponseEntity<>(new ApiResult<>("Failed to retrieve user rating for this recipe. ", null), HttpStatus.BAD_REQUEST);
         }
     }
-
 }

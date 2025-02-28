@@ -9,12 +9,10 @@ import jakarta.validation.constraints.NotNull;
 import org.group2.comp313.kitchen_companion.domain.Category;
 import org.group2.comp313.kitchen_companion.domain.Recipe;
 import org.group2.comp313.kitchen_companion.domain.SavedRecipe;
-import org.group2.comp313.kitchen_companion.domain.projection.RecipeSummaryForCards;
-import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationResult;
-import org.group2.comp313.kitchen_companion.dto.ai.ChatCompletionResponse;
-import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationRequest;
+import org.group2.comp313.kitchen_companion.dto.ai.*;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeDto;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryCardWithCategory;
+import org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryForCards;
 import org.group2.comp313.kitchen_companion.mapper.RecipeMapper;
 import org.group2.comp313.kitchen_companion.repository.RecipeRepository;
 import org.group2.comp313.kitchen_companion.repository.SavedRecipeRepository;
@@ -181,23 +179,13 @@ public class RecipeService extends BaseService {
      * @return an AIRecipeRecommendationResult object containing the recommended recipes and related information
      * @throws JsonProcessingException if there is an error processing the JSON response
      */
-    public AIRecipeRecommendationResult getAiRecipeRecommendation(AIRecipeRecommendationRequest aiRecipeRecommendationRequest) throws JsonProcessingException {
+    public AIRecipeRecommendationResult getAiRecipeRecommendation(AIRecipeRecommendationRequest aiRecipeRecommendationRequest) throws Exception {
 
         ChatCompletionResponse response = this.chatGptClientService.getRecipeRecommendations(aiRecipeRecommendationRequest);
-
-        ObjectMapper mapper = new ObjectMapper();
-
-        String jsonDirty = response.choices().getFirst().message().content();
-        String cleanedJson = jsonDirty.replaceAll("^```json\\s*", "").replaceAll("```$", "");
-
-        try {
-            return mapper.readValue(cleanedJson, AIRecipeRecommendationResult.class);
-        }
-        catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw e;
-        }
+        return deserializeChatResponse(response, AIRecipeRecommendationResult.class);
     }
+
+
 
     /**
      * Updates an existing recipe with the given details.

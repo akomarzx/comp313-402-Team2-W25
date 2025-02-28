@@ -3,9 +3,7 @@ package org.group2.comp313.kitchen_companion.service;
 import org.group2.comp313.kitchen_companion.domain.Category;
 import org.group2.comp313.kitchen_companion.domain.CodeBook;
 import org.group2.comp313.kitchen_companion.domain.CodeValue;
-import org.group2.comp313.kitchen_companion.dto.ai.ChatCompletionRequest;
-import org.group2.comp313.kitchen_companion.dto.ai.ChatCompletionResponse;
-import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationRequest;
+import org.group2.comp313.kitchen_companion.dto.ai.*;
 import org.group2.comp313.kitchen_companion.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -55,6 +53,45 @@ public class ChatGptClientService extends BaseService{
         ChatCompletionRequest.Message prompt = new ChatCompletionRequest.Message("user", recipeRecommendationPrompt);
         ChatCompletionRequest chatCompletionRequest = new ChatCompletionRequest(openApiModel, List.of(prompt));
 
+        return this.sendPrompt(chatCompletionRequest);
+    }
+
+    /**
+     * Generates an AI-based meal plan recommendation.
+     *
+     * <p>This method builds a meal plan recommendation prompt using the provided request by invoking
+     * {@code buildMealPlanAIRecommendationPrompt}, wraps the prompt in a {@link ChatCompletionRequest.Message},
+     * constructs a {@link ChatCompletionRequest} with the generated message, and finally sends the prompt
+     * using {@code sendPrompt}. The resulting AI response is returned as a {@link ChatCompletionResponse} object.
+     *
+     * @param aiMealPlanRecommendationRequest the request object containing parameters for generating the meal plan recommendation
+     * @return a {@link ChatCompletionResponse} containing the AI-generated meal plan recommendation
+     */
+    public ChatCompletionResponse getMealPlanAIRecommendation(AIMealPlanRecommendationRequest aiMealPlanRecommendationRequest) {
+
+        String mealPlanAIRecommendationPrompt = this.buildMealPlanAIRecommendationPrompt(aiMealPlanRecommendationRequest);
+
+        ChatCompletionRequest.Message prompt = new ChatCompletionRequest.Message("user", mealPlanAIRecommendationPrompt);
+        ChatCompletionRequest chatCompletionRequest = new ChatCompletionRequest(openApiModel, List.of(prompt));
+
+        return this.sendPrompt(chatCompletionRequest);
+    }
+
+    /**
+     * Sends a chat completion request to the remote chat service.
+     *
+     * <p>This method constructs and sends an HTTP POST request to the "/chat/completions" endpoint using the provided
+     * {@code ChatCompletionRequest} object. It then waits for the response, converts it to a {@code ChatCompletionResponse},
+     * and returns the response body.</p>
+     *
+     * <p>If an error occurs during the request (e.g., network issues, invalid response), the method logs the error
+     * message and rethrows the exception.</p>
+     *
+     * @param chatCompletionRequest the request object containing the necessary parameters for generating a chat completion.
+     * @return the chat completion response received from the remote service.
+     */
+    private ChatCompletionResponse sendPrompt(ChatCompletionRequest chatCompletionRequest) {
+
         try {
             ResponseEntity<ChatCompletionResponse> response = this.restClient.post()
                     .uri("/chat/completions")
@@ -71,12 +108,11 @@ public class ChatGptClientService extends BaseService{
             log.error(e.getMessage());
             throw e;
         }
-
     }
 
     /**
-     * Builds a prompt string to guide an AI-based recipe recommendation system in generating
-     * a JSON output for a recipe tailored to the user's input ingredients, dietary preferences, allergies,
+     * Builds a prompt string to guide an AI-based Meal Plan recommendation system in generating
+     * a JSON output for a Meal Plan tailored to the user's input dietary preferences, allergies,
      * and restrictions.
      *
      * @param recipeRecommendationRequest the AIRecipeRecommendationRequest object containing information
@@ -136,12 +172,83 @@ public class ChatGptClientService extends BaseService{
 
     }
 
-    private String getRecipeDtoJsonAsString() {
-        return "{\n  \"success\": true,\n  \"reasonForFail\": \"string\",\n  \"recipe\": {\n    \"title\": \"string\",\n    \"summary\": \"string\",\n    \"prepTime\": 1073741824,\n    \"prepTimeUnitCd\": 1073741824,\n    \"cookTime\": 1073741824,\n    \"cookTimeUnitCd\": 1073741824,\n    \"servings\": 1073741824,\n    \"yield\": \"string\",\n    \"imageUrl\": \"string\",\n    \"thumbnailUrl\": \"string\",\n    \"calories\": 0,\n    \"carbsG\": 0,\n    \"sugarsG\": 0,\n    \"fatG\": 0,\n    \"categoryIds\": [0],\n    \"ingredientGroups\": [\n      {\n        \"ingredientGroupOrder\": 1073741824,\n        \"label\": \"string\",\n        \"ingredients\": [\n          {\n            \"ingredientOrder\": 1073741824,\n            \"imageUrl\": \"string\",\n            \"label\": \"string\"\n          }\n        ]\n      }\n    ],\n    \"stepGroups\": [\n      {\n        \"stepGroupOrder\": 1073741824,\n        \"label\": \"string\",\n        \"steps\": [\n          {\n            \"stepOrder\": 1073741824,\n            \"label\": \"string\",\n            \"imageUrl\": \"string\"\n          }\n        ]\n      }\n    ]\n  }\n}";
-        //return "{\n  \"success\": true,\n  \"recipe\": {\n    \"title\": \"string\",\n    \"summary\": \"string\",\n    \"prepTime\": 1073741824,\n    \"prepTimeUnitCd\": 1073741824,\n    \"cookTime\": 1073741824,\n    \"cookTimeUnitCd\": 1073741824,\n    \"servings\": 1073741824,\n    \"yield\": \"string\",\n    \"imageUrl\": \"string\",\n    \"thumbnailUrl\": \"string\",\n    \"calories\": 0,\n    \"carbsG\": 0,\n    \"sugarsG\": 0,\n    \"fatG\": 0,\n    \"categoryIds\": [0],\n    \"ingredientGroups\": [\n      {\n        \"ingredientGroupOrder\": 1073741824,\n        \"label\": \"string\",\n        \"ingredients\": [\n          {\n            \"ingredientOrder\": 1073741824,\n            \"imageUrl\": \"string\",\n            \"label\": \"string\"\n          }\n        ]\n      }\n    ],\n    \"stepGroups\": [\n      {\n        \"stepGroupOrder\": 1073741824,\n        \"label\": \"string\",\n        \"steps\": [\n          {\n            \"stepOrder\": 1073741824,\n            \"label\": \"string\",\n            \"imageUrl\": \"string\"\n          }\n        ]\n      }\n    ]\n  }\n}"
-        //return "\"{\\n  \\\"title\\\": \\\"string\\\",\\n  \\\"summary\\\": \\\"string\\\",\\n  \\\"prepTime\\\": 1073741824,\\n  \\\"prepTimeUnitCd\\\": 1073741824,\\n  \\\"cookTime\\\": 1073741824,\\n  \\\"cookTimeUnitCd\\\": 1073741824,\\n  \\\"servings\\\": 1073741824,\\n  \\\"yield\\\": \\\"string\\\",\\n  \\\"imageUrl\\\": \\\"string\\\",\\n  \\\"thumbnailUrl\\\": \\\"string\\\",\\n  \\\"calories\\\": 0,\\n  \\\"carbsG\\\": 0,\\n  \\\"sugarsG\\\": 0,\\n  \\\"fatG\\\": 0,\\n  \\\"categoryIds\\\": [\\\"categoryId\\\"],\\n  \\\"ingredientGroups\\\": [\\n    {\\n      \\\"ingredientGroupOrder\\\": 1073741824,\\n      \\\"label\\\": \\\"string\\\",\\n      \\\"ingredients\\\": [\\n        {\\n          \\\"ingredientOrder\\\": 1073741824,\\n          \\\"imageUrl\\\": \\\"string\\\",\\n          \\\"label\\\": \\\"string\\\"\\n        }\\n      ]\\n    }\\n  ],\\n  \\\"stepGroups\\\": [\\n    {\\n      \\\"stepGroupOrder\\\": 1073741824,\\n      \\\"label\\\": \\\"string\\\",\\n      \\\"steps\\\": [\\n        {\\n          \\\"stepOrder\\\": 1073741824,\\n          \\\"label\\\": \\\"string\\\",\\n          \\\"imageUrl\\\": \\\"string\\\"\\n        }\\n      ]\\n    }\\n  ]\\n}\"\n";
+    /**
+     * Builds a prompt string to guide an AI-based Meal Plan recommendation system in generating
+     * a JSON output for a Meal Plan tailored to the user's input dietary preferences, allergies,
+     * and restrictions.
+     *
+     * @param aiMealPlanRecommendationRequest object containing information
+     *                                    such as  dietary preferences, calorie goals, and allergies.
+     * @return a formatted string to be used as a prompt for generating recipe recommendations.
+     */
+    private String buildMealPlanAIRecommendationPrompt(AIMealPlanRecommendationRequest aiMealPlanRecommendationRequest) {
+
+        StringBuilder stringBuilder = new StringBuilder();
+        String weekWord = aiMealPlanRecommendationRequest.numberOfWeeks() > 1 ? " weeks " : " week ";
+        Integer numberOfMeals = aiMealPlanRecommendationRequest.numberOfWeeks() * 7;
+
+        stringBuilder.append("Please create a meal plan for ").append(aiMealPlanRecommendationRequest.numberOfWeeks()).append(weekWord).append("using this following instructions:");
+        stringBuilder.append(NEW_LINE);
+        stringBuilder.append("Can you please generate your response as JSON using the following schema: ");
+        stringBuilder.append(NEW_LINE);
+        stringBuilder.append(getMealPlanDtoJsonAsString());
+        stringBuilder.append(NEW_LINE);
+        stringBuilder.append("Can you please generate ").append(numberOfMeals).append(" Meal Plan Days with 3 Recipes for each for Day. I need ").append(aiMealPlanRecommendationRequest.numberOfWeeks()).append(weekWord).append("worth of recipe thanks.");
+        stringBuilder.append(NEW_LINE);
+        stringBuilder.append(createInstruction("Please tailor the recipe for this particular goal: ", List.of(aiMealPlanRecommendationRequest.goalOrPurpose()), COMMA_DELIMITER));
+        stringBuilder.append(NEW_LINE);
+        stringBuilder.append(createInstruction("Please tailor the recipe to the following dietary preferences if any:", aiMealPlanRecommendationRequest.mealPreferences(), COMMA_DELIMITER));
+        stringBuilder.append(NEW_LINE);
+        stringBuilder.append(createInstruction("Here are some allergies and dietary restrictions if any:", aiMealPlanRecommendationRequest.allergiesAndRestrictions(), COMMA_DELIMITER));
+        stringBuilder.append(NEW_LINE);
+        stringBuilder.append(createCategoryListString());
+        stringBuilder.append(NEW_LINE);
+        stringBuilder.append(createCodeValueListString("Here are the only values for prepTimeUnitCD and cookTimeUnitCD", StaticCodeService.TIME_UNIT_CODE_BOOK_ID));
+        stringBuilder.append(NEW_LINE);
+        stringBuilder.append(createCodeValueListString("Here are the only values for daysOfWeekCd", StaticCodeService.DAYS_OF_WEEK_CODE_BOOK_ID));
+        stringBuilder.append(NEW_LINE);
+        stringBuilder.append(createCodeValueListString("Here are the only values for breakfastRecipeSubstituteCd, lunchRecipeSubstituteCd, and dinnerRecipeSubstituteCd", StaticCodeService.NON_RECIPE_SUBSTITUTION_CODE_BOOK_ID));
+        stringBuilder.append("Please leave the Substitute fields empty.");
+        stringBuilder.append(NEW_LINE);
+        stringBuilder.append(createInstruction("For the Recipe Image URL please select randomly from the following list: ", List.of(
+                "https://ronaldjro.dev/static/img/image1.jpg",
+                "https://ronaldjro.dev/static/img/image2.jpg",
+                "https://ronaldjro.dev/static/img/image3.jpg",
+                "https://ronaldjro.dev/static/img/image4.jpg",
+                "https://ronaldjro.dev/static/img/image5.jpg",
+                "https://ronaldjro.dev/static/img/image6.jpg",
+                "https://ronaldjro.dev/static/img/image7.jpg",
+                "https://ronaldjro.dev/static/img/image8.jpg",
+                "https://ronaldjro.dev/static/img/image9.jpg",
+                "https://ronaldjro.dev/static/img/image10.jpg"
+        ), NEW_LINE));
+        stringBuilder.append(NEW_LINE);
+        stringBuilder.append(createInstruction("Ensure the recipe is complete with: ", List.of(
+                "A meaningful title and summary.",
+                "Calories and nutritional information filled with realistic values.",
+                "Step-by-step instructions grouped logically.",
+                "Ingredient groups clearly labeled."
+        ), NEW_LINE));
+        stringBuilder.append(NEW_LINE);
+        stringBuilder.append("As this is used in an api call please don't include any explanation or any other text just the JSON result. If you include anything the system will break so please don't Thank you.");
+        stringBuilder.append(NEW_LINE);
+        stringBuilder.append("Can you also please make sure that the JSON result can be deserialized I am getting error with ObjectMapper Thanks.");
+        stringBuilder.append(NEW_LINE);
+        stringBuilder.append("Can you also please make sure that you do not include any JSON comments, I am getting error with ObjectMapper Thanks.");
+
+        this.log.debug(stringBuilder.toString());
+
+        return stringBuilder.toString();
+
     }
 
+    private String getRecipeDtoJsonAsString() {
+        return "{\n  \"success\": true,\n  \"reasonForFail\": \"string\",\n  \"recipe\": {\n    \"title\": \"string\",\n    \"summary\": \"string\",\n    \"prepTime\": 1073741824,\n    \"prepTimeUnitCd\": 1073741824,\n    \"cookTime\": 1073741824,\n    \"cookTimeUnitCd\": 1073741824,\n    \"servings\": 1073741824,\n    \"yield\": \"string\",\n    \"imageUrl\": \"string\",\n    \"thumbnailUrl\": \"string\",\n    \"calories\": 0,\n    \"carbsG\": 0,\n    \"sugarsG\": 0,\n    \"fatG\": 0,\n    \"categoryIds\": [0],\n    \"ingredientGroups\": [\n      {\n        \"ingredientGroupOrder\": 1073741824,\n        \"label\": \"string\",\n        \"ingredients\": [\n          {\n            \"ingredientOrder\": 1073741824,\n            \"imageUrl\": \"string\",\n            \"label\": \"string\"\n          }\n        ]\n      }\n    ],\n    \"stepGroups\": [\n      {\n        \"stepGroupOrder\": 1073741824,\n        \"label\": \"string\",\n        \"steps\": [\n          {\n            \"stepOrder\": 1073741824,\n            \"label\": \"string\",\n            \"imageUrl\": \"string\"\n          }\n        ]\n      }\n    ]\n  }\n}";
+    }
+
+    private String getMealPlanDtoJsonAsString() {
+        return "{\n  \"success\": true,\n  \"reasonForFail\": \"string \",\n  \"mealPlanTitle\": \"string\",\n  \"mealPlanWeek\": [\n    {\n      \"mealPlanDay\": [\n        {\n          \"breakfastRecipeId\": {\n            \"title\": \"string \",\n            \"summary\": \"string \",\n            \"prepTime\": 1073741824,\n            \"prepTimeUnitCd\": 1073741824,\n            \"cookTime\": 1073741824,\n            \"cookTimeUnitCd\": 1073741824,\n            \"servings\": 1073741824,\n            \"yield\": \"string \",\n            \"imageUrl\": \"string \",\n            \"thumbnailUrl\": \"string \",\n            \"calories\": 0,\n            \"carbsG\": 0,\n            \"sugarsG\": 0,\n            \"fatG\": 0,\n            \"categoryIds\": [0],\n            \"ingredientGroups\": [\n              {\n                \"ingredientGroupOrder\": 1073741824,\n                \"label\": \"string \",\n                \"ingredients\": [\n                  {\n                    \"ingredientOrder\": 1073741824,\n                    \"imageUrl\": \"string \",\n                    \"label\": \"string \"\n                  }\n                ]\n              }\n            ],\n            \"stepGroups\": [\n              {\n                \"stepGroupOrder\": 1073741824,\n                \"label\": \"string \",\n                \"steps\": [\n                  {\n                    \"stepOrder\": 1073741824,\n                    \"label\": \"string \",\n                    \"imageUrl\": \"string \"\n                  }\n                ]\n              }\n            ]\n          },\n          \"lunchRecipeId\": {\n            \"title\": \"string \",\n            \"summary\": \"string \",\n            \"prepTime\": 1073741824,\n            \"prepTimeUnitCd\": 1073741824,\n            \"cookTime\": 1073741824,\n            \"cookTimeUnitCd\": 1073741824,\n            \"servings\": 1073741824,\n            \"yield\": \"string \",\n            \"imageUrl\": \"string \",\n            \"thumbnailUrl\": \"string \",\n            \"calories\": 0,\n            \"carbsG\": 0,\n            \"sugarsG\": 0,\n            \"fatG\": 0,\n            \"categoryIds\": [0],\n            \"ingredientGroups\": [\n              {\n                \"ingredientGroupOrder\": 1073741824,\n                \"label\": \"string \",\n                \"ingredients\": [\n                  {\n                    \"ingredientOrder\": 1073741824,\n                    \"imageUrl\": \"string \",\n                    \"label\": \"string \"\n                  }\n                ]\n              }\n            ],\n            \"stepGroups\": [\n              {\n                \"stepGroupOrder\": 1073741824,\n                \"label\": \"string \",\n                \"steps\": [\n                  {\n                    \"stepOrder\": 1073741824,\n                    \"label\": \"string \",\n                    \"imageUrl\": \"string \"\n                  }\n                ]\n              }\n            ]\n          },\n          \"dinnerRecipeId\": {\n            \"title\": \"string \",\n            \"summary\": \"string \",\n            \"prepTime\": 1073741824,\n            \"prepTimeUnitCd\": 1073741824,\n            \"cookTime\": 1073741824,\n            \"cookTimeUnitCd\": 1073741824,\n            \"servings\": 1073741824,\n            \"yield\": \"string \",\n            \"imageUrl\": \"string \",\n            \"thumbnailUrl\": \"string \",\n            \"calories\": 0,\n            \"carbsG\": 0,\n            \"sugarsG\": 0,\n            \"fatG\": 0,\n            \"categoryIds\": [0],\n            \"ingredientGroups\": [\n              {\n                \"ingredientGroupOrder\": 1073741824,\n                \"label\": \"string \",\n                \"ingredients\": [\n                  {\n                    \"ingredientOrder\": 1073741824,\n                    \"imageUrl\": \"string \",\n                    \"label\": \"string \"\n                  }\n                ]\n              }\n            ],\n            \"stepGroups\": [\n              {\n                \"stepGroupOrder\": 1073741824,\n                \"label\": \"string \",\n                \"steps\": [\n                  {\n                    \"stepOrder\": 1073741824,\n                    \"label\": \"string \",\n                    \"imageUrl\": \"string \"\n                  }\n                ]\n              }\n            ]\n          },\n          \"breakfastRecipeSubstituteCd\": 1073741824,\n          \"lunchRecipeSubstituteCd\": 1073741824,\n          \"dinnerRecipeSubstituteCd\": 1073741824,\n          \"daysOfWeekCd\": 1073741824\n        }\n      ]\n    }\n  ]\n}";
+    }
 
     /**
      * Constructs an instruction string by combining a leading prompt with a list of items,

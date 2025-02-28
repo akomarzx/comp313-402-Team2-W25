@@ -2,8 +2,8 @@ package org.group2.comp313.kitchen_companion.controller;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.group2.comp313.kitchen_companion.domain.projection.CategorySummary;
 import org.group2.comp313.kitchen_companion.dto.ApiResult;
+import org.group2.comp313.kitchen_companion.dto.category.CategorySummary;
 import org.group2.comp313.kitchen_companion.repository.CategoryRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
