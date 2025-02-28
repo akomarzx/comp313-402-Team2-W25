@@ -30,8 +30,6 @@ public class BaseService {
         String cleanedJson = jsonDirty.replaceAll("^```json\\s*", "").replaceAll("```$", "");
         ObjectMapper mapper = new ObjectMapper();
 
-        this.log.info(cleanedJson);
-
         try {
             return mapper.readValue(cleanedJson, clazz);
         }

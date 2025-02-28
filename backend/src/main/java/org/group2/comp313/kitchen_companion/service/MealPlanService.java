@@ -10,9 +10,7 @@ import org.group2.comp313.kitchen_companion.dto.ApiResult;
 import org.group2.comp313.kitchen_companion.dto.ai.AIMealPlanRecommendationRequest;
 import org.group2.comp313.kitchen_companion.dto.ai.AIMealPlanRecommendationResult;
 import org.group2.comp313.kitchen_companion.dto.ai.ChatCompletionResponse;
-import org.group2.comp313.kitchen_companion.dto.meal_plan.MealPlanDaysSummaryDto;
-import org.group2.comp313.kitchen_companion.dto.meal_plan.MealPlanGroupSummaryDto;
-import org.group2.comp313.kitchen_companion.dto.meal_plan.MealPlanSummaryDto;
+import org.group2.comp313.kitchen_companion.dto.meal_plan.*;
 import org.group2.comp313.kitchen_companion.repository.MealPlanDayRepository;
 import org.group2.comp313.kitchen_companion.repository.MealPlanGroupRepository;
 import org.group2.comp313.kitchen_companion.repository.MealPlanRepository;
@@ -21,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MealPlanService extends BaseService {
@@ -55,7 +54,7 @@ public class MealPlanService extends BaseService {
                 mealPlanGroupSummaryDtoList.add(new MealPlanGroupSummaryDto(mpg.getId(), mpg.getLabel(), mealPlanDaysSummaryDtoList));
             }
 
-            MealPlanSummaryDto result = new MealPlanSummaryDto(mealPlan.getLabel(), mealPlan.getCreatedAt(), mealPlan.getCreatedBy(), mealPlanGroupSummaryDtoList);
+            MealPlanSummaryDto result = new MealPlanSummaryDto(mealPlan.getId(), mealPlan.getLabel(), mealPlan.getCreatedAt(), mealPlan.getCreatedBy(), mealPlanGroupSummaryDtoList);
 
             return new ApiResult<>("Meal Plan Summary", result);
         }
@@ -75,7 +74,38 @@ public class MealPlanService extends BaseService {
         return this.processAiMealPlanResponse(recommendationResult, createdBy);
     }
 
-    public MealPlan createMealPlan(String label, String createdBy) {
+    @Transactional
+    public ApiResult<MealPlanSummaryDto> createMealPlanFromRequest(CreateMealPlanDto createMealPlanDto, String createdBy) throws Exception {
+        return this.processMealPlanRequest(createMealPlanDto, createdBy);
+    }
+
+    @Transactional
+    public ApiResult<Boolean> updateMealPlanDay(Integer mealPlanDayId, CreateMealPlanDto.CreateMealPlanDaysSummary request, String updatedBy) {
+        Optional<MealPlanDay> findMealPlanDay = mealPlanDayRepository.findById(mealPlanDayId);
+        if (findMealPlanDay.isEmpty()) {
+            return new ApiResult<>("Meal Plan Day not found", false);
+        } else {
+            MealPlanDay mealPlanDay = findMealPlanDay.get();
+            mealPlanDay.setCreatedAt(Instant.now());
+            mealPlanDay.setUpdatedAt(Instant.now());
+            mealPlanDay.setUpdatedBy(updatedBy);
+
+            mealPlanDay.setBreakfastRecipeSubstituteCd(request.breakfastSubstituteCode());
+            mealPlanDay.setBreakfastRecipe(request.breakfastRecipeId());
+
+            mealPlanDay.setLunchRecipeSubstituteCd(request.lunchSubstituteCode());
+            mealPlanDay.setLunchRecipe(request.lunchRecipeId());
+
+            mealPlanDay.setDinnerRecipeSubstituteCd(request.dinnerSubstituteCode());
+            mealPlanDay.setBreakfastRecipe(request.breakfastRecipeId());
+
+            this.mealPlanDayRepository.save(mealPlanDay);
+
+            return new ApiResult<>("Meal Plan Day updated", true);
+        }
+    }
+
+    private MealPlan createMealPlan(String label, String createdBy) {
         MealPlan mealPlan = new MealPlan();
         mealPlan.setLabel(label);
         mealPlan.setCreatedBy(createdBy);
@@ -83,7 +113,7 @@ public class MealPlanService extends BaseService {
         return this.mealPlanRepository.save(mealPlan);
     }
 
-    public MealPlanGroup createMealPlanGroup(Integer mealPlanId ,String createdBy) {
+    private MealPlanGroup createMealPlanGroup(Integer mealPlanId ,String createdBy) {
 
         MealPlanGroup mealPlanGroup = new MealPlanGroup();
         mealPlanGroup.setCreatedBy(createdBy);
@@ -99,6 +129,7 @@ public class MealPlanService extends BaseService {
 
         return this.mealPlanGroupRepository.save(mealPlanGroup);
     }
+
 
     /**
      * Create a meal plan day entity from the AI Result.
@@ -121,6 +152,61 @@ public class MealPlanService extends BaseService {
 
         this.mealPlanDayRepository.save(newMealPlanDay);
     }
+
+    private void createMealPlanDayFromRequest(CreateMealPlanDto.CreateMealPlanDaysSummary mealPlanDaysSummary, Integer mealPlanGroupId, String createdBy) {
+
+        MealPlanDay newMealPlanDay = new MealPlanDay();
+
+        newMealPlanDay.setCreatedAt(Instant.now());
+        newMealPlanDay.setCreatedBy(createdBy);
+        newMealPlanDay.setDayOfWeekCode(mealPlanDaysSummary.daysOfWeekCd());
+        newMealPlanDay.setMealPlanGroup(mealPlanGroupId);
+
+        newMealPlanDay.setBreakfastRecipe(mealPlanDaysSummary.breakfastRecipeId());
+        newMealPlanDay.setLunchRecipe(mealPlanDaysSummary.lunchRecipeId());
+        newMealPlanDay.setDinnerRecipe(mealPlanDaysSummary.dinnerRecipeId());
+
+        newMealPlanDay.setBreakfastRecipeSubstituteCd(mealPlanDaysSummary.breakfastSubstituteCode());
+        newMealPlanDay.setBreakfastRecipeSubstituteCd(mealPlanDaysSummary.lunchSubstituteCode());
+        newMealPlanDay.setBreakfastRecipeSubstituteCd(mealPlanDaysSummary.dinnerSubstituteCode());
+
+        this.mealPlanDayRepository.save(newMealPlanDay);
+    }
+
+    private ApiResult<MealPlanSummaryDto> processMealPlanRequest(CreateMealPlanDto createMealPlanDto, String createdBy) {
+
+        String mealPlanLabel = createMealPlanDto.label();
+        Instant createdAt = Instant.now();
+
+        List<MealPlanGroupSummaryDto> mealPlanGroupSummaryDtoList = new ArrayList<>();
+
+        if (mealPlanLabel != null && createMealPlanDto.mealPlanGroupSummaryDtoList() != null) {
+
+            // Create Meal Plan
+            MealPlan createdMealPlan = this.createMealPlan(mealPlanLabel, createdBy);
+
+            for (CreateMealPlanDto.CreateMealPlanGroupSummary mealPlanGroup : createMealPlanDto.mealPlanGroupSummaryDtoList()) {
+
+                // Create Meal Plan Group
+                MealPlanGroup newMealPlanGroup = this.createMealPlanGroup(createdMealPlan.getId(), createdBy);
+
+                for (CreateMealPlanDto.CreateMealPlanDaysSummary mealPlanDay : mealPlanGroup.mealPlanDaysSummaryDtoList()) {
+                    createMealPlanDayFromRequest(mealPlanDay, newMealPlanGroup.getId(), createdBy);
+                }
+
+                // Retrieve all meal plan days summary for the meal plan group.
+                List<MealPlanDaysSummaryDto> mealPlanDaysSummaryDtoList = this.mealPlanDayRepository.findMealPlanDaySummaryDtoByMealPlanGroup(newMealPlanGroup.getId());
+                mealPlanGroupSummaryDtoList.add(new MealPlanGroupSummaryDto(newMealPlanGroup.getId(), newMealPlanGroup.getLabel(), mealPlanDaysSummaryDtoList));
+            }
+
+            // Return API response after processing the request
+            return new ApiResult<>("Meal plan created successfully.", new MealPlanSummaryDto(createdMealPlan.getId(), mealPlanLabel, createdAt, createdBy, mealPlanGroupSummaryDtoList));
+
+        } else {
+            return new ApiResult<>("Invalid meal plan request - missing required data", null);
+        }
+    }
+
 
     private ApiResult<MealPlanSummaryDto> processAiMealPlanResponse(AIMealPlanRecommendationResult aiMealPlanRecommendationResult, String createdBy) {
 
@@ -148,7 +234,7 @@ public class MealPlanService extends BaseService {
             }
 
             // After all records are inserted query the database for the meal Plan Days
-            return new ApiResult<MealPlanSummaryDto>("Meal plan created successfully.", new MealPlanSummaryDto(mealPlanLabel, createdAt, createdBy, mealPlanGroupSummaryDtoList));
+            return new ApiResult<MealPlanSummaryDto>("Meal plan created successfully.", new MealPlanSummaryDto(createdMealPlan.getId() ,mealPlanLabel, createdAt, createdBy, mealPlanGroupSummaryDtoList));
 
         } else {
             return new ApiResult<>("AI Failed to generate meal plan - " + aiMealPlanRecommendationResult.reasonForFail() , null);

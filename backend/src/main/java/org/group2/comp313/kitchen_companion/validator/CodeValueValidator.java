@@ -67,6 +67,9 @@ public class CodeValueValidator implements ConstraintValidator<ValidateCodeID, I
     private Integer getCodeBookID(String parameter) {
         if (parameter.equalsIgnoreCase("TIME_UNIT")) {
             return StaticCodeService.TIME_UNIT_CODE_BOOK_ID;
+        }
+        else if (parameter.equalsIgnoreCase("SUBSTITUTION_CODE")) {
+            return StaticCodeService.NON_RECIPE_SUBSTITUTION_CODE_BOOK_ID;
         } else {
             return null;
         }

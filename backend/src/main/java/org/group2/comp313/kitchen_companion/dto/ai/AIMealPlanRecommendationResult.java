@@ -17,9 +17,9 @@ public record AIMealPlanRecommendationResult(
     ) {}
 
     public record MealPlanDay(
-            @JsonProperty("breakfastRecipe") RecipeDto breakfastRecipe,
-            @JsonProperty("lunchRecipe") RecipeDto lunchRecipe,
-            @JsonProperty("dinnerRecipe") RecipeDto dinnerRecipe,
+            @JsonProperty("breakfastRecipeId") RecipeDto breakfastRecipe,
+            @JsonProperty("lunchRecipeId") RecipeDto lunchRecipe,
+            @JsonProperty("dinnerRecipeId") RecipeDto dinnerRecipe,
             @JsonProperty("breakfastRecipeSubstituteCd") int breakfastRecipeSubstituteCd,
             @JsonProperty("lunchRecipeSubstituteCd") int lunchRecipeSubstituteCd,
             @JsonProperty("dinnerRecipeSubstituteCd") int dinnerRecipeSubstituteCd,

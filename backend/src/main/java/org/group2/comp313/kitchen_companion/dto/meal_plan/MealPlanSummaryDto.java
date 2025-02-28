@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.List;
 
 public record MealPlanSummaryDto(
+        Integer id,
         String label,
         Instant createdAt,
         String createdBy,
