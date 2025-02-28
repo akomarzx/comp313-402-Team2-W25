@@ -12,10 +12,7 @@ import org.group2.comp313.kitchen_companion.service.MealPlanService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/meal-plan")
@@ -27,6 +24,25 @@ public class MealPlanController extends BaseController {
 
     public MealPlanController(MealPlanService mealPlanService) {
         this.mealPlanService = mealPlanService;
+    }
+
+    @GetMapping("{id}")
+    public ResponseEntity<ApiResult<MealPlanSummaryDto>> getMealPlanById(@PathVariable("id") Integer id,
+                                                                         @AuthenticationPrincipal(expression = "claims['email']") String createdByEmail) {
+
+        try {
+            ApiResult<MealPlanSummaryDto> mealPlanSummaryDtoApiResult = this.mealPlanService.getMealPlanGroupSummary(id);
+
+            if(mealPlanSummaryDtoApiResult.result() == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+            return ResponseEntity.ok(mealPlanSummaryDtoApiResult);
+
+        } catch (Exception e) {
+            log.error(e.getLocalizedMessage(), e);
+            return new ResponseEntity<>(new ApiResult<>(e.getLocalizedMessage(), null), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping("/ai-recommend")

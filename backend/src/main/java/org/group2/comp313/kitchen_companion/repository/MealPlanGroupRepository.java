@@ -11,4 +11,5 @@ import java.util.List;
 public interface MealPlanGroupRepository extends JpaRepository<MealPlanGroup, Integer>, JpaSpecificationExecutor<MealPlanGroup> {
     Integer countByMealPlan(@NotNull Integer mealPlan);
 
+    List<MealPlanGroup> findAllByMealPlan(@NotNull Integer mealPlan);
 }

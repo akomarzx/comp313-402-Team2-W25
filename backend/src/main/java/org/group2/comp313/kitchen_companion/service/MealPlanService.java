@@ -39,8 +39,26 @@ public class MealPlanService extends BaseService {
         this.recipeService = recipeService;
     }
 
-    public List<MealPlanDaysSummaryDto> findAllMealPlanDaySummaryDtoById(Integer id) {
-        return this.mealPlanDayRepository.findMealPlanDaySummaryDtoByMealPlanGroup(id);
+    public ApiResult<MealPlanSummaryDto> getMealPlanGroupSummary(Integer id) {
+
+        MealPlan mealPlan = mealPlanRepository.findById(id).orElse(null);
+
+        if (mealPlan == null) {
+            return new ApiResult<>("Meal Plan not found", null);
+        } else {
+
+            List<MealPlanGroup> mealPlanGroups = mealPlanGroupRepository.findAllByMealPlan(mealPlan.getId());
+            List<MealPlanGroupSummaryDto> mealPlanGroupSummaryDtoList = new ArrayList<>();
+
+            for(MealPlanGroup mpg : mealPlanGroups) {
+                List<MealPlanDaysSummaryDto> mealPlanDaysSummaryDtoList = this.mealPlanDayRepository.findMealPlanDaySummaryDtoByMealPlanGroup(mpg.getId());
+                mealPlanGroupSummaryDtoList.add(new MealPlanGroupSummaryDto(mpg.getId(), mpg.getLabel(), mealPlanDaysSummaryDtoList));
+            }
+
+            MealPlanSummaryDto result = new MealPlanSummaryDto(mealPlan.getLabel(), mealPlan.getCreatedAt(), mealPlan.getCreatedBy(), mealPlanGroupSummaryDtoList);
+
+            return new ApiResult<>("Meal Plan Summary", result);
+        }
     }
 
     /**
@@ -66,6 +84,7 @@ public class MealPlanService extends BaseService {
     }
 
     public MealPlanGroup createMealPlanGroup(Integer mealPlanId ,String createdBy) {
+
         MealPlanGroup mealPlanGroup = new MealPlanGroup();
         mealPlanGroup.setCreatedBy(createdBy);
         mealPlanGroup.setCreatedAt(Instant.now());
@@ -75,7 +94,8 @@ public class MealPlanService extends BaseService {
         // Meal Plan Are group weekly for easier development
         // Will Improve Later;
         Integer countByMealPlanId = this.mealPlanGroupRepository.countByMealPlan(mealPlanId);
-        mealPlanGroup.setLabel("Week " + countByMealPlanId + 1);
+        int currentWeekLabelCount = countByMealPlanId + 1;
+        mealPlanGroup.setLabel("Week " + currentWeekLabelCount);
 
         return this.mealPlanGroupRepository.save(mealPlanGroup);
     }
