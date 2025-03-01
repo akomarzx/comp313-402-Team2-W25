@@ -11,8 +11,7 @@ import org.group2.comp313.kitchen_companion.dto.ai.AIMealPlanRecommendationReque
 import org.group2.comp313.kitchen_companion.dto.ai.AIMealPlanRecommendationResult;
 import org.group2.comp313.kitchen_companion.dto.ai.ChatCompletionResponse;
 import org.group2.comp313.kitchen_companion.dto.meal_plan.*;
-import org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryForCards;
-import org.group2.comp313.kitchen_companion.repository.MealPlanDayRepository;
+    import org.group2.comp313.kitchen_companion.repository.MealPlanDayRepository;
 import org.group2.comp313.kitchen_companion.repository.MealPlanGroupRepository;
 import org.group2.comp313.kitchen_companion.repository.MealPlanRepository;
 import org.springframework.data.domain.Page;
@@ -24,7 +23,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class MealPlanService extends BaseService {
@@ -253,19 +251,19 @@ public class MealPlanService extends BaseService {
 
         return results.stream()
                 .map(dto -> {
-                    var breakfast = dto.breakfastRecipeSummary();
-                    var lunch = dto.lunchRecipeSummary();
-                    var dinner = dto.dinnerRecipeSummary();
+                    var breakfast = dto.breakfastRecipe();
+                    var lunch = dto.lunchRecipe();
+                    var dinner = dto.dinnerRecipe();
 
                     return new MealPlanDaysSummaryDto(
                             dto.id(),
                             dto.mealPlanGroupId(),
                             dto.breakfastSubstituteLabel(),
-                            (breakfast != null && breakfast.id() != null) ? breakfast : null,
+                            (breakfast != null && breakfast.getId() != null) ? breakfast : null,
                             dto.lunchSubstituteLabel(),
-                            (lunch != null && lunch.id() != null) ? lunch : null,
+                            (lunch != null && lunch.getId() != null) ? lunch : null,
                             dto.dinnerSubstituteLabel(),
-                            (dinner != null && dinner.id() != null) ? dinner : null,
+                            (dinner != null && dinner.getId() != null) ? dinner : null,
                             dto.daysOfWeekCd(),
                             dto.dayOfWeekLabel()
                     );

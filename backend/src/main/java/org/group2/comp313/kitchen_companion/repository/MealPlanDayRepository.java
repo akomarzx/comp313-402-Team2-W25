@@ -16,11 +16,11 @@ public interface MealPlanDayRepository extends JpaRepository<MealPlanDay, Intege
             "   mpd.id, " +
             "   mpd.mealPlanGroup," +
             "   bscv.label," +
-            "   new org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryForCards(br.id, br.title, null, br.thumbnailUrl, br.calories)," +
+            "   br," +
             "   lscv.label," +
-            "   new org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryForCards(lr.id, lr.title, null, lr.thumbnailUrl, lr.calories)," +
+            "   lr," +
             "   dscv.label," +
-            "   new org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryForCards(dr.id, dr.title, null, dr.thumbnailUrl, dr.calories)," +
+            "   dr," +
             "   mpd.dayOfWeekCode," +
             "   dowcd.label" +
             ") " +
