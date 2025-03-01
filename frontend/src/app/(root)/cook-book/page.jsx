@@ -22,9 +22,9 @@ const MyCookBook = () => {
   const [isLoading2, setIsLoading2] = useState(true);
   const [isLoading3, setIsLoading3] = useState(true);
 
-  const [isMyRecipeCollapse, setIsMyRecipeCollapse] = useState(false);
-  const [isFavoriteCollapse, setIsFavoriteCollapse] = useState(false);
-  const [isMealPlanCollapse, setIsMealPlanCollapse] = useState(false);
+  const [isMyRecipeCollapse, setIsMyRecipeCollapse] = useState(true);
+  const [isFavoriteCollapse, setIsFavoriteCollapse] = useState(true);
+  const [isMealPlanCollapse, setIsMealPlanCollapse] = useState(true);
 
   const fetchMyRecipes = async () => {
     const data = await getMyRecipes(recipePage);
@@ -94,10 +94,13 @@ const MyCookBook = () => {
       <div>
         <fieldset
           className={`${
-            isMyRecipeCollapse ? "max-h-[10px]" : "max-h-[1000px]"
-          } overflow-hidden transition-all duration-300 ease-in-out border mx-2 my-5 border-gray-200 rounded-lg p-4`}
+            isMyRecipeCollapse ? "h-[50px]" : "h-[800px]"
+          } overflow-y-auto transition-all duration-300 ease-in-out border mx-2 my-5 border-gray-200 rounded-lg p-4`}
         >
-          <legend onClick={() => setIsMyRecipeCollapse((prev) => !prev)}>
+          <legend
+            className="cursor-pointer"
+            onClick={() => setIsMyRecipeCollapse((prev) => !prev)}
+          >
             <h2 className="flex font-semibold">
               <span>MY RECIPES</span>
               {isMyRecipeCollapse ? (
@@ -132,10 +135,13 @@ const MyCookBook = () => {
       <div>
         <fieldset
           className={`${
-            isFavoriteCollapse ? "max-h-[10px]" : "max-h-[1000px]"
-          }  overflow-hidden transition-all duration-300 ease-in-out border mx-2 my-5 border-gray-200 rounded-lg p-4`}
+            isFavoriteCollapse ? "h-[50px]" : "h-[800px]"
+          }  overflow-y-auto transition-all duration-300 ease-in-out border mx-2 my-5 border-gray-200 rounded-lg p-4`}
         >
-          <legend onClick={() => setIsFavoriteCollapse((prev) => !prev)}>
+          <legend
+            className="cursor-pointer"
+            onClick={() => setIsFavoriteCollapse((prev) => !prev)}
+          >
             <h2 className="flex font-semibold">
               <span>MY FAVORITE RECIPES</span>
               {isFavoriteCollapse ? (
@@ -171,12 +177,12 @@ const MyCookBook = () => {
       <div>
         <fieldset
           className={`${
-            isMealPlanCollapse ? "max-h-[10px]" : "max-h-[1000px]"
-          } overflow-hidden transition-all duration-300 ease-in-out border mx-2 my-5 border-gray-200 rounded-lg p-4`}
+            isMealPlanCollapse ? "h-[50px]" : "h-[800px]"
+          } overflow-y-auto transition-all duration-300 ease-in-out border mx-2 my-5 border-gray-200 rounded-lg p-4`}
         >
           <legend
             onClick={() => setIsMealPlanCollapse((prev) => !prev)}
-            className="flex font-semibold"
+            className="flex font-semibold cursor-pointer"
           >
             <h2 className="flex font-semibold">
               <span>MY MEAL PLANS</span>
@@ -202,7 +208,7 @@ const MyCookBook = () => {
                   }}
                   className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded"
                 >
-                  Load More Recipes
+                  Load Meal Plans
                 </button>
               )}
             </div>

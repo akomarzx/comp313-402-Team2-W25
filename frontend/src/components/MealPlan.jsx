@@ -1,13 +1,9 @@
-import React, { use, useEffect, useState } from "react";
+import React, { useState, useMemo } from "react";
 import MealPlanList from "../components/MealPlanList";
 import { Leaf } from "lucide-react";
-import { getRecipeById } from "@/api/recipe";
 
-const MealPlan = ({ preFetchPlan }) => {
+const MealPlan = ({ mealPlanData }) => {
   const [selectedDay, setSelectedDay] = useState("Monday");
-  const [isLoading, setIsLoading] = useState(true);
-  const [mealPlan, setMealPlan] = useState({});
-  const [currentRecipes, setCurrentRecipes] = useState([]);
 
   const days = [
     "Monday",
@@ -19,65 +15,28 @@ const MealPlan = ({ preFetchPlan }) => {
     "Sunday",
   ];
 
-  const mealPlanByDay = days.reduce((acc, day, index) => {
-    const startIndex = index * 3;
-    const dayRecipes = preFetchPlan?.mealPlanGroupSummaryDtoList?.slice(
-      startIndex,
-      startIndex + 3
-    );
-
-    const adjustedRecipes =
-      dayRecipes?.length === 3
-        ? dayRecipes
-        : [
-            ...dayRecipes,
-            ...preFetchPlan.mealPlanGroupSummaryDtoList?.slice(
-              0,
-              3 - dayRecipes.length
-            ),
+  const mealPlanByDay = useMemo(
+    () =>
+      mealPlanData?.mealPlanGroupSummaryDtoList[0].mealPlanDaysSummaryDtoList.reduce(
+        (acc, meal) => {
+          const day = meal.dayOfWeekLabel;
+          if (!acc[day]) {
+            acc[day] = [];
+          }
+          acc[day] = [
+            meal.breakfastRecipe,
+            meal.lunchRecipe,
+            meal.dinnerRecipe,
           ];
-
-    acc[day] = adjustedRecipes;
-    return acc;
-  }, {});
-
+          return acc;
+        },
+        {}
+      ),
+    [mealPlanData]
+  );
   const handleDayChange = (day) => {
     setSelectedDay(day);
   };
-
-  const fetchRecipes = async (day) => {
-    console.log("fetch");
-    setIsLoading(true);
-    const morningRes = await getRecipeById(
-      mealPlanByDay[day][0].mealPlanDaysSummaryDtoList[0].breakfastRecipeSummary
-        .id
-    );
-    const afternoonRes = await getRecipeById(
-      mealPlanByDay[day][1].mealPlanDaysSummaryDtoList[0].lunchRecipeSummary.id
-    );
-    const eveningRes = await getRecipeById(
-      mealPlanByDay[day][2].mealPlanDaysSummaryDtoList[0].dinnerRecipeSummary.id
-    );
-
-    if (morningRes && afternoonRes && eveningRes) {
-      setMealPlan({
-        ...mealPlan,
-        [selectedDay]: [morningRes, afternoonRes, eveningRes],
-      });
-      setIsLoading(false);
-      setCurrentRecipes([morningRes, afternoonRes, eveningRes]);
-    }
-  };
-  useEffect(() => {
-    console.log(mealPlanByDay);
-    console.log(mealPlan);
-    setIsLoading(true);
-    setCurrentRecipes([]);
-    if (!mealPlan[selectedDay]) fetchRecipes(selectedDay);
-    else setCurrentRecipes(mealPlan[selectedDay]);
-    setCurrentRecipes(mealPlan[selectedDay]);
-    setIsLoading(false);
-  }, [selectedDay]);
 
   return (
     <div className="min-h-screen w-[90%] bg-white py-10 max-w-[1920px] mx-auto">
@@ -89,7 +48,7 @@ const MealPlan = ({ preFetchPlan }) => {
             </div>
           </div>
           <h1 className="text-4xl font-medium  mb-2">
-            {preFetchPlan?.label || "Weekly Meal Plan"}
+            {mealPlanData?.label || "Weekly Meal Plan"}
           </h1>
           <p className=" max-w-xl mx-auto">
             Discover healthy and delicious recipes for your week. Three meals
@@ -103,7 +62,7 @@ const MealPlan = ({ preFetchPlan }) => {
               <button
                 key={day}
                 onClick={() => handleDayChange(day)}
-                className={`px-4 py-2 rounded-full transition-all duration-200 ${
+                className={`px-4 py-2 rounded-full ${
                   selectedDay === day
                     ? "bg-green-600 text-white shadow-md"
                     : "bg-white border text-gray-600"
@@ -123,11 +82,7 @@ const MealPlan = ({ preFetchPlan }) => {
               {selectedDay.toLowerCase()}.
             </p>
           </div>
-          {isLoading ? (
-            <>Loading Meal Plans...</>
-          ) : (
-            <MealPlanList recipes={currentRecipes || []} />
-          )}
+          <MealPlanList recipes={mealPlanByDay[selectedDay] || []} />
         </div>
       </div>
     </div>

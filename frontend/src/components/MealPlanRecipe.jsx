@@ -1,11 +1,18 @@
-import React, { useState, useRef, useEffect, use } from "react";
-import { Clock, Users, ChevronDown, ChevronUp, Scale } from "lucide-react";
+import React, { useState, useRef, useEffect } from "react";
+import {
+  Clock,
+  Users,
+  ChevronDown,
+  ChevronUp,
+  Scale,
+  ArrowRight,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const MealPlanRecipe = ({ recipe }) => {
   const [expanded, setExpanded] = useState(false);
   const contentRef = useRef(null);
-  const [currentRecipe, setCurrentRecipe] = useState(recipe);
-
+  const router = useRouter();
   const toggleExpand = () => {
     setExpanded(!expanded);
   };
@@ -18,10 +25,6 @@ const MealPlanRecipe = ({ recipe }) => {
       });
     }
   }, [expanded]);
-
-  useEffect(() => {
-    setCurrentRecipe(recipe);
-  }, [recipe]);
 
   return (
     <div
@@ -38,8 +41,8 @@ const MealPlanRecipe = ({ recipe }) => {
           }}
         >
           <img
-            src={currentRecipe.imageUrl}
-            alt={currentRecipe.title}
+            src={recipe?.imageUrl}
+            alt={recipe?.title}
             className="w-full h-full object-cover transition-transform duration-700 ease-out"
             style={{
               transform: expanded ? "scale(1.05)" : "scale(1)",
@@ -58,7 +61,7 @@ const MealPlanRecipe = ({ recipe }) => {
         <div className="absolute bottom-0 left-0 p-4 w-full">
           <div className="flex items-start justify-between">
             <h2 className="text-white font-semibold text-xl tracking-tight leading-tight">
-              {currentRecipe.title}
+              {recipe.title}
             </h2>
             <button
               className="p-1 rounded-full bg-white/90 hover:bg-white transition-colors duration-200"
@@ -74,7 +77,7 @@ const MealPlanRecipe = ({ recipe }) => {
           </div>
 
           <div className="flex space-x-3 mt-2">
-            {currentRecipe?.categories?.map((cat, i) => (
+            {recipe?.categories?.map((cat, i) => (
               <span key={i}>
                 <span className="text-blue-600 border rounded-full px-2 bg-blue-100 text-xs">
                   {cat.label}
@@ -90,24 +93,24 @@ const MealPlanRecipe = ({ recipe }) => {
         className={expanded ? "recipe-card-expanded" : "recipe-card-collapsed"}
       >
         <div className="p-4">
-          <p className=" mb-4 line-clamp-1">{currentRecipe.summary}</p>
+          <p className=" mb-4 line-clamp-1">{recipe.summary}</p>
 
           <div className="flex justify-between items-center mb-4 text-sm ">
             <div className="flex items-center">
               <Clock className="h-4 w-4 mr-1" />
-              <span>{currentRecipe.prepTime} prep</span>
+              <span>{recipe.prepTime} prep</span>
             </div>
             <div className="flex items-center">
               <Clock className="h-4 w-4 mr-1" />
-              <span>{currentRecipe.cookTime} cook</span>
+              <span>{recipe.cookTime} cook</span>
             </div>
             <div className="flex items-center">
               <Users className="h-4 w-4 mr-1" />
-              <span>Serves {currentRecipe.servings}</span>
+              <span>Serves {recipe.servings}</span>
             </div>
             <div className="flex items-center">
               <Scale className="h-4 w-4 mr-1" />
-              <span>{currentRecipe.calories} cal</span>
+              <span>{recipe.calories} cal</span>
             </div>
           </div>
 
@@ -116,7 +119,7 @@ const MealPlanRecipe = ({ recipe }) => {
           <div>
             <h3 className="font-medium  mb-2">Ingredients</h3>
             <ol className="list list-inside text-gray-700">
-              {currentRecipe?.ingredientGroups
+              {recipe?.ingredientGroups
                 .sort((a, b) => a.ingredientGroupOrder - b.ingredientGroupOrder)
                 .map((ingredientGroup, index) => (
                   <li key={index} className="mb-4">
@@ -140,7 +143,7 @@ const MealPlanRecipe = ({ recipe }) => {
           <div>
             <h3 className="font-medium  mb-2">Instructions</h3>
             <ol className="list list-inside text-gray-700 space-y-2">
-              {currentRecipe?.stepGroups
+              {recipe?.stepGroups
                 .sort((a, b) => a.stepGroupOrder - b.stepGroupOrder)
                 .map((stepGroup, index) => (
                   <li key={index} className="mb-4">
@@ -155,6 +158,16 @@ const MealPlanRecipe = ({ recipe }) => {
                   </li>
                 ))}
             </ol>
+          </div>
+        </div>
+        <div className="justify-end flex p-4">
+          <div
+            onClick={() => {
+              router.push(`/recipe/${recipe.id}`);
+            }}
+            className="cursor-pointer  flex border-t justify-around items-center rounded-full  w-[150px] hover:bg-gray-100"
+          >
+            <span>Go to details</span> <ArrowRight size={20} className="" />
           </div>
         </div>
       </div>

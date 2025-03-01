@@ -251,7 +251,7 @@ const AIReccommend = () => {
 
             <TabsContent value="mealplan" className="space-y-8">
               <div className="space-y-4">
-                <label className="block text-lg font-semibold text-gray-800">
+                {/* <label className="block text-lg font-semibold text-gray-800">
                   Meal Plan Duration
                 </label>
                 <Select value={mealPlanDays} onValueChange={setMealPlanDays}>
@@ -264,7 +264,10 @@ const AIReccommend = () => {
                     <SelectItem value="21">21 Days</SelectItem>
                     <SelectItem value="28">28 Days</SelectItem>
                   </SelectContent>
-                </Select>
+                </Select> */}
+                <p className="text-lg text-center font-semibold text-gray-800">
+                  A fully customized 3 meals - 7 days tailored to your need
+                </p>
               </div>
 
               <div className="space-y-4">

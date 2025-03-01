@@ -2,10 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useParams, useRouter } from "next/navigation";
-import { LoaderIcon, MinusCircle, PlusCircle } from "lucide-react";
+import { LoaderIcon } from "lucide-react";
 import { getMealPlanById } from "@/api/recipe";
-import RecipesResult from "@/components/RecipesResult";
-import MyMealPlanList from "@/components/MyMealPlanList";
 import MealPlan from "@/components/MealPlan";
 
 const MyMealPlan = () => {
@@ -18,6 +16,7 @@ const MyMealPlan = () => {
   const fetchMealPlan = async () => {
     const data = await getMealPlanById(mealPlanId);
     setMealPlan(data);
+    console.log(data);
     setIsLoading(false);
   };
 
@@ -32,13 +31,13 @@ const MyMealPlan = () => {
 
   return (
     <div className="min-h-screen py-10 px-6 max-w-[1200px] mx-auto bg-white">
-      {loading && isLoading ? (
+      {isLoading ? (
         <LoaderIcon className="animate-spin m-auto" />
       ) : (
         <div>
           {mealPlan && (
             <div>
-              <MealPlan preFetchPlan={mealPlan} />
+              <MealPlan mealPlanData={mealPlan} />
             </div>
           )}
         </div>
