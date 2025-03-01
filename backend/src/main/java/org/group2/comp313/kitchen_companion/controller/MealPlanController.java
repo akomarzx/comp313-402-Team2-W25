@@ -4,11 +4,14 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.group2.comp313.kitchen_companion.domain.MealPlan;
 import org.group2.comp313.kitchen_companion.dto.ApiResult;
 import org.group2.comp313.kitchen_companion.dto.ai.AIMealPlanRecommendationRequest;
 import org.group2.comp313.kitchen_companion.dto.meal_plan.CreateMealPlanDto;
 import org.group2.comp313.kitchen_companion.dto.meal_plan.MealPlanSummaryDto;
+import org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryForCards;
 import org.group2.comp313.kitchen_companion.service.MealPlanService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -86,6 +89,19 @@ public class MealPlanController extends BaseController {
             return new ResponseEntity<>(result, result.result() ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(new ApiResult<>(e.getLocalizedMessage(), false), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/my-meal-plans")
+    public ResponseEntity<ApiResult<Page<MealPlan>>> getSavedRecipes(@RequestParam Integer page,
+                                                                     @RequestParam Integer size,
+                                                                     @AuthenticationPrincipal(expression = "claims['email']") String email) {
+        try {
+            Page<MealPlan> savedRecipeForUser = this.mealPlanService.getMealPlansForUser(page, size, email);
+            return ResponseEntity.ok(new ApiResult<>(null, savedRecipeForUser));
+        } catch (Exception e) {
+            log.error(e.getLocalizedMessage());
+            return new ResponseEntity<>(new ApiResult<>(e.getLocalizedMessage(), null), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

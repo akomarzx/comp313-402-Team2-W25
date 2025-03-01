@@ -18,6 +18,7 @@ import java.util.Set;
 public interface RecipeRepository extends PagingAndSortingRepository<Recipe, Integer>, CrudRepository<Recipe, Integer>, JpaSpecificationExecutor<Recipe> {
 
     Page<RecipeSummaryForCards> findAllByCreatedByOrderByIdDesc(String createdBy, Pageable pageable);
+
     Optional<Recipe> findByIdAndCreatedBy(Integer id, String createdBy);
 
     @Query("SELECT c FROM Recipe r JOIN r.categories c WHERE r.id = :recipeId")
@@ -62,7 +63,7 @@ public interface RecipeRepository extends PagingAndSortingRepository<Recipe, Int
             nativeQuery = true)
     Page<RecipeSummaryCardWithCategory> findRecipeSummaryCardsByKeywordAndSort(@Param("keyword") String keyword, @Param("username") String username, Pageable pageable);
 
-    @Query(value = "SELECT r.recipe_id as id, r.title, r.summary, r.thumbnail_url " +
+    @Query(value = "SELECT r.recipe_id as id, r.title, r.summary, r.thumbnail_url, r.calories " +
             "FROM recipe r LEFT JOIN saved_recipe sr ON r.recipe_id = sr.recipe_id " +
             "WHERE sr.created_by = :username", nativeQuery = true)
     Page<RecipeSummaryForCards> findSavedRecipeSummaryCardsByUser(@Param("username") String username, Pageable pageable);

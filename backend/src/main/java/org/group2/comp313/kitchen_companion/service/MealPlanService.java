@@ -11,9 +11,13 @@ import org.group2.comp313.kitchen_companion.dto.ai.AIMealPlanRecommendationReque
 import org.group2.comp313.kitchen_companion.dto.ai.AIMealPlanRecommendationResult;
 import org.group2.comp313.kitchen_companion.dto.ai.ChatCompletionResponse;
 import org.group2.comp313.kitchen_companion.dto.meal_plan.*;
+import org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryForCards;
 import org.group2.comp313.kitchen_companion.repository.MealPlanDayRepository;
 import org.group2.comp313.kitchen_companion.repository.MealPlanGroupRepository;
 import org.group2.comp313.kitchen_companion.repository.MealPlanRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -239,5 +243,10 @@ public class MealPlanService extends BaseService {
         } else {
             return new ApiResult<>("AI Failed to generate meal plan - " + aiMealPlanRecommendationResult.reasonForFail() , null);
         }
+    }
+
+    public Page<MealPlan> getMealPlansForUser( Integer page, Integer size, String createdBy) {
+        Pageable pageRequest = PageRequest.of(page, size);
+        return this.mealPlanRepository.findAllByCreatedBy(createdBy, pageRequest);
     }
 }
