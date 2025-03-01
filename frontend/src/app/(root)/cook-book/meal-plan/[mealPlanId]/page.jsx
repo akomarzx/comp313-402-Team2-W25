@@ -16,7 +16,6 @@ const MyMealPlan = () => {
   const fetchMealPlan = async () => {
     const data = await getMealPlanById(mealPlanId);
     setMealPlan(data);
-    console.log(data);
     setIsLoading(false);
   };
 
