@@ -1,13 +1,15 @@
+import { useRouter } from "next/navigation";
 import React from "react";
 
 const MyMealPlanList = ({ list }) => {
-  console.log(list);
+  const router = useRouter();
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 ">
       {list?.map((mealPlan) => (
         <div
+          onClick={() => router.push(`/cook-book/meal-plan/${mealPlan.id}`)}
           key={mealPlan.id}
-          className="meal-section bg-white shadow-md rounded-lg p-6 mb-4 hover:shadow-lg transition duration-300"
+          className="cursor-pointer meal-section bg-white shadow-md rounded-lg p-6 mb-4 hover:shadow-lg transition duration-300"
         >
           <h2 className="text-2xl font-bold text-gray-800 mb-2">
             {mealPlan.label}

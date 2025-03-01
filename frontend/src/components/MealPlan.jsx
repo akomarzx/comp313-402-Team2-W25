@@ -75,8 +75,8 @@ const MealPlan = ({ preFetchPlan }) => {
     setCurrentRecipes([]);
     if (!mealPlan[selectedDay]) fetchRecipes(selectedDay);
     else setCurrentRecipes(mealPlan[selectedDay]);
-    setIsLoading(false);
     setCurrentRecipes(mealPlan[selectedDay]);
+    setIsLoading(false);
   }, [selectedDay]);
 
   return (
