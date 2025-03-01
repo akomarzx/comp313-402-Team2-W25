@@ -76,6 +76,22 @@ export async function generateRecipe(data) {
   }
 }
 
+export async function generateMealPlan(data) {
+  console.log(data);
+  try {
+    const mealPlanResponse = await axios.post(
+      `${recipeUrl}/kc/v1/meal-plan/ai-recommend`,
+      data,
+      {
+        withCredentials: true,
+      }
+    );
+    return mealPlanResponse;
+  } catch (error) {
+    console.log("Error generating meal plan:", error);
+  }
+}
+
 export async function uploadImg(data) {
   try {
     const imgResponse = await axios.post(
