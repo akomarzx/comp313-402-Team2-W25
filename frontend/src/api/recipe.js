@@ -142,6 +142,36 @@ export async function getSavedRecipes(page) {
   }
 }
 
+export async function getMealPlans(page) {
+  try {
+    console.log(page);
+    const mealPlans = await axios.get(
+      `${recipeUrl}/kc/v1/meal-plan/my-meal-plans?size=${12}&page=${page}`,
+      {
+        withCredentials: true,
+      }
+    );
+    console.log(mealPlans);
+    return mealPlans.data.result;
+  } catch (error) {
+    console.log("Error fetching saved recipes:", error);
+  }
+}
+
+export async function getMealPlanById(mealPlanId) {
+  try {
+    const mealPlan = await axios.get(
+      `${recipeUrl}/kc/v1/meal-plan/${mealPlanId}`,
+      {
+        withCredentials: true,
+      }
+    );
+    return mealPlan.data.result;
+  } catch (error) {
+    console.log("Error fetching meal plan:", error);
+  }
+}
+
 export async function saveRecipe(recipeId) {
   try {
     const recipeResponse = await axios.post(
