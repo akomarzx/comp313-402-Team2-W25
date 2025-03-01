@@ -24,6 +24,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class MealPlanService extends BaseService {
@@ -54,7 +55,7 @@ public class MealPlanService extends BaseService {
             List<MealPlanGroupSummaryDto> mealPlanGroupSummaryDtoList = new ArrayList<>();
 
             for(MealPlanGroup mpg : mealPlanGroups) {
-                List<MealPlanDaysSummaryDto> mealPlanDaysSummaryDtoList = this.mealPlanDayRepository.findMealPlanDaySummaryDtoByMealPlanGroup(mpg.getId());
+                List<MealPlanDaysSummaryDto> mealPlanDaysSummaryDtoList = this.getAllMealPlanDaysSummaryDtoByMealPlanGroup(mpg.getId());
                 mealPlanGroupSummaryDtoList.add(new MealPlanGroupSummaryDto(mpg.getId(), mpg.getLabel(), mealPlanDaysSummaryDtoList));
             }
 
@@ -107,6 +108,11 @@ public class MealPlanService extends BaseService {
 
             return new ApiResult<>("Meal Plan Day updated", true);
         }
+    }
+
+    public Page<MealPlan> getMealPlansForUser( Integer page, Integer size, String createdBy) {
+        Pageable pageRequest = PageRequest.of(page, size);
+        return this.mealPlanRepository.findAllByCreatedBy(createdBy, pageRequest);
     }
 
     private MealPlan createMealPlan(String label, String createdBy) {
@@ -171,8 +177,8 @@ public class MealPlanService extends BaseService {
         newMealPlanDay.setDinnerRecipe(mealPlanDaysSummary.dinnerRecipeId());
 
         newMealPlanDay.setBreakfastRecipeSubstituteCd(mealPlanDaysSummary.breakfastSubstituteCode());
-        newMealPlanDay.setBreakfastRecipeSubstituteCd(mealPlanDaysSummary.lunchSubstituteCode());
-        newMealPlanDay.setBreakfastRecipeSubstituteCd(mealPlanDaysSummary.dinnerSubstituteCode());
+        newMealPlanDay.setLunchRecipeSubstituteCd(mealPlanDaysSummary.lunchSubstituteCode());
+        newMealPlanDay.setDinnerRecipeSubstituteCd(mealPlanDaysSummary.dinnerSubstituteCode());
 
         this.mealPlanDayRepository.save(newMealPlanDay);
     }
@@ -199,7 +205,7 @@ public class MealPlanService extends BaseService {
                 }
 
                 // Retrieve all meal plan days summary for the meal plan group.
-                List<MealPlanDaysSummaryDto> mealPlanDaysSummaryDtoList = this.mealPlanDayRepository.findMealPlanDaySummaryDtoByMealPlanGroup(newMealPlanGroup.getId());
+                List<MealPlanDaysSummaryDto> mealPlanDaysSummaryDtoList = this.getAllMealPlanDaysSummaryDtoByMealPlanGroup(newMealPlanGroup.getId());
                 mealPlanGroupSummaryDtoList.add(new MealPlanGroupSummaryDto(newMealPlanGroup.getId(), newMealPlanGroup.getLabel(), mealPlanDaysSummaryDtoList));
             }
 
@@ -230,7 +236,7 @@ public class MealPlanService extends BaseService {
             }
 
             // Retrieve all meal plan days summary for the meal plan summary group.
-            List<MealPlanDaysSummaryDto> mealPlanDaysSummaryDtoList = this.mealPlanDayRepository.findMealPlanDaySummaryDtoByMealPlanGroup(newMealPlanGroup.getId());
+            List<MealPlanDaysSummaryDto> mealPlanDaysSummaryDtoList = this.getAllMealPlanDaysSummaryDtoByMealPlanGroup(newMealPlanGroup.getId());
             mealPlanGroupSummaryDtoList.add(new MealPlanGroupSummaryDto(newMealPlanGroup.getId(), newMealPlanGroup.getLabel(), mealPlanDaysSummaryDtoList));
 
             // After all records are inserted query the database for the meal Plan Days
@@ -241,8 +247,30 @@ public class MealPlanService extends BaseService {
         }
     }
 
-    public Page<MealPlan> getMealPlansForUser( Integer page, Integer size, String createdBy) {
-        Pageable pageRequest = PageRequest.of(page, size);
-        return this.mealPlanRepository.findAllByCreatedBy(createdBy, pageRequest);
+    private List<MealPlanDaysSummaryDto> getAllMealPlanDaysSummaryDtoByMealPlanGroup(Integer mealPlanGroupId) {
+
+        List<MealPlanDaysSummaryDto> results = this.mealPlanDayRepository.findMealPlanDaySummaryDtoByMealPlanGroup(mealPlanGroupId);
+
+        return results.stream()
+                .map(dto -> {
+                    var breakfast = dto.breakfastRecipeSummary();
+                    var lunch = dto.lunchRecipeSummary();
+                    var dinner = dto.dinnerRecipeSummary();
+
+                    return new MealPlanDaysSummaryDto(
+                            dto.id(),
+                            dto.mealPlanGroupId(),
+                            dto.breakfastSubstituteLabel(),
+                            (breakfast != null && breakfast.id() != null) ? breakfast : null,
+                            dto.lunchSubstituteLabel(),
+                            (lunch != null && lunch.id() != null) ? lunch : null,
+                            dto.dinnerSubstituteLabel(),
+                            (dinner != null && dinner.id() != null) ? dinner : null,
+                            dto.daysOfWeekCd(),
+                            dto.dayOfWeekLabel()
+                    );
+                })
+                .toList();
     }
+
 }
