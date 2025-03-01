@@ -223,22 +223,18 @@ public class MealPlanService extends BaseService {
 
             mealPlanLabel = aiMealPlanRecommendationResult.mealPlanTitle();
             MealPlan createdMealPlan = this.createMealPlan(mealPlanLabel, createdBy);
+            MealPlanGroup newMealPlanGroup = this.createMealPlanGroup(createdMealPlan.getId(), createdBy);
 
-            for(AIMealPlanRecommendationResult.MealPlanWeek mealPlanWeek : aiMealPlanRecommendationResult.mealPlanWeek()) {
-
-                MealPlanGroup newMealPlanGroup = this.createMealPlanGroup(createdMealPlan.getId(), createdBy);
-
-                for(AIMealPlanRecommendationResult.MealPlanDay mealPlanDay : mealPlanWeek.mealPlanDays()) {
-                    createMealPlanDayFromAIResult(mealPlanDay, newMealPlanGroup.getId(), createdBy);
-                }
-
-                // Retrieve all meal plan days summary for the meal plan summary group.
-                List<MealPlanDaysSummaryDto> mealPlanDaysSummaryDtoList = this.mealPlanDayRepository.findMealPlanDaySummaryDtoByMealPlanGroup(newMealPlanGroup.getId());
-                mealPlanGroupSummaryDtoList.add(new MealPlanGroupSummaryDto(newMealPlanGroup.getId(), newMealPlanGroup.getLabel(), mealPlanDaysSummaryDtoList));
+            for(AIMealPlanRecommendationResult.MealPlanDay mealPlanDay : aiMealPlanRecommendationResult.mealPlanDays()) {
+                createMealPlanDayFromAIResult(mealPlanDay, newMealPlanGroup.getId(), createdBy);
             }
 
+            // Retrieve all meal plan days summary for the meal plan summary group.
+            List<MealPlanDaysSummaryDto> mealPlanDaysSummaryDtoList = this.mealPlanDayRepository.findMealPlanDaySummaryDtoByMealPlanGroup(newMealPlanGroup.getId());
+            mealPlanGroupSummaryDtoList.add(new MealPlanGroupSummaryDto(newMealPlanGroup.getId(), newMealPlanGroup.getLabel(), mealPlanDaysSummaryDtoList));
+
             // After all records are inserted query the database for the meal Plan Days
-            return new ApiResult<MealPlanSummaryDto>("Meal plan created successfully.", new MealPlanSummaryDto(createdMealPlan.getId() ,mealPlanLabel, createdAt, createdBy, mealPlanGroupSummaryDtoList));
+            return new ApiResult<>("Meal plan created successfully.", new MealPlanSummaryDto(createdMealPlan.getId() ,mealPlanLabel, createdAt, createdBy, mealPlanGroupSummaryDtoList));
 
         } else {
             return new ApiResult<>("AI Failed to generate meal plan - " + aiMealPlanRecommendationResult.reasonForFail() , null);
