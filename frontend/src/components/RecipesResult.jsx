@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { redirect, useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 
 const RecipesResult = ({
   isSearching = false,
@@ -24,7 +24,6 @@ const RecipesResult = ({
   user = {},
 }) => {
   const [viewMode, setViewMode] = useState(displayType);
-  const router = useRouter();
 
   useEffect(() => {
     const lastView = sessionStorage.getItem("view");
@@ -60,14 +59,14 @@ const RecipesResult = ({
               <p className="mb-10">No recipes found...</p>
             </div>
           ) : (
-            <div className="flex justify-between items-center my-2 w-[90%] mx-auto">
-              <div className="my-4 flex justify-end">
+            <div className="flex flex-col min-[450px]:flex-row justify-between items-center my-2 w-[90%] mx-auto">
+              <div className="w-[80%] my-4 flex justify-end min-[450px]:justify-start">
                 <Select
                   value={sort}
                   onValueChange={handleSortChange}
                   closeOnSelect
                 >
-                  <SelectTrigger className="w-[140px] md:w-[180px]">
+                  <SelectTrigger className="w-[200px]">
                     <SelectValue placeholder="Sort by..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -113,7 +112,7 @@ const RecipesResult = ({
                 </button>
               </div>
 
-              <div>
+              <div className="w-[80%] flex justify-end">
                 <button
                   className={`px-2 py-2 md:px-4 border rounded mr-2 ${
                     viewMode !== "list"

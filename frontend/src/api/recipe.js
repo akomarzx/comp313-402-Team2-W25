@@ -76,6 +76,22 @@ export async function generateRecipe(data) {
   }
 }
 
+export async function generateMealPlan(data) {
+  console.log(data);
+  try {
+    const mealPlanResponse = await axios.post(
+      `${recipeUrl}/kc/v1/meal-plan/ai-recommend`,
+      data,
+      {
+        withCredentials: true,
+      }
+    );
+    return mealPlanResponse;
+  } catch (error) {
+    console.log("Error generating meal plan:", error);
+  }
+}
+
 export async function uploadImg(data) {
   try {
     const imgResponse = await axios.post(
@@ -123,6 +139,36 @@ export async function getSavedRecipes(page) {
     return recipes.data.result;
   } catch (error) {
     console.log("Error fetching saved recipes:", error);
+  }
+}
+
+export async function getMealPlans(page) {
+  try {
+    console.log(page);
+    const mealPlans = await axios.get(
+      `${recipeUrl}/kc/v1/meal-plan/my-meal-plans?size=${12}&page=${page}`,
+      {
+        withCredentials: true,
+      }
+    );
+    console.log(mealPlans);
+    return mealPlans.data.result;
+  } catch (error) {
+    console.log("Error fetching saved recipes:", error);
+  }
+}
+
+export async function getMealPlanById(mealPlanId) {
+  try {
+    const mealPlan = await axios.get(
+      `${recipeUrl}/kc/v1/meal-plan/${mealPlanId}`,
+      {
+        withCredentials: true,
+      }
+    );
+    return mealPlan.data.result;
+  } catch (error) {
+    console.log("Error fetching meal plan:", error);
   }
 }
 

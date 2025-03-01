@@ -29,7 +29,7 @@ import { Input } from "@/components/ui/input";
 
 const AIReccommend = () => {
   const [ingredients, setIngredients] = useState([]);
-  const [dietary, setDietary] = useState("");
+  const [dietary, setDietary] = useState("none");
   const [allergies, setAllergies] = useState([]);
   const [mealPlanDays, setMealPlanDays] = useState("7");
   const [mealPlanGoal, setMealPlanGoal] = useState("");
@@ -39,13 +39,18 @@ const AIReccommend = () => {
   const { user, login, loading } = useAuth();
 
   const handleGenerateMealPlan = async () => {
-    if (ingredients.length === 0) {
-      toast.error("Please add at least one ingredient");
-      return;
+    if (caloriesGoal) {
+      if (caloriesGoal < 1000) {
+        toast.error("Daily calorie goal must be at least 1000");
+        return;
+      }
+      if (caloriesGoal > 5000) {
+        toast.error("Daily calorie goal should be at most 5000");
+        return;
+      }
     }
     setIsLoading(true);
     const requestBody = {
-      ingredients,
       dietary,
       allergies,
       mealPlanDays,
@@ -246,7 +251,7 @@ const AIReccommend = () => {
 
             <TabsContent value="mealplan" className="space-y-8">
               <div className="space-y-4">
-                <label className="block text-lg font-semibold text-gray-800">
+                {/* <label className="block text-lg font-semibold text-gray-800">
                   Meal Plan Duration
                 </label>
                 <Select value={mealPlanDays} onValueChange={setMealPlanDays}>
@@ -254,12 +259,15 @@ const AIReccommend = () => {
                     <SelectValue placeholder="Select number of days" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="3">3 Days</SelectItem>
-                    <SelectItem value="5">5 Days</SelectItem>
                     <SelectItem value="7">7 Days</SelectItem>
                     <SelectItem value="14">14 Days</SelectItem>
+                    <SelectItem value="21">21 Days</SelectItem>
+                    <SelectItem value="28">28 Days</SelectItem>
                   </SelectContent>
-                </Select>
+                </Select> */}
+                <p className="text-lg text-center font-semibold text-gray-800">
+                  A fully customized 3 meals - 7 days tailored to your need
+                </p>
               </div>
 
               <div className="space-y-4">
@@ -289,8 +297,8 @@ const AIReccommend = () => {
                   placeholder="Enter your daily calorie goal"
                   value={caloriesGoal}
                   onChange={(e) => setCaloriesGoal(e.target.value)}
-                  min="1000"
-                  max="5000"
+                  min={1000}
+                  max={5000}
                   className="w-full"
                 />
               </div>

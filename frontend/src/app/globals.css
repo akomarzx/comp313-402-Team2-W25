@@ -187,3 +187,25 @@ body {
 .glass-card {
   @apply bg-white/80 backdrop-blur-sm border border-white/20 shadow-lg;
 }
+
+@layer components {
+  .recipe-card-expanded {
+    @apply max-h-[1000px] transition-all duration-500 ease-in-out;
+  }
+
+  .recipe-card-collapsed {
+    @apply max-h-[100px] overflow-hidden transition-all duration-500 ease-in-out;
+  }
+
+  .recipe-divider {
+    @apply h-[1px] w-full my-4;
+  }
+
+  .recipe-tag {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .meal-section {
+    @apply mb-8 pb-6 border-b last:border-b-0;
+  }
+}
