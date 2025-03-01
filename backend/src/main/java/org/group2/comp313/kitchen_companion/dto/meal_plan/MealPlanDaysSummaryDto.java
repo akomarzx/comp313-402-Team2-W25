@@ -1,16 +1,17 @@
 package org.group2.comp313.kitchen_companion.dto.meal_plan;
 
+import org.group2.comp313.kitchen_companion.domain.Recipe;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryForCards;
 
 public record MealPlanDaysSummaryDto(
         Integer id,
         Integer mealPlanGroupId,
         String breakfastSubstituteLabel,
-        RecipeSummaryForCards breakfastRecipeSummary,
+        Recipe breakfastRecipe,
         String lunchSubstituteLabel,
-        RecipeSummaryForCards lunchRecipeSummary,
+        Recipe lunchRecipe,
         String dinnerSubstituteLabel,
-        RecipeSummaryForCards dinnerRecipeSummary,
+        Recipe dinnerRecipe,
         Integer daysOfWeekCd,
         String dayOfWeekLabel
 ) {
