@@ -40,7 +40,7 @@ public class PublicController extends BaseController {
 
         log.info("Get recipe with id {}", id);
 
-        String email = null;
+        String email = "";
 
         if(jwt != null) {
             email = jwt.getClaimAsString("email");
@@ -70,13 +70,13 @@ public class PublicController extends BaseController {
 
     @GetMapping("/recipe")
     public ResponseEntity<ApiResult<Page<RecipeSummaryCardWithCategory>>> getRecipes(@RequestParam(required = false) String search,
-                                                                          @RequestParam(defaultValue = "0") Integer page,
-                                                                          @RequestParam(defaultValue = "10") Integer size,
-                                                                          @RequestParam(required = false) String[] sort, @AuthenticationPrincipal Jwt jwt) {
+                                                                                     @RequestParam(defaultValue = "0") Integer page,
+                                                                                     @RequestParam(defaultValue = "10") Integer size,
+                                                                                     @RequestParam(required = false) String[] sort, @AuthenticationPrincipal Jwt jwt) {
 
         log.debug("Request to retrieve all recipe");
 
-        String email = null;
+        String email = "";
 
         if(jwt != null) {
             email = jwt.getClaimAsString("email");
