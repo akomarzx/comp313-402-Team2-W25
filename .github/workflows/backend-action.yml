@@ -1,4 +1,5 @@
 name: Build and Push Backend to ecr
+ubuntu-24.04-arm
 on:
   workflow_dispatch:
   push:
@@ -9,6 +10,7 @@ on:
 
 jobs:
   build-and-push:
+    runs-on: ubuntu-24.04-arm # Specify the arm64 runner
     name: Build and Push to ECR
     runs-on: ubuntu-latest
     steps:
