@@ -28,14 +28,14 @@ const MealPlanRecipe = ({ recipe }) => {
 
   return (
     <div
-      className={`bg-white rounded-lg shadow-sm border overflow-hidden mb-6 transform transition-all duration-300 ${
+      className={`bg-white rounded-lg shadow-sm border overflow-hidden mb-4 sm:mb-6 transform transition-all duration-300 ${
         expanded ? "shadow-md" : ""
       }`}
       ref={contentRef}
     >
       <div className="relative">
         <div
-          className="h-32 overflow-hidden transition-all duration-500 ease-in-out"
+          className="overflow-hidden transition-all duration-500 ease-in-out"
           style={{
             height: expanded ? "220px" : "100px",
           }}
@@ -58,31 +58,33 @@ const MealPlanRecipe = ({ recipe }) => {
           } transition-opacity duration-500`}
         ></div>
 
-        <div className="absolute bottom-0 left-0 p-4 w-full">
+        <div className="absolute bottom-0 left-0 p-2 sm:p-4 w-full">
           <div className="flex items-start justify-between">
-            <h2 className="text-white font-semibold text-xl tracking-tight leading-tight">
+            <h2 className="text-white font-semibold text-lg sm:text-xl tracking-tight leading-tight pr-2 line-clamp-2">
               {recipe.title}
             </h2>
             <button
-              className="p-1 rounded-full bg-white/90 hover:bg-white transition-colors duration-200"
+              className="p-1 rounded-full bg-white/90 hover:bg-white transition-colors duration-200 flex-shrink-0"
               onClick={toggleExpand}
               aria-label={expanded ? "Collapse recipe" : "Expand recipe"}
             >
               {expanded ? (
-                <ChevronUp className="h-5 w-5" />
+                <ChevronUp className="h-4 w-4 sm:h-5 sm:w-5" />
               ) : (
-                <ChevronDown className="h-5 w-5" />
+                <ChevronDown className="h-4 w-4 sm:h-5 sm:w-5" />
               )}
             </button>
           </div>
 
-          <div className="flex space-x-3 mt-2">
+          <div className="flex flex-wrap gap-1 mt-1 sm:mt-2 max-h-[28px] min-[400px]:max-h-[60px] overflow-hidden">
             {recipe?.categories?.map((cat, i) => (
-              <span key={i}>
-                <span className="text-blue-600 border rounded-full px-2 bg-blue-100 text-xs">
+              <span
+                key={i}
+                className="inline-block mb-1 line-clamp-1 min-[400px]:line-clamp-none "
+              >
+                <span className="text-blue-600 border rounded-full px-2 bg-blue-100 text-xs ">
                   {cat.label}
                 </span>
-                &nbsp;{" "}
               </span>
             ))}
           </div>
@@ -92,10 +94,12 @@ const MealPlanRecipe = ({ recipe }) => {
       <div
         className={expanded ? "recipe-card-expanded" : "recipe-card-collapsed"}
       >
-        <div className="p-4">
-          <p className=" mb-4 line-clamp-1">{recipe.summary}</p>
+        <div className="p-3 sm:p-4">
+          <p className="mb-3 sm:mb-4 line-clamp-1 text-sm sm:text-base">
+            {recipe.summary}
+          </p>
 
-          <div className="flex justify-between items-center mb-4 text-sm ">
+          <div className="grid grid-cols-2 sm:flex sm:justify-between gap-2 items-center mb-3 sm:mb-4 text-xs sm:text-sm">
             <div className="flex items-center">
               <Clock className="h-4 w-4 mr-1" />
               <span>{recipe.prepTime} prep</span>
@@ -117,16 +121,18 @@ const MealPlanRecipe = ({ recipe }) => {
           <div className="recipe-divider"></div>
 
           <div>
-            <h3 className="font-medium  mb-2">Ingredients</h3>
-            <ol className="list list-inside text-gray-700">
+            <h3 className="font-medium mb-2 text-sm sm:text-base">
+              Ingredients
+            </h3>
+            <ol className="list list-inside text-gray-700 text-sm sm:text-base">
               {recipe?.ingredientGroups
                 .sort((a, b) => a.ingredientGroupOrder - b.ingredientGroupOrder)
                 .map((ingredientGroup, index) => (
-                  <li key={index} className="mb-4">
-                    <h3 className="font-semibold text-lg">
+                  <li key={index} className="mb-3 sm:mb-4">
+                    <h3 className="font-semibold text-base sm:text-lg">
                       {ingredientGroup.label}
                     </h3>
-                    <ul className="list-disc list-inside text-gray-700">
+                    <ul className="list-disc list-inside text-gray-700 pl-1 sm:pl-2">
                       {ingredientGroup.ingredients
                         .sort((a, b) => a.ingredientOrder - b.ingredientOrder)
                         .map((ingredient, index) => (
@@ -141,14 +147,18 @@ const MealPlanRecipe = ({ recipe }) => {
           <div className="recipe-divider"></div>
 
           <div>
-            <h3 className="font-medium  mb-2">Instructions</h3>
-            <ol className="list list-inside text-gray-700 space-y-2">
+            <h3 className="font-medium mb-2 text-sm sm:text-base">
+              Instructions
+            </h3>
+            <ol className="list list-inside text-gray-700 space-y-1 sm:space-y-2 text-sm sm:text-base">
               {recipe?.stepGroups
                 .sort((a, b) => a.stepGroupOrder - b.stepGroupOrder)
                 .map((stepGroup, index) => (
-                  <li key={index} className="mb-4">
-                    <h3 className="font-semibold text-lg">{stepGroup.label}</h3>
-                    <ol className="list-decimal list-inside text-gray-700">
+                  <li key={index} className="mb-3 sm:mb-4">
+                    <h3 className="font-semibold text-base sm:text-lg">
+                      {stepGroup.label}
+                    </h3>
+                    <ol className="list-decimal list-inside text-gray-700 pl-1 sm:pl-2">
                       {stepGroup.steps
                         .sort((a, b) => a.stepOrder - b.stepOrder)
                         .map((step, index) => (
@@ -160,7 +170,7 @@ const MealPlanRecipe = ({ recipe }) => {
             </ol>
           </div>
         </div>
-        <div className="justify-end flex p-4">
+        <div className="flex justify-end p-3 sm:p-4">
           <div
             onClick={() => {
               router.push(`/recipe/${recipe.id}`);
