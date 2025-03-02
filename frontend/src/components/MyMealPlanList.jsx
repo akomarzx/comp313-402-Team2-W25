@@ -11,7 +11,7 @@ const MyMealPlanList = ({ list }) => {
           key={mealPlan.id}
           className="cursor-pointer meal-section bg-white shadow-md rounded-lg p-6 mb-4 hover:shadow-lg transition duration-300"
         >
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+          <h2 className="text-xl font-bold text-gray-800 mb-2">
             {mealPlan.label}
           </h2>
           <p className="text-gray-600 text-sm">
