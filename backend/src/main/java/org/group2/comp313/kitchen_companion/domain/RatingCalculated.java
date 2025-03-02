@@ -15,8 +15,13 @@ import java.math.BigDecimal;
 @Table(name = "rating_calculated")
 public class RatingCalculated {
     @Id
-    @Column(name = "recipe_id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "rating_calculated_id", nullable = false)
     private Integer id;
+
+    @NotNull
+    @Column(name = "recipe_id", nullable = false)
+    private Integer recipe;
 
     @NotNull
     @DecimalMin(value = "0.0")
