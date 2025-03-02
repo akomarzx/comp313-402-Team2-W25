@@ -39,7 +39,7 @@ const MealPlan = ({ mealPlanData }) => {
   };
 
   return (
-    <div className="min-h-screen w-[90%] bg-white py-10 max-w-[1920px] mx-auto">
+    <div className="min-h-screen w-full min-[600px]:w-[90%] bg-white py-10 max-w-[1920px] mx-auto">
       <div className="container mx-auto px-4 sm:px-6">
         <header className="mb-12 text-center">
           <div className="flex justify-center mb-4">
