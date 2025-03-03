@@ -77,6 +77,12 @@ const RecipePage = () => {
     fetchRecipes();
   }, [currentPage, searchKey, sortParam, categoryKeyParam]);
 
+  useEffect(() => {
+    if (page !== currentPage) {
+      setCurrentPage(page);
+    }
+  }, [page]);
+
   const handleSearch = (e) => {
     if (e?.key === "Enter" && e?.target?.value.length < 3) {
       toast("Search key must be at least 3 characters long.");
@@ -138,6 +144,7 @@ const RecipePage = () => {
           <CategoriesFilter
             categories={categories?.data}
             selectedCategory={[categoryKeyParam] || []}
+            searhKey={searchKey}
           />
         )}
         <div className="w-full">

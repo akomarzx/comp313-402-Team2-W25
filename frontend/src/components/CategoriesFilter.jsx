@@ -1,12 +1,12 @@
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-const CategoriesFilter = ({ categories, selectedCategory = [] }) => {
+const CategoriesFilter = ({ categories, selectedCategory = [], searhKey }) => {
   const [selectedCategories, setSelectedCategories] =
     useState(selectedCategory);
-
+  console.log(searhKey);
   const handleCategoryChange = (e) => {
     // if (e.target.checked) {
     //   setSelectedCategories([...selectedCategories, e.target.value]);
@@ -75,7 +75,9 @@ const CategoriesFilter = ({ categories, selectedCategory = [] }) => {
                 className="rounded-lg w-20 h-10"
                 onClick={() => {
                   router.push(
-                    `/recipes?category=${selectedCategories[0] || ""}`
+                    `/recipes?page=${1}&search=${searhKey}&category=${
+                      selectedCategories[0] || ""
+                    }`
                   );
                 }}
               >
@@ -139,7 +141,7 @@ const CategoriesFilter = ({ categories, selectedCategory = [] }) => {
               <Button
                 onClick={() => {
                   router.push(
-                    `/recipes?category=${selectedCategories[0] || ""}`
+                    `/recipes?page=1&category=${selectedCategories[0] || ""}`
                   );
                   setIsFilterOpen(false);
                 }}
