@@ -14,7 +14,7 @@ const RecipeCard = ({ data, version = 1, user = {} }) => {
   const imageStyle = version === 2 ? "h-[150px]" : "h-[200px]";
   const [saved, setSaved] = useState(data?.isFavorite);
   const handleSaveClick = async () => {
-    if (!data.isFavorite) {
+    if (!saved) {
       const res = await saveRecipe(data.id);
       if (res?.status === 200 || 201) {
         setSaved(!saved);
