@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 const CategoriesFilter = ({ categories, selectedCategory = [] }) => {
   const [selectedCategories, setSelectedCategories] =
     useState(selectedCategory);
+
   const handleCategoryChange = (e) => {
     // if (e.target.checked) {
     //   setSelectedCategories([...selectedCategories, e.target.value]);
@@ -20,9 +21,10 @@ const CategoriesFilter = ({ categories, selectedCategory = [] }) => {
       setSelectedCategories([]);
     }
   };
+  useEffect(() => {}, [selectedCategories]);
   useEffect(() => {
-    console.log(selectedCategories);
-  }, [selectedCategories]);
+    setSelectedCategories(selectedCategory);
+  }, [selectedCategory]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const router = useRouter();
   return (
