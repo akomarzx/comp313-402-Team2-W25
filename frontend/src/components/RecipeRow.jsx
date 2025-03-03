@@ -8,7 +8,7 @@ import { toast } from "sonner";
 const RecipeRow = ({ recipe, user }) => {
   const [saved, setSaved] = useState(recipe?.isFavorite);
   const handleSaveClick = async () => {
-    if (!data.isFavorite) {
+    if (!saved) {
       const res = await saveRecipe(recipe.id);
       if (res?.status === 200 || 201) {
         setSaved(!saved);
