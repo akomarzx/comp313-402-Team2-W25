@@ -22,6 +22,7 @@ const RecipesResult = ({
   version = 1,
   searchKey = "",
   user = {},
+  selectedCategory = [],
 }) => {
   const [viewMode, setViewMode] = useState(displayType);
 
@@ -36,13 +37,29 @@ const RecipesResult = ({
       switch (e) {
         case "title-asc":
           console.log(e);
-          redirect(`/recipes?sort=title-asc&search=${searchKey}`);
+          redirect(
+            `/recipes?sort=title-asc&search=${searchKey}&category=${
+              selectedCategory[0] || ""
+            }`
+          );
         case "title-desc":
-          redirect(`/recipes?sort=title-desc&search=${searchKey}`);
+          redirect(
+            `/recipes?sort=title-desc&search=${searchKey}&category=${
+              selectedCategory[0] || ""
+            }`
+          );
         case "rating-asc":
-          redirect(`/recipes?sort=rating-asc&search=${searchKey}`);
+          redirect(
+            `/recipes?sort=rating-asc&search=${searchKey}&category=${
+              selectedCategory[0] || ""
+            }`
+          );
         case "rating-desc":
-          redirect(`/recipes?sort=rating-desc&search=${searchKey}`);
+          redirect(
+            `/recipes?sort=rating-desc&search=${searchKey}&category=${
+              selectedCategory[0] || ""
+            }`
+          );
         default:
           redirect(`/recipes`);
       }

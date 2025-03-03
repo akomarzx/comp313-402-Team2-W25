@@ -3,8 +3,9 @@ import { Button } from "./ui/button";
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-const CategoriesFilter = ({ categories, selected = [] }) => {
-  const [selectedCategories, setSelectedCategories] = useState(selected);
+const CategoriesFilter = ({ categories, selectedCategory = [] }) => {
+  const [selectedCategories, setSelectedCategories] =
+    useState(selectedCategory);
   const handleCategoryChange = (e) => {
     // if (e.target.checked) {
     //   setSelectedCategories([...selectedCategories, e.target.value]);

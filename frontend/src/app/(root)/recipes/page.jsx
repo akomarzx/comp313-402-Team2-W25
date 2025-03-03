@@ -137,7 +137,7 @@ const RecipePage = () => {
         {!loading && recipeCardData && (
           <CategoriesFilter
             categories={categories?.data}
-            selected={[categoryKeyParam] || []}
+            selectedCategory={[categoryKeyParam] || []}
           />
         )}
         <div className="w-full">
@@ -149,6 +149,7 @@ const RecipePage = () => {
             sort={sortParam}
             searchKey={searchKey}
             user={user}
+            selectedCategory={[categoryKeyParam] || []}
           />
 
           {!isLoading && recipeCardData?.length == 12 && (
@@ -162,7 +163,9 @@ const RecipePage = () => {
                       router.push(
                         `/recipes?page=${
                           currentPage > 1 ? currentPage - 1 : 1
-                        }&sort=${sortParam}&search=${searchKey}`
+                        }&sort=${sortParam}&search=${searchKey}&category=${
+                          categoryKeyParam || ""
+                        }`
                       );
                       setCurrentPage((prev) => {
                         if (prev > 1) {
@@ -194,7 +197,9 @@ const RecipePage = () => {
                         isActive={isActive}
                         onClick={(e) => {
                           router.push(
-                            `/recipes?page=${page}&sort=${sortParam}&search=${searchKey}`
+                            `/recipes?page=${page}&sort=${sortParam}&search=${searchKey}&category=${
+                              categoryKeyParam || ""
+                            }`
                           );
                           e.preventDefault();
                           setCurrentPage(page);
@@ -215,7 +220,9 @@ const RecipePage = () => {
                           currentPage < totalPages
                             ? currentPage + 1
                             : totalPages
-                        }&sort=${sortParam}&search=${searchKey}`
+                        }&sort=${sortParam}&search=${searchKey}&category=${
+                          categoryKeyParam || ""
+                        }`
                       );
                       setCurrentPage((prev) => {
                         if (prev < totalPages) {
