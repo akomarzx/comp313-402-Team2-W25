@@ -70,6 +70,7 @@ public class PublicController extends BaseController {
 
     @GetMapping("/recipe")
     public ResponseEntity<ApiResult<Page<RecipeSummaryCardWithCategory>>> getRecipes(@RequestParam(required = false) String search,
+                                                                                     @RequestParam(required = false) String category,
                                                                                      @RequestParam(defaultValue = "0") Integer page,
                                                                                      @RequestParam(defaultValue = "10") Integer size,
                                                                                      @RequestParam(required = false) String[] sort, @AuthenticationPrincipal Jwt jwt) {
@@ -83,7 +84,7 @@ public class PublicController extends BaseController {
         }
 
         try {
-            return ResponseEntity.ok(new ApiResult<>("", recipeService.getRecipes(search, page, size, sort, email)));
+            return ResponseEntity.ok(new ApiResult<>("", recipeService.getRecipes(search, category, page, size, sort, email)));
         } catch (InvalidDataAccessResourceUsageException exception) {
                 return new ResponseEntity<>(new ApiResult<>("Sort Criteria might be invalid please verify", null), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {

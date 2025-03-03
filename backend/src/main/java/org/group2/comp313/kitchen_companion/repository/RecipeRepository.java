@@ -35,33 +35,43 @@ public interface RecipeRepository extends PagingAndSortingRepository<Recipe, Int
      * @return a paginated list of {@link RecipeSummaryCardWithCategory} that matches the search criteria.
      */
     @Query(
-            value = "Select * From (" +
-                    "SELECT r.recipe_id AS id, " +
-                    "       r.title, " +
-                    "       r.summary AS description, " +
-                    "       r.thumbnail_url AS thumbnailUrl, " +
-                    "       CAST(IFNULL(r_calc.rating_count, 0) AS UNSIGNED) AS ratingCount, " +
-                    "       CAST(IFNULL(r_calc.rating_value, 0.0) AS DECIMAL(4,2)) AS rating, " +
-                    "       GROUP_CONCAT(DISTINCT c.label SEPARATOR ', ') AS category, " +
-                    "       IF(sr.saved_recipe_id IS NOT NULL, 1, 0) AS isFavorite " +
-                    " FROM  recipe r " +
+            value = "SELECT * FROM ( " +
+                    "  SELECT r.recipe_id AS id, " +
+                    "         r.title, " +
+                    "         r.summary AS description, " +
+                    "         r.thumbnail_url AS thumbnailUrl, " +
+                    "         CAST(IFNULL(r_calc.rating_count, 0) AS UNSIGNED) AS ratingCount, " +
+                    "         CAST(IFNULL(r_calc.rating_value, 0.0) AS DECIMAL(4,2)) AS rating, " +
+                    "         GROUP_CONCAT(DISTINCT c.label SEPARATOR ', ') AS category, " +
+                    "         IF(sr.saved_recipe_id IS NOT NULL, 1, 0) AS isFavorite " +
+                    "  FROM recipe r " +
                     "       LEFT JOIN recipe_category rc ON r.recipe_id = rc.recipe_id " +
                     "       LEFT JOIN category c ON rc.category_id = c.category_id " +
                     "       LEFT JOIN rating_calculated r_calc ON r.recipe_id = r_calc.recipe_id " +
-                    "       LEFT JOIN saved_recipe sr on r.recipe_id = sr.recipe_id and sr.created_by = :username" +
+                    "       LEFT JOIN saved_recipe sr ON r.recipe_id = sr.recipe_id AND sr.created_by = :username " +
                     "  WHERE (:keyword IS NULL OR :keyword = '' " +
                     "         OR MATCH(r.title, r.summary) AGAINST(:keyword IN NATURAL LANGUAGE MODE)) " +
+                    "        AND (:category IS NULL OR :category = '' OR c.label = :category) " +
                     "  GROUP BY r.recipe_id, r.title, r.summary, r.thumbnail_url, " +
-                    "           r_calc.rating_count, r_calc.rating_value ) as x ",
+                    "           r_calc.rating_count, r_calc.rating_value " +
+                    ") AS x",
             countQuery = "SELECT COUNT(*) FROM ( " +
                     "  SELECT r.recipe_id " +
                     "  FROM recipe r " +
+                    "       LEFT JOIN recipe_category rc ON r.recipe_id = rc.recipe_id " +
+                    "       LEFT JOIN category c ON rc.category_id = c.category_id " +
                     "  WHERE (:keyword IS NULL OR :keyword = '' " +
                     "         OR MATCH(r.title, r.summary) AGAINST(:keyword IN NATURAL LANGUAGE MODE)) " +
+                    "        AND (:category IS NULL OR :category = '' OR c.label = :category) " +
                     "  GROUP BY r.recipe_id " +
                     ") AS countTable",
             nativeQuery = true)
-    Page<RecipeSummaryCardWithCategory> findRecipeSummaryCardsByKeywordAndSort(@Param("keyword") String keyword, @Param("username") String username, Pageable pageable);
+    Page<RecipeSummaryCardWithCategory> findRecipeSummaryCardsByKeywordAndSort(
+            @Param("keyword") String keyword,
+            @Param("username") String username,
+            @Param("category") String category,
+            Pageable pageable);
+
 
     @Query(value = "SELECT r.recipe_id as id, r.title, r.summary, r.thumbnail_url, r.calories " +
             "FROM recipe r LEFT JOIN saved_recipe sr ON r.recipe_id = sr.recipe_id " +
