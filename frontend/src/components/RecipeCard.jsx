@@ -4,8 +4,10 @@ import Link from "next/link";
 import { ChefHatIcon, HeartIcon } from "lucide-react";
 import { toast } from "sonner";
 import { saveRecipe, unsaveRecipe } from "@/api/recipe";
+import { useRouter } from "next/navigation";
 
 const RecipeCard = ({ data, version = 1, user = {} }) => {
+  const router = useRouter();
   const cardStyle =
     version === 2
       ? "w-[190px] min-h-[220px] p-2"
@@ -44,70 +46,69 @@ const RecipeCard = ({ data, version = 1, user = {} }) => {
           />
         </div>
       )}
-      <Link href={`/recipe/${data?.id}`}>
-        <div
-          className={`relative w-full ${imageStyle} rounded-md overflow-hidden`}
-        >
-          <Image
-            src={
-              data?.thumbnailUrl ||
-              "https://www.themealdb.com/images/media/meals/58oia61564916529.jpg"
-            }
-            alt={data?.title}
-            fill
-            sizes="100%"
-            className="rounded-t-lg"
-            priority
-          />
-        </div>
+      <div
+        className={`relative w-full ${imageStyle} rounded-md overflow-hidden`}
+        onClick={() => {
+          router.push(`/recipe/${data?.id}`);
+        }}
+      >
+        <Image
+          src={
+            data?.thumbnailUrl ||
+            "https://www.themealdb.com/images/media/meals/58oia61564916529.jpg"
+          }
+          alt={data?.title}
+          fill
+          sizes="100%"
+          className="rounded-t-lg"
+          priority
+        />
+      </div>
 
-        <div className="pt-4">
-          <h3
-            className={`${
-              version === 2
-                ? "font-bold line-clamp-2"
-                : "font-semibold truncate"
-            } font-bold text-gray-800 `}
-          >
-            {data?.title}
-          </h3>
-          {version === 1 && (
-            <div className="flex mt-2 w-full justify-between">
-              <p className="text-sm line-clamp-1">
-                {data?.category?.split(",").map((cat, i) => (
-                  <span key={i}>
-                    <span className="text-blue-600 border rounded-full px-2 bg-blue-100">
-                      {cat}
-                    </span>
-                    &nbsp;{" "}
+      <div className="pt-4">
+        <h3
+          className={`${
+            version === 2 ? "font-bold line-clamp-2" : "font-semibold truncate"
+          } font-bold text-gray-800 `}
+        >
+          {data?.title}
+        </h3>
+        {version === 1 && (
+          <div className="flex mt-2 w-full justify-between">
+            <p className="text-sm line-clamp-1">
+              {data?.category?.split(",").map((cat, i) => (
+                <span key={i}>
+                  <span className="text-blue-600 border rounded-full px-2 bg-blue-100">
+                    {cat}
                   </span>
-                ))}
-              </p>
-              <p className="text-sm text-gray-600 flex items-right font-semibold">
-                {data?.ratingValue !== null && data?.ratingCount > 0 && (
-                  <span className="flex items-center">
-                    <ChefHatIcon
-                      size={20}
-                      className={
-                        data?.ratingValue >= 4
-                          ? "text-green-600"
-                          : data?.ratingValue >= 3
-                          ? "text-yellow-400"
-                          : data?.ratingValue >= 2
-                          ? "text-orange-400"
-                          : data?.ratingValue >= 1
-                          ? "text-red-400"
-                          : "text-gray-400"
-                      }
-                    />
-                    {data?.ratingValue}({data?.ratingCount})
-                  </span>
-                )}
-              </p>
-            </div>
-          )}
-        </div>
-      </Link>{" "}
+                  &nbsp;{" "}
+                </span>
+              ))}
+            </p>
+            <p className="text-sm text-gray-600 flex items-right font-semibold">
+              {data?.ratingValue !== null && data?.ratingCount > 0 && (
+                <span className="flex items-center">
+                  <ChefHatIcon
+                    size={20}
+                    className={
+                      data?.ratingValue >= 4
+                        ? "text-green-600"
+                        : data?.ratingValue >= 3
+                        ? "text-yellow-400"
+                        : data?.ratingValue >= 2
+                        ? "text-orange-400"
+                        : data?.ratingValue >= 1
+                        ? "text-red-400"
+                        : "text-gray-400"
+                    }
+                  />
+                  {data?.ratingValue}({data?.ratingCount})
+                </span>
+              )}
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
