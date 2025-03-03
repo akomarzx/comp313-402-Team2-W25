@@ -16,15 +16,17 @@ import { redirect, useRouter, useSearchParams } from "next/navigation";
 import RecipeCarousel from "@/components/RecipeCarousel";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
-import { ArrowBigUp, LoaderIcon, Search } from "lucide-react";
+import { ArrowBigUp, Search } from "lucide-react";
+import CategoriesFilter from "@/components/CategoriesFilter";
 
 const RecipePage = () => {
-  const { user, logout, loading } = useAuth();
+  const { user, logout, loading, categories } = useAuth();
   const searchParams = useSearchParams();
   const displayType = searchParams.get("displayType") || "default";
   let page = searchParams.get("page") || 1;
   const sortParam = searchParams.get("sort") || "default";
   const searchKeyParam = searchParams.get("search") || "";
+  const categoryKeyParam = searchParams.get("category") || "";
   if (typeof page !== "number") {
     try {
       page = parseInt(page);
@@ -47,9 +49,13 @@ const RecipePage = () => {
   const fetchRecipes = async () => {
     try {
       setIsLoading(true);
-      const fetchData = await getRecipes(currentPage, 12, searchKey, [
-        sortParam?.split("-"),
-      ]);
+      const fetchData = await getRecipes(
+        currentPage,
+        12,
+        searchKey,
+        [sortParam?.split("-")],
+        categoryKeyParam
+      );
       if (fetchData === 401) {
         logout();
         toast("Session expired. Please login again.");
@@ -69,7 +75,7 @@ const RecipePage = () => {
   };
   useEffect(() => {
     fetchRecipes();
-  }, [currentPage, searchKey, sortParam]);
+  }, [currentPage, searchKey, sortParam, categoryKeyParam]);
 
   const handleSearch = (e) => {
     if (e?.key === "Enter" && e?.target?.value.length < 3) {
@@ -127,8 +133,14 @@ const RecipePage = () => {
         </div>
       </div>
 
-      <div className="border-t-2">
-        <>
+      <div className="border-t-2 flex-col lg:flex-row flex w-full ">
+        {!loading && recipeCardData && (
+          <CategoriesFilter
+            categories={categories?.data}
+            selected={[categoryKeyParam] || []}
+          />
+        )}
+        <div className="w-full">
           <RecipesResult
             isSearching={isSearching}
             recipeCardData={recipeCardData}
@@ -226,7 +238,7 @@ const RecipePage = () => {
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
           />
-        </>
+        </div>
       </div>
     </div>
   );

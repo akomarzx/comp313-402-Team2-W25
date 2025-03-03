@@ -157,7 +157,7 @@ const RecipesResult = ({
               className={`grid grid-cols-1 ${
                 version === 2
                   ? "md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4"
-                  : "lg:grid-cols-2 min-[1250px]:grid-cols-3 2xl:grid-cols-3 min-[1600px]:grid-cols-4"
+                  : "md:grid-cols-2 min-[1250px]:grid-cols-3 2xl:grid-cols-3 min-[1650px]:grid-cols-4"
               } gap-6 xl:px-4 py-4 mx-auto max-w-[1600px]`}
             >
               {recipeCardData?.map((recipe, index) => (

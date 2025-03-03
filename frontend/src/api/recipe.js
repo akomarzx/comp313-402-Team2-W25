@@ -21,7 +21,8 @@ export async function getRecipeById(recipeId) {
   }
 }
 
-export async function getRecipes(page, size, search = "", sort = []) {
+export async function getRecipes(page, size, search = "", sort = [], category) {
+  console.log(category);
   try {
     if (page < 0) {
       page = 0;
@@ -29,7 +30,7 @@ export async function getRecipes(page, size, search = "", sort = []) {
       page -= 1;
     }
     const recipes = await axios.get(
-      `${recipeUrl}/kc/v1/public/recipe?size=${size}&page=${page}&search=${search}&sort=${sort}`,
+      `${recipeUrl}/kc/v1/public/recipe?size=${size}&page=${page}&search=${search}&sort=${sort}&category=${category}`,
       {
         withCredentials: true,
       }

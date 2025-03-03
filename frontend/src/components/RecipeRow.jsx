@@ -26,7 +26,7 @@ const RecipeRow = ({ recipe, user }) => {
     <div className="relative slide-up">
       {" "}
       {user && (
-        <div className="absolute top-5 right-5 z-10">
+        <div className="absolute top-5 right-4 z-10">
           <HeartIcon
             size={25}
             className={`${
@@ -51,7 +51,7 @@ const RecipeRow = ({ recipe, user }) => {
             />
           </div>
           <div className="flex-grow">
-            <h3 className="font-serif text-xl font-semibold mb-2">
+            <h3 className="font-serif text-xl font-semibold mb-2 w-[90%]">
               {recipe?.title}
             </h3>
             <p className="text-gray-600 text-sm mb-4 line-clamp-2">
