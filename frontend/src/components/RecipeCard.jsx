@@ -9,7 +9,7 @@ const RecipeCard = ({ data, version = 1, user = {} }) => {
   const cardStyle =
     version === 2
       ? "w-[190px] min-h-[220px] p-2"
-      : "w-[300px] min-h-[300px] p-4";
+      : "w-[250px] min-h-[300px] p-4";
 
   const imageStyle = version === 2 ? "h-[150px]" : "h-[200px]";
   const [saved, setSaved] = useState(data?.isFavorite);
