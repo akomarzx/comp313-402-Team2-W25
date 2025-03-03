@@ -84,7 +84,7 @@ public class RecipeService extends BaseService {
      * @return a paginated {@code Page<RecipeSummaryCardWithCategory>} containing recipe summaries filtered
      *         by the given keyword and sorted as specified.
      */
-    public Page<RecipeSummaryCardWithCategory> getRecipes(String keyword, Integer page, Integer size, String[] sort, String currentUserEmail) {
+    public Page<RecipeSummaryCardWithCategory> getRecipes(String keyword, String categoryLabel, Integer page, Integer size, String[] sort, String currentUserEmail) {
 
         Pageable pageable;
 
@@ -113,7 +113,7 @@ public class RecipeService extends BaseService {
             pageable = PageRequest.of(page, size, Sort.by("id").ascending());
         }
 
-        return recipeRepository.findRecipeSummaryCardsByKeywordAndSort(keyword, currentUserEmail, pageable);
+        return recipeRepository.findRecipeSummaryCardsByKeywordAndSort(keyword, currentUserEmail, categoryLabel,pageable);
     }
 
     /**
