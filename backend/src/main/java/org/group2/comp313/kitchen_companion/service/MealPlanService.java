@@ -1,6 +1,7 @@
 package org.group2.comp313.kitchen_companion.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.transaction.Transactional;
 import org.group2.comp313.kitchen_companion.domain.MealPlan;
 import org.group2.comp313.kitchen_companion.domain.MealPlanDay;
 import org.group2.comp313.kitchen_companion.domain.MealPlanGroup;
@@ -10,15 +11,13 @@ import org.group2.comp313.kitchen_companion.dto.ai.AIMealPlanRecommendationReque
 import org.group2.comp313.kitchen_companion.dto.ai.AIMealPlanRecommendationResult;
 import org.group2.comp313.kitchen_companion.dto.ai.ChatCompletionResponse;
 import org.group2.comp313.kitchen_companion.dto.meal_plan.*;
-import org.group2.comp313.kitchen_companion.repository.MealPlanDayRepository;
+    import org.group2.comp313.kitchen_companion.repository.MealPlanDayRepository;
 import org.group2.comp313.kitchen_companion.repository.MealPlanGroupRepository;
 import org.group2.comp313.kitchen_companion.repository.MealPlanRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -33,7 +32,6 @@ public class MealPlanService extends BaseService {
     private final MealPlanDayRepository mealPlanDayRepository;
     private final ChatGptClientService chatGptClientService;
     private final RecipeService recipeService;
-    private final Integer NUMBER_OF_DAYS_IN_WEEK = 7;
 
     public MealPlanService(MealPlanGroupRepository mealPlanGroupRepository, MealPlanRepository mealPlanRepository, MealPlanDayRepository mealPlanDayRepository, ChatGptClientService chatGptClientService, RecipeService recipeService) {
         this.mealPlanGroupRepository = mealPlanGroupRepository;
@@ -225,7 +223,7 @@ public class MealPlanService extends BaseService {
 
         List<MealPlanGroupSummaryDto> mealPlanGroupSummaryDtoList = new ArrayList<>();
 
-        if(aiMealPlanRecommendationResult.success() && aiMealPlanRecommendationResult.mealPlanDays().size() == NUMBER_OF_DAYS_IN_WEEK) {
+        if(aiMealPlanRecommendationResult.success()) {
 
             mealPlanLabel = aiMealPlanRecommendationResult.mealPlanTitle();
             MealPlan createdMealPlan = this.createMealPlan(mealPlanLabel, createdBy);
@@ -243,7 +241,7 @@ public class MealPlanService extends BaseService {
             return new ApiResult<>("Meal plan created successfully.", new MealPlanSummaryDto(createdMealPlan.getId() ,mealPlanLabel, createdAt, createdBy, mealPlanGroupSummaryDtoList));
 
         } else {
-            return new ApiResult<>("AI Failed to generate meal plan. " + aiMealPlanRecommendationResult.reasonForFail() , null);
+            return new ApiResult<>("AI Failed to generate meal plan - " + aiMealPlanRecommendationResult.reasonForFail() , null);
         }
     }
 

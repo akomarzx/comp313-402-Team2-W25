@@ -20,7 +20,7 @@ public record CreateMealPlanDto(
         @Size(min = 1, max = 4) List<@Valid CreateMealPlanGroupSummary> mealPlanGroupSummaryDtoList
 ) {
     public record CreateMealPlanGroupSummary(
-            @Size(min = 7, max = 7) List<@Valid CreateMealPlanDaysSummary> mealPlanDaysSummaryDtoList
+            @Size(min = 1) List<@Valid CreateMealPlanDaysSummary> mealPlanDaysSummaryDtoList
     ) {}
 
     public record CreateMealPlanDaysSummary(
