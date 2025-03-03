@@ -37,9 +37,10 @@ const CategoriesFilter = ({ categories, selectedCategory = [] }) => {
       </div>
 
       <div className="hidden lg:block pt-20 w-[320px] p-4 bg-white min-h-full border-r-2">
-        <div className="text-lg font-bold sticky top-12">
-          Categories{" "}
-          {/* {selectedCategories.length > 0 && (
+        <div className="sticky top-20">
+          <div className="text-lg font-bold ">
+            Categories{" "}
+            {/* {selectedCategories.length > 0 && (
             <span
               className="text-sm font-normal underline cursor-pointer"
               onClick={() => setSelectedCategories([])}
@@ -47,35 +48,38 @@ const CategoriesFilter = ({ categories, selectedCategory = [] }) => {
               (Clear)
             </span>
           )} */}
-        </div>
-        <div className="mt-4 sticky top-20">
-          {categories?.map((category, index) => (
-            <div key={index} className="flex" onChange={handleCategoryChange}>
-              <input
-                id={category.label}
-                type="checkbox"
-                value={category.label}
-                checked={selectedCategories.includes(category.label)}
-                className="text-sm"
-                onChange={handleCategoryChange}
-              />
-              <label
-                className="pl-3 text-left hover:font-semibold cursor-pointer mb-2"
-                htmlFor={category.label}
+          </div>
+          <div className="mt-4">
+            {categories?.map((category, index) => (
+              <div key={index} className="flex" onChange={handleCategoryChange}>
+                <input
+                  id={category.label}
+                  type="checkbox"
+                  value={category.label}
+                  checked={selectedCategories.includes(category.label)}
+                  className="text-sm"
+                  onChange={handleCategoryChange}
+                />
+                <label
+                  className="pl-3 text-left hover:font-semibold cursor-pointer mb-2"
+                  htmlFor={category.label}
+                >
+                  {category.label}
+                </label>
+              </div>
+            ))}
+            <div className="text-center">
+              <Button
+                className="rounded-lg w-20 h-10"
+                onClick={() => {
+                  router.push(
+                    `/recipes?category=${selectedCategories[0] || ""}`
+                  );
+                }}
               >
-                {category.label}
-              </label>
+                Apply
+              </Button>
             </div>
-          ))}
-          <div className="text-center">
-            <Button
-              className="rounded-lg w-20 h-10"
-              onClick={() => {
-                router.push(`/recipes?category=${selectedCategories[0] || ""}`);
-              }}
-            >
-              Apply
-            </Button>
           </div>
         </div>
       </div>
