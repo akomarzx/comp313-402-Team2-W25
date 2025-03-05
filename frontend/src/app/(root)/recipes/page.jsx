@@ -66,7 +66,6 @@ const RecipePage = () => {
       }
       setRecipeCardData(fetchData?.content);
       setTotalPages(fetchData?.page?.totalPages);
-      console.log(fetchData);
     } catch (error) {
       console.error("Error fetching recipes:", error);
     } finally {
@@ -180,7 +179,6 @@ const RecipePage = () => {
                         }
                         return prev;
                       });
-                      console.log(totalPages);
                     }}
                     className="rounded-none cursor-pointer"
                   />
@@ -237,7 +235,6 @@ const RecipePage = () => {
                         }
                         return prev;
                       });
-                      console.log(totalPages);
                     }}
                     className="rounded-none cursor-pointer"
                   />

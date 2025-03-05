@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 const CategoriesFilter = ({ categories, selectedCategory = [], searhKey }) => {
   const [selectedCategories, setSelectedCategories] =
     useState(selectedCategory);
-  console.log(searhKey);
   const handleCategoryChange = (e) => {
     // if (e.target.checked) {
     //   setSelectedCategories([...selectedCategories, e.target.value]);
@@ -53,17 +52,21 @@ const CategoriesFilter = ({ categories, selectedCategory = [], searhKey }) => {
           </div>
           <div className="mt-4">
             {categories?.map((category, index) => (
-              <div key={index} className="flex" onChange={handleCategoryChange}>
+              <div
+                key={index}
+                className="flex my-2"
+                onChange={handleCategoryChange}
+              >
                 <input
                   id={category.label}
                   type="checkbox"
                   value={category.label}
                   checked={selectedCategories.includes(category.label)}
-                  className="text-sm"
+                  className="text-sm text-center"
                   onChange={handleCategoryChange}
                 />
                 <label
-                  className="pl-3 text-left hover:font-semibold cursor-pointer mb-2"
+                  className="pl-3 text-left hover:font-semibold cursor-pointer "
                   htmlFor={category.label}
                 >
                   {category.label}

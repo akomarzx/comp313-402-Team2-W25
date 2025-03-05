@@ -29,14 +29,12 @@ const RecipesResult = ({
   useEffect(() => {
     const lastView = sessionStorage.getItem("view");
     setViewMode(lastView || displayType);
-    console.log(sort);
   }, []);
 
   const handleSortChange = (e) => {
     setTimeout(() => {
       switch (e) {
         case "title-asc":
-          console.log(e);
           redirect(
             `/recipes?sort=title-asc&search=${searchKey}&category=${
               selectedCategory[0] || ""

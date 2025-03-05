@@ -13,7 +13,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 const RecipeCarousel = ({ data }) => {
   const router = useRouter();
-  console.log(data);
   return (
     <>
       <h2 className="font-semibold text-2xl text-center p-2">

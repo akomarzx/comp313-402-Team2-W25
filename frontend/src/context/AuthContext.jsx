@@ -55,11 +55,11 @@ export const AuthProvider = ({ children }) => {
         // console.log("User is authenticated:", response.data.user);
         setUser(response.data.user);
       } else {
-        console.log("User is not authenticated");
+        // console.log("User is not authenticated");
         setUser(null);
       }
     } catch (error) {
-      console.log("Error fetching session:", error);
+      // console.log("Error fetching session:", error);
       setUser(null);
     } finally {
       setLoading(false);
