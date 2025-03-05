@@ -39,7 +39,7 @@ public class RatingsService extends BaseService {
      */
     public RecipeRatingDto getRecipeRatingForUser(Integer recipeId, String username) {
 
-        Optional<RatingCalculated> calculated = this.ratingCalculatedRepository.findById(recipeId);
+        Optional<RatingCalculated> calculated = this.ratingCalculatedRepository.findByRecipe(recipeId);
         Optional<Rating> userRatingForRecipe = ratingRepository.findByRecipeAndCreatedBy(recipeId, username);
 
         BigDecimal userRating;
@@ -95,7 +95,7 @@ public class RatingsService extends BaseService {
         Long currentCount = ratingRepository.countByRecipe(recipeId);
         BigDecimal ratingValue = ratingRepository.getAverageRatingByRecipe(recipeId).setScale(1, RoundingMode.CEILING);
 
-        Optional<RatingCalculated> calculated = ratingCalculatedRepository.findById(recipeId);
+        Optional<RatingCalculated> calculated = ratingCalculatedRepository.findByRecipe(recipeId);
 
         if (calculated.isPresent()) {
             calculated.get().setRatingValue(ratingValue);
@@ -105,7 +105,7 @@ public class RatingsService extends BaseService {
             RatingCalculated newRatingCalculated = new RatingCalculated();
             newRatingCalculated.setRatingValue(ratingValue);
             newRatingCalculated.setRatingCount(currentCount.intValue());
-            newRatingCalculated.setId(recipeId);
+            newRatingCalculated.setRecipe(recipeId);
             ratingCalculatedRepository.save(newRatingCalculated);
         }
 
