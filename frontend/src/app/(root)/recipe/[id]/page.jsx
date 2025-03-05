@@ -6,6 +6,7 @@ import { RotateLoader } from "react-spinners";
 import DisplayRecipe from "@/components/DisplayRecipe";
 import { redirect } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 const Recipe = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -13,21 +14,28 @@ const Recipe = () => {
   const [recipe, setRecipe] = useState(null);
   const [rating, setRating] = useState(null);
   const { loading, user, categories } = useAuth();
+  const router = useRouter();
   if (isNaN(id)) {
     redirect("/recipes");
   }
   const fetchRecipe = async () => {
     setIsLoading(true);
-    const data = await getRecipeById(id);
-    console.log(data);
-    const data2 = await getRatingById(id, user !== null);
+    try {
+      const data = await getRecipeById(id);
+      const data2 = await getRatingById(id, user !== null);
 
-    if (data && data2) {
-      setIsLoading(false);
+      if (data && data2) {
+        setIsLoading(false);
+      }
+      if (data === undefined) {
+        router.push("/recipes");
+      }
+
+      setRecipe(data);
+      setRating(data2);
+    } catch (error) {
+      console.log(error);
     }
-
-    setRecipe(data);
-    setRating(data2);
   };
   useEffect(() => {
     if (!loading) fetchRecipe();

@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 const CategoriesFilter = ({ categories, selectedCategory = [], searhKey }) => {
   const [selectedCategories, setSelectedCategories] =
     useState(selectedCategory);
-  console.log(searhKey);
   const handleCategoryChange = (e) => {
     // if (e.target.checked) {
     //   setSelectedCategories([...selectedCategories, e.target.value]);

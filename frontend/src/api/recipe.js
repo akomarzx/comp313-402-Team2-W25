@@ -22,7 +22,6 @@ export async function getRecipeById(recipeId) {
 }
 
 export async function getRecipes(page, size, search = "", sort = [], category) {
-  console.log(category);
   try {
     if (page < 0) {
       page = 0;
@@ -35,7 +34,6 @@ export async function getRecipes(page, size, search = "", sort = [], category) {
         withCredentials: true,
       }
     );
-    console.log(recipes.data.result);
     return recipes.data.result;
   } catch (error) {
     if (error.response) {
