@@ -47,6 +47,8 @@ const RecipePage = () => {
   const [searchCategory, setSearchCategory] = useState(categoryKeyParam);
   const router = useRouter();
 
+  let pages = [1, 2, 3];
+
   const fetchRecipes = async () => {
     try {
       setIsLoading(true);
@@ -67,6 +69,7 @@ const RecipePage = () => {
       }
       setRecipeCardData(fetchData?.content);
       setTotalPages(fetchData?.page?.totalPages);
+      console.log(fetchData);
     } catch (error) {
       console.error("Error fetching recipes:", error);
     } finally {
@@ -74,8 +77,8 @@ const RecipePage = () => {
     }
   };
   useEffect(() => {
-    console.log(searchCategory);
     fetchRecipes();
+    console.log(totalPages);
   }, [currentPage, searchKey, sortParam, searchCategory]);
 
   useEffect(() => {
@@ -106,14 +109,25 @@ const RecipePage = () => {
       setSearchCategory("");
     }
   };
-
-  let pages = [1, 2, 3];
   if (currentPage === 1) {
-    pages = [1, 2, 3];
+    if (totalPages > 3) {
+      pages = [1, 2, 3];
+    } else if (totalPages === 2) {
+      pages = [1, 2];
+    } else {
+      pages = [1];
+    }
+  } else if (currentPage === totalPages) {
+    if (totalPages > 3) {
+      pages = [totalPages - 2, totalPages - 1, totalPages];
+    } else if (totalPages === 2) {
+      pages = [1, 2];
+    } else {
+      pages = [1];
+    }
   } else {
     pages = [currentPage - 1, currentPage, currentPage + 1];
   }
-
   return (
     <div className="py-10 px max-w-[80%] mx-auto bg-white min-h-lvh transition-all duration-300">
       <div className="fade-in">
@@ -164,7 +178,7 @@ const RecipePage = () => {
             selectedCategory={[categoryKeyParam] || []}
           />
 
-          {!isLoading && recipeCardData?.length == 12 && (
+          {!isLoading && totalPages > 1 && (
             <Pagination>
               <PaginationContent className="gap-0 border mt-8 rounded-lg divide-x overflow-hidden">
                 <PaginationItem>
