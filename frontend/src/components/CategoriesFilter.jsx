@@ -153,7 +153,7 @@ const CategoriesFilter = ({
                 Cancel
               </Button>
               <Button
-                onClick={() => {
+                onClick={(e) => {
                   e.preventDefault();
                   setSearchCategory(selectedCategories[0]);
                   setCurrentPage(1);
@@ -162,6 +162,7 @@ const CategoriesFilter = ({
                     (searchKey ? `&search=${searchKey}` : "") +
                     `&category=${selectedCategories[0] || ""}`;
                   router.push(url);
+                  setIsFilterOpen(false);
                 }}
                 className="w-[48%]"
               >
