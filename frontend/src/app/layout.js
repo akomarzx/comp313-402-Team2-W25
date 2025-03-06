@@ -2,7 +2,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "../context/AuthContext";
 import { Suspense } from "react";
-import { Analytics } from "@vercel/analytics/react";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -46,7 +45,6 @@ export default function RootLayout({ children }) {
           className={`${geistSans.variable} ${geistMono.variable} min-w-[350px]  text-[#333] antialiased`}
         >
           <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
-          <Analytics />
         </body>
       </AuthProvider>
     </html>
