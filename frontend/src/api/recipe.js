@@ -28,12 +28,11 @@ export async function getRecipes(page, size, search = "", sort = [], category) {
     } else {
       page -= 1;
     }
-    const recipes = await axios.get(
-      `${recipeUrl}/kc/v1/public/recipe?size=${size}&page=${page}&search=${search}&sort=${sort}&category=${category}`,
-      {
-        withCredentials: true,
-      }
-    );
+    const url = `${recipeUrl}/kc/v1/public/recipe?size=${size}&page=${page}&search=${search}&sort=${sort}&category=${category}`;
+    console.log(url);
+    const recipes = await axios.get(url, {
+      withCredentials: true,
+    });
     return recipes.data.result;
   } catch (error) {
     if (error.response) {
