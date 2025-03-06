@@ -178,7 +178,7 @@ const RecipePage = () => {
             selectedCategory={[categoryKeyParam] || []}
           />
 
-          {!isLoading && totalPages > 1 && (
+          {!isLoading && totalPages > 1 && currentPage <= totalPages && (
             <Pagination>
               <PaginationContent className="gap-0 border mt-8 rounded-lg divide-x overflow-hidden">
                 <PaginationItem>
