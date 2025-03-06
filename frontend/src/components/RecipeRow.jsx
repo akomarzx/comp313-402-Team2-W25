@@ -43,6 +43,7 @@ const RecipeRow = ({ recipe, user }) => {
         >
           <div className="w-48 h-32 flex-shrink-0 mx-auto">
             <Image
+              unoptimized
               src={recipe.thumbnailUrl || "/placeholder.svg"}
               alt={recipe.title}
               width={192}
