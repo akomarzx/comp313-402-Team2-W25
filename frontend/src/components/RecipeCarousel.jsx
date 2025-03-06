@@ -35,6 +35,7 @@ const RecipeCarousel = ({ data }) => {
                       <Tooltip>
                         <TooltipTrigger className="cursor-default">
                           <Image
+                            unoptimized
                             src={
                               item?.thumbnailUrl ||
                               "https://www.themealdb.com/images/media/meals/58oia61564916529.jpg"

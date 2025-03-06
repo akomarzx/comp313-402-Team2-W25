@@ -94,6 +94,7 @@ const DisplayRecipe = ({
             </div>
           )}
           <Image
+            unoptimized
             src={
               (recipe?.imageUrl !== "x" && recipe?.imageUrl) ||
               "https://www.themealdb.com/images/media/meals/58oia61564916529.jpg"
