@@ -78,7 +78,7 @@ const Navbar = () => {
                 onBlur={() =>
                   setTimeout(() => {
                     setIsProfileDropdownOpen(false);
-                  }, 100)
+                  }, 200)
                 }
               >
                 <button
