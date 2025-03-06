@@ -44,6 +44,7 @@ const RecipePage = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(parseInt(page));
   const [searchKey, setSearchKey] = useState(searchKeyParam);
+  const [searchCategory, setSearchCategory] = useState(categoryKeyParam);
   const router = useRouter();
 
   const fetchRecipes = async () => {
@@ -54,7 +55,7 @@ const RecipePage = () => {
         12,
         searchKey,
         [sortParam?.split("-")],
-        categoryKeyParam
+        searchCategory
       );
       if (fetchData === 401) {
         logout();
@@ -73,8 +74,9 @@ const RecipePage = () => {
     }
   };
   useEffect(() => {
+    console.log(searchCategory);
     fetchRecipes();
-  }, [currentPage, searchKey, sortParam, categoryKeyParam]);
+  }, [currentPage, searchKey, sortParam, searchCategory]);
 
   useEffect(() => {
     if (page !== currentPage) {
@@ -87,8 +89,9 @@ const RecipePage = () => {
       toast("Search key must be at least 3 characters long.");
     } else if (e?.key === "Enter" && e?.target?.value) {
       setSearchKey(e.target.value);
-      router.push(`/recipes?search=${e.target.value}&page=1`);
+      router.push(`/recipes?search=${e.target.value}&page=1&category=`);
       setCurrentPage(1);
+      setSearchCategory("");
     }
   };
 
@@ -98,8 +101,9 @@ const RecipePage = () => {
       toast("Search key must be at least 3 characters long.");
     } else if (searchBox?.value) {
       setSearchKey(searchBox.value);
-      router.push(`/recipes?search=${searchBox.value}&page=1`);
+      router.push(`/recipes?search=${searchBox.value}&page=1&category=`);
       setCurrentPage(1);
+      setSearchCategory("");
     }
   };
 
@@ -142,8 +146,10 @@ const RecipePage = () => {
         {!loading && recipeCardData && (
           <CategoriesFilter
             categories={categories?.data}
-            selectedCategory={[categoryKeyParam] || []}
-            searhKey={searchKey}
+            selectedCategory={[searchCategory] || []}
+            setSearchCategory={setSearchCategory}
+            setCurrentPage={setCurrentPage}
+            searchKey={searchKey}
           />
         )}
         <div className="w-full">

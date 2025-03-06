@@ -3,7 +3,13 @@ import { Button } from "./ui/button";
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-const CategoriesFilter = ({ categories, selectedCategory = [], searhKey }) => {
+const CategoriesFilter = ({
+  categories,
+  selectedCategory = [],
+  searchKey,
+  setCurrentPage,
+  setSearchCategory,
+}) => {
   const [selectedCategories, setSelectedCategories] =
     useState(selectedCategory);
   const handleCategoryChange = (e) => {
@@ -30,7 +36,9 @@ const CategoriesFilter = ({ categories, selectedCategory = [], searhKey }) => {
     <>
       <div className="lg:hidden fixed bottom-10 left-4 z-10">
         <Button
-          onClick={() => setIsFilterOpen(!isFilterOpen)}
+          onClick={() => {
+            setIsFilterOpen(!isFilterOpen);
+          }}
           className="rounded-full shadow-lg"
         >
           {isFilterOpen ? "Close" : "Filters"}
@@ -76,12 +84,15 @@ const CategoriesFilter = ({ categories, selectedCategory = [], searhKey }) => {
             <div className="text-center">
               <Button
                 className="rounded-lg w-20 h-10"
-                onClick={() => {
-                  router.push(
-                    `/recipes?page=${1}&search=${searhKey}&category=${
-                      selectedCategories[0] || ""
-                    }`
-                  );
+                onClick={(e) => {
+                  e.preventDefault();
+                  setSearchCategory(selectedCategories[0]);
+                  setCurrentPage(1);
+                  const url =
+                    `/recipes?page=${1}` +
+                    (searchKey ? `&search=${searchKey}` : "") +
+                    `&category=${selectedCategories[0] || ""}`;
+                  router.push(url);
                 }}
               >
                 Apply
@@ -143,10 +154,14 @@ const CategoriesFilter = ({ categories, selectedCategory = [], searhKey }) => {
               </Button>
               <Button
                 onClick={() => {
-                  router.push(
-                    `/recipes?page=1&category=${selectedCategories[0] || ""}`
-                  );
-                  setIsFilterOpen(false);
+                  e.preventDefault();
+                  setSearchCategory(selectedCategories[0]);
+                  setCurrentPage(1);
+                  const url =
+                    `/recipes?page=${1}` +
+                    (searchKey ? `&search=${searchKey}` : "") +
+                    `&category=${selectedCategories[0] || ""}`;
+                  router.push(url);
                 }}
                 className="w-[48%]"
               >
