@@ -76,10 +76,10 @@ const Navbar = () => {
               <div
                 className="relative"
                 onBlur={async (e) => {
-                  if (e.relatedTarget.id === "logout") {
-                    await logout().then(() => {
-                      setIsProfileDropdownOpen(false);
-                    });
+                  if (e.relatedTarget?.id === "logout") {
+                    await logout().then(() => {});
+                  } else {
+                    setIsProfileDropdownOpen(false);
                   }
                 }}
               >
