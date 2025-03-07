@@ -288,6 +288,9 @@ const proxyConfig = createProxyMiddleware({
   },
   on: {
     proxyReq: (proxyReq, req, res) => {
+
+      proxyReq.setHeader("Session-Id", req.sessionID || "");
+      
       if (req.isAuthenticated()) {
         let accessToken = req.user.accessToken;
         proxyReq.setHeader("Authorization", `Bearer ${accessToken}`);
