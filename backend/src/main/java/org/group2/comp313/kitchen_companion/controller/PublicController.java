@@ -36,9 +36,11 @@ public class PublicController extends BaseController {
 
     @GetMapping("/recipe/{id}")
     public ResponseEntity<ApiResult<Recipe>> getRecipe(@PathVariable Integer id,
-                                                       @AuthenticationPrincipal Jwt jwt) {
+                                                       @AuthenticationPrincipal Jwt jwt,
+                                                       @RequestHeader(value = "Session-Id", required = false) String sessionId) {
 
         log.info("Get recipe with id {}", id);
+        log.info(sessionId);
 
         String email = "";
 

@@ -158,7 +158,8 @@ public class RecipeController extends BaseController {
 
     @PostMapping("/save")
     public ResponseEntity<ApiResult<Void>> saveRecipeForUser(@Valid @RequestBody SaveRecipeDto saveRecipeDto,
-                                                             @AuthenticationPrincipal(expression = "claims['email']") String createdByEmail) {
+                                                             @AuthenticationPrincipal(expression = "claims['email']") String createdByEmail,
+                                                             @RequestHeader(value = "Session-Id", required = false) String sessionId) {
 
         try {
             this.recipeService.saveRecipeForUser(saveRecipeDto.recipeId(), createdByEmail);
