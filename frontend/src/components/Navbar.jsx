@@ -75,11 +75,13 @@ const Navbar = () => {
             {user ? (
               <div
                 className="relative"
-                onBlur={() =>
-                  setTimeout(() => {
+                onBlur={async (e) => {
+                  if (e.relatedTarget?.id === "logout") {
+                    await logout().then(() => {});
+                  } else {
                     setIsProfileDropdownOpen(false);
-                  }, 200)
-                }
+                  }
+                }}
               >
                 <button
                   onClick={() => setIsProfileDropdownOpen((prev) => !prev)}
@@ -114,9 +116,8 @@ const Navbar = () => {
                       </div>
                     </Link>
                     <button
-                      onClick={async () => {
-                        await logout();
-                      }}
+                      id="logout"
+                      onClick={async () => {}}
                       className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-slate-600"
                     >
                       <div className="flex gap-2 items-center">
