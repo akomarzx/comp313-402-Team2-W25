@@ -4,7 +4,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.apache.camel.ProducerTemplate;
 import org.group2.comp313.kitchen_companion.domain.Recipe;
+import org.group2.comp313.kitchen_companion.dto.UserInteractionDto;
 import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationResult;
 import org.group2.comp313.kitchen_companion.dto.ai.AIRecipeRecommendationRequest;
 import org.group2.comp313.kitchen_companion.dto.ApiResult;
@@ -38,12 +40,14 @@ public class RecipeController extends BaseController {
     private final AWSS3Service awss3Service;
     private final IngredientGroupService ingredientGroupService;
     private final StepGroupService stepGroupService;
+    private final ProducerTemplate camelTemplate;
 
-    public RecipeController(RecipeService recipeService, AWSS3Service awss3Service, IngredientGroupService ingredientGroupService, StepGroupService stepGroupService) {
+    public RecipeController(RecipeService recipeService, AWSS3Service awss3Service, IngredientGroupService ingredientGroupService, StepGroupService stepGroupService, ProducerTemplate camelTemplate) {
         this.recipeService = recipeService;
         this.awss3Service = awss3Service;
         this.ingredientGroupService = ingredientGroupService;
         this.stepGroupService = stepGroupService;
+        this.camelTemplate = camelTemplate;
     }
 
     @GetMapping("/my-recipe")
@@ -158,7 +162,13 @@ public class RecipeController extends BaseController {
 
     @PostMapping("/save")
     public ResponseEntity<ApiResult<Void>> saveRecipeForUser(@Valid @RequestBody SaveRecipeDto saveRecipeDto,
-                                                             @AuthenticationPrincipal(expression = "claims['email']") String createdByEmail) {
+                                                             @AuthenticationPrincipal(expression = "claims['email']") String createdByEmail,
+                                                             @RequestHeader(value = "Session-Id", required = false) String sessionId) {
+
+        if(sessionId != null) {
+            UserInteractionDto userInteractionDto = new UserInteractionDto(sessionId, saveRecipeDto.recipeId(), "saved");
+            this.camelTemplate.asyncSendBody("direct:userInteractionEvents", userInteractionDto);
+        }
 
         try {
             this.recipeService.saveRecipeForUser(saveRecipeDto.recipeId(), createdByEmail);

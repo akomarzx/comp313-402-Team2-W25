@@ -297,4 +297,13 @@ public class RecipeService extends BaseService {
         Pageable pageRequest = PageRequest.of(page, size);
         return this.recipeRepository.findSavedRecipeSummaryCardsByUser(userEmail, pageRequest);
     }
+
+    /***
+     * Retrieves Top 10 recipes based on user interaction algorithm
+     * @return List RecipeSummaryCards
+     */
+    public List<RecipeSummaryForCards> getTop10RecommendedRecipes() {
+        Pageable pageable = PageRequest.of(0, 10);
+        return recipeRepository.findTop10RecipesByInteractionScore(pageable);
+    }
 }

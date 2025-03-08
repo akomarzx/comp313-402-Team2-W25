@@ -1,14 +1,15 @@
 package org.group2.comp313.kitchen_companion.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
+import org.apache.camel.ProducerTemplate;
+import org.apache.camel.support.DefaultExchange;
 import org.group2.comp313.kitchen_companion.domain.Recipe;
+import org.group2.comp313.kitchen_companion.domain.UserInteraction;
 import org.group2.comp313.kitchen_companion.dto.ApiResult;
-import org.group2.comp313.kitchen_companion.dto.ai.AIMealPlanRecommendationRequest;
-import org.group2.comp313.kitchen_companion.dto.ai.AIMealPlanRecommendationResult;
-import org.group2.comp313.kitchen_companion.dto.meal_plan.MealPlanDaysSummaryDto;
+import org.group2.comp313.kitchen_companion.dto.UserInteractionDto;
 import org.group2.comp313.kitchen_companion.dto.rating.RecipeRatingDto;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryCardWithCategory;
+import org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryForCards;
 import org.group2.comp313.kitchen_companion.service.RatingsService;
 import org.group2.comp313.kitchen_companion.service.RecipeService;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
 @RestController
 @RequestMapping("/public")
 @Tag(name = "Public API", description = "All Public APIs available")
@@ -28,19 +30,27 @@ public class PublicController extends BaseController {
 
     private final RecipeService recipeService;
     private final RatingsService ratingsService;
+    private final ProducerTemplate producerTemplate;
 
-    public PublicController(RecipeService recipeService, RatingsService ratingsService) {
+    public PublicController(RecipeService recipeService, RatingsService ratingsService, ProducerTemplate producerTemplate) {
         this.recipeService = recipeService;
         this.ratingsService = ratingsService;
+        this.producerTemplate = producerTemplate;
     }
 
     @GetMapping("/recipe/{id}")
     public ResponseEntity<ApiResult<Recipe>> getRecipe(@PathVariable Integer id,
-                                                       @AuthenticationPrincipal Jwt jwt) {
+                                                       @AuthenticationPrincipal Jwt jwt,
+                                                       @RequestHeader(value = "Session-Id", required = false) String sessionId) {
 
         log.info("Get recipe with id {}", id);
 
         String email = "";
+
+        if(sessionId != null) {
+            UserInteractionDto userInteractionDto = new UserInteractionDto(sessionId, id, "view");
+            this.producerTemplate.asyncSendBody("direct:userInteractionEvents", userInteractionDto);
+        }
 
         if(jwt != null) {
             email = jwt.getClaimAsString("email");
@@ -87,6 +97,18 @@ public class PublicController extends BaseController {
             return ResponseEntity.ok(new ApiResult<>("", recipeService.getRecipes(search, category, page, size, sort, email)));
         } catch (InvalidDataAccessResourceUsageException exception) {
                 return new ResponseEntity<>(new ApiResult<>("Sort Criteria might be invalid please verify", null), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ApiResult<>(e.getLocalizedMessage(), null), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/top-recipe")
+    public ResponseEntity<ApiResult<List<RecipeSummaryForCards>>> getTop10RecipeBasedOnUserInteraction() {
+
+        try {
+            return ResponseEntity.ok(new ApiResult<>("", recipeService.getTop10RecommendedRecipes()));
+        } catch (InvalidDataAccessResourceUsageException exception) {
+            return new ResponseEntity<>(new ApiResult<>("Sort Criteria might be invalid please verify", null), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
             return new ResponseEntity<>(new ApiResult<>(e.getLocalizedMessage(), null), HttpStatus.INTERNAL_SERVER_ERROR);
         }

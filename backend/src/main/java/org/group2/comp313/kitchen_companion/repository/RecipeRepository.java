@@ -12,6 +12,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -77,5 +78,20 @@ public interface RecipeRepository extends PagingAndSortingRepository<Recipe, Int
             "FROM recipe r LEFT JOIN saved_recipe sr ON r.recipe_id = sr.recipe_id " +
             "WHERE sr.created_by = :username", nativeQuery = true)
     Page<RecipeSummaryForCards> findSavedRecipeSummaryCardsByUser(@Param("username") String username, Pageable pageable);
+
+
+    @Query("SELECT new org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryForCards(" +
+            "r.id, r.title, r.summary, r.thumbnailUrl, r.calories, " +
+            "SUM(CASE WHEN cv.label = 'view' THEN 1 " +
+            "WHEN cv.label = 'saved' THEN 10 " +
+            "WHEN cv.label = 'rating' THEN 5 " +
+            "ELSE 0 END) AS interactionScore) as interactionScore " +
+            "FROM Recipe r " +
+            "LEFT JOIN UserInteraction ui ON r.id = ui.recipe " +
+            "LEFT JOIN CodeValue cv ON cv.id = ui.userInteractionEventTypeCode " +
+            "Left JOIN RatingCalculated rc on rc.recipe = r.id " +
+            "GROUP BY r.id, rc.ratingValue " +
+            "ORDER BY interactionScore DESC, rc.ratingValue, r.id DESC")
+    List<RecipeSummaryForCards> findTop10RecipesByInteractionScore(Pageable pageable);
 
 }

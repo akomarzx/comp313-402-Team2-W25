@@ -7,6 +7,7 @@ public record RecipeSummaryForCards(
     String title,
     String summary,
     String thumbnailUrl,
-    BigDecimal calories
+    BigDecimal calories,
+    Long interactionScore
 ) {
 }
