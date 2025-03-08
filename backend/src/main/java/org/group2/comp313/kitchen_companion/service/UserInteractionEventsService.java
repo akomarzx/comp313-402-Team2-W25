@@ -7,6 +7,7 @@ import org.group2.comp313.kitchen_companion.dto.UserInteractionDto;
 import org.group2.comp313.kitchen_companion.repository.UserInteractionRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -27,7 +28,7 @@ public class UserInteractionEventsService extends BaseService{
 
         Integer codeValueId = this.getCodeValueIdForInteractionEvent(userInteractionDto.eventType());
 
-        Optional<UserInteraction> existingInteraction = this.userInteractionRepository.findUserInteractionBySessionIdAndUserInteractionEventTypeCodeAndRecipe(userInteractionDto.sessionId(), codeValueId, userInteractionDto.recipeId());
+        List<UserInteraction> existingInteraction = this.userInteractionRepository.findAllUserInteractionBySessionIdAndUserInteractionEventTypeCodeAndRecipe(userInteractionDto.sessionId(), codeValueId, userInteractionDto.recipeId());
 
         if (existingInteraction.isEmpty()) {
             UserInteraction userInteraction = new UserInteraction();

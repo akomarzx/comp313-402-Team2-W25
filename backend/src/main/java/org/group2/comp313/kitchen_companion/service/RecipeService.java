@@ -180,7 +180,6 @@ public class RecipeService extends BaseService {
      * @throws JsonProcessingException if there is an error processing the JSON response
      */
     public AIRecipeRecommendationResult getAiRecipeRecommendation(AIRecipeRecommendationRequest aiRecipeRecommendationRequest) throws Exception {
-
         ChatCompletionResponse response = this.chatGptClientService.getRecipeRecommendations(aiRecipeRecommendationRequest);
         return deserializeChatResponse(response, AIRecipeRecommendationResult.class);
     }

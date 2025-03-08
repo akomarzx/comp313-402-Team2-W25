@@ -10,8 +10,8 @@ public class CamelRoutes extends RouteBuilder {
     @Override
     public void configure() throws Exception {
 
-        from("quartz://WeeklyJobScheduler?cron=0+0+22+?+*+SUN")
-                .log("Weekly Job Schedule to clear user interaction events")
+        from("quartz://monthlySchedule?cron=0+0+22+1+*+?")
+                .log("Monthly Job Schedule to clear user interaction events")
                 .bean(UserInteractionEventsService.class, "clearUserInteractionEventTable");
 
         from("direct:userInteractionEvents")

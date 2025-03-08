@@ -15,7 +15,7 @@ import java.util.Set;
 public record RecipeDto(
         @NotNull(groups = ValidationGroups.Update.class) Integer id,
         @NotNull @Size(min = 1, max = 256) String title,
-        @Size(max = 255) String summary,
+        @Size(min = 1, max = 255) String summary,
         @NotNull @Min(1) int prepTime,
         @NotNull @ValidateCodeID(codeTypeName = "TIME_UNIT") int prepTimeUnitCd,
         @NotNull @Min(1) int cookTime,
