@@ -20,7 +20,7 @@ import { ArrowBigUp, Search } from "lucide-react";
 import CategoriesFilter from "@/components/CategoriesFilter";
 
 const RecipePage = () => {
-  const { user, logout, loading, categories } = useAuth();
+  const { user, logout, loading, categories, topRecipes } = useAuth();
   const searchParams = useSearchParams();
   const displayType = searchParams.get("displayType") || "default";
   let page = searchParams.get("page") || 1;
@@ -77,6 +77,7 @@ const RecipePage = () => {
     }
   };
   useEffect(() => {
+    console.log(topRecipes);
     fetchRecipes();
     console.log(totalPages);
   }, [currentPage, searchKey, sortParam, searchCategory]);
@@ -131,7 +132,7 @@ const RecipePage = () => {
   return (
     <div className="py-10 px max-w-[80%] mx-auto bg-white min-h-lvh transition-all duration-300">
       <div className="fade-in">
-        {!isLoading && <RecipeCarousel data={recipeCardData?.slice(0, 5)} />}
+        <RecipeCarousel data={topRecipes?.data.slice(0, 10)} />
       </div>
       <div className="mx-auto max-w-[600px] mb-5">
         <h3 className="font-semibold text-normal p-4 mt-6">
