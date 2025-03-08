@@ -14,6 +14,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   const [categories, setCategories] = useState(null);
+  const [topRecipes, setTopRecipes] = useState(null);
   // Function to log in
   const login = async (currentUrl = "") => {
     try {
@@ -82,6 +83,20 @@ export const AuthProvider = ({ children }) => {
       console.error("Error fetching categories:", error);
     }
   };
+
+  const fetchTopRecipes = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_RECIPE_API}/kc/v1/public/top-recipe`
+      );
+      if (response.data) {
+        setTopRecipes({ data: response.data?.result, lastUpdated: Date.now() });
+        console.log("Top recipes fetched:", response.data.result);
+      }
+    } catch (error) {
+      console.error("Error fetching top recipes:", error);
+    }
+  };
   // Check if user is logged in on initial load
   useEffect(() => {
     if (!user) fetchSession();
@@ -98,12 +113,34 @@ export const AuthProvider = ({ children }) => {
         fetchCategories();
       }
     }
+
+    if (!topRecipes) {
+      fetchTopRecipes();
+    } else {
+      try {
+        const sevenDays = 7 * 24 * 60 * 60 * 1000;
+        if (Date.now() - topRecipes.lastUpdated > sevenDays) {
+          fetchTopRecipes();
+        }
+      } catch (error) {
+        console.log("Failed to parse top recipes:", error);
+        fetchTopRecipes();
+      }
+    }
   }, []);
 
   // Provide the authentication state and actions
   return (
     <AuthContext.Provider
-      value={{ user, login, logout, loading, fetchSession, categories }}
+      value={{
+        user,
+        login,
+        logout,
+        loading,
+        fetchSession,
+        categories,
+        topRecipes,
+      }}
     >
       {children}
     </AuthContext.Provider>
