@@ -3,7 +3,9 @@ package org.group2.comp313.kitchen_companion.controller;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.apache.camel.ProducerTemplate;
 import org.group2.comp313.kitchen_companion.dto.ApiResult;
+import org.group2.comp313.kitchen_companion.dto.UserInteractionDto;
 import org.group2.comp313.kitchen_companion.dto.rating.PostRatingDto;
 import org.group2.comp313.kitchen_companion.dto.rating.RecipeRatingDto;
 import org.group2.comp313.kitchen_companion.service.RatingsService;
@@ -19,15 +21,23 @@ import org.springframework.web.bind.annotation.*;
 public class RatingController extends BaseController {
 
     private final RatingsService ratingsService;
+    private final ProducerTemplate producerTemplate;
 
-    public RatingController(RatingsService ratingsService) {
+    public RatingController(RatingsService ratingsService, ProducerTemplate producerTemplate) {
         this.ratingsService = ratingsService;
+        this.producerTemplate = producerTemplate;
     }
 
     @PutMapping("/{recipeId}")
     public ResponseEntity<ApiResult<RecipeRatingDto>> upsertRatingForRecipeForUser(@PathVariable(name = "recipeId") Integer recipeId,
                                                                                    @Valid @RequestBody PostRatingDto ratingDto,
-                                                                                   @AuthenticationPrincipal(expression = "claims['email']") String userEmail) {
+                                                                                   @AuthenticationPrincipal(expression = "claims['email']") String userEmail,
+                                                                                   @RequestHeader(value = "Session-Id", required = false) String sessionId) {
+
+        if(sessionId != null) {
+            UserInteractionDto userInteractionDto = new UserInteractionDto(sessionId, recipeId, "rating");
+            this.producerTemplate.asyncSendBody("direct:userInteractionEvents", userInteractionDto);
+        }
 
         try {
             RecipeRatingDto recipeRatingDto = this.ratingsService.upsertRatingForUser(ratingDto, recipeId, userEmail);

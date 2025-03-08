@@ -20,6 +20,7 @@ public class StaticCodeService extends BaseService {
     public static final Integer TIME_UNIT_CODE_BOOK_ID = 100;
     public static final Integer DAYS_OF_WEEK_CODE_BOOK_ID = 200;
     public static final Integer NON_RECIPE_SUBSTITUTION_CODE_BOOK_ID = 300;
+    public static final Integer USER_INTERACTION_EVENT_CODE_BOOK_ID = 400;
 
     private final CodeBookRepository codeBookRepository;
     private final CodeValueRepository codeValueRepository;
