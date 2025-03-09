@@ -4,6 +4,7 @@ import org.group2.comp313.kitchen_companion.domain.Category;
 import org.group2.comp313.kitchen_companion.domain.Recipe;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryCardWithCategory;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryForCards;
+import org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryForCardsWithScore;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -80,18 +81,18 @@ public interface RecipeRepository extends PagingAndSortingRepository<Recipe, Int
     Page<RecipeSummaryForCards> findSavedRecipeSummaryCardsByUser(@Param("username") String username, Pageable pageable);
 
 
-    @Query("SELECT new org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryForCards(" +
-            "r.id, r.title, r.summary, r.thumbnailUrl, r.calories, " +
+    @Query("SELECT new org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryForCardsWithScore(" +
+            "r.id, r.title, r.thumbnailUrl, r.calories, " +
             "SUM(CASE WHEN cv.label = 'view' THEN 1 " +
             "WHEN cv.label = 'saved' THEN 10 " +
             "WHEN cv.label = 'rating' THEN 5 " +
-            "ELSE 0 END) AS interactionScore) as interactionScore " +
+            "ELSE 0 END) as interactionScore )" +
             "FROM Recipe r " +
             "LEFT JOIN UserInteraction ui ON r.id = ui.recipe " +
             "LEFT JOIN CodeValue cv ON cv.id = ui.userInteractionEventTypeCode " +
             "Left JOIN RatingCalculated rc on rc.recipe = r.id " +
             "GROUP BY r.id, rc.ratingValue " +
             "ORDER BY interactionScore DESC, rc.ratingValue, r.id DESC")
-    List<RecipeSummaryForCards> findTop10RecipesByInteractionScore(Pageable pageable);
+    List<RecipeSummaryForCardsWithScore> findTop10RecipesByInteractionScore(Pageable pageable);
 
 }

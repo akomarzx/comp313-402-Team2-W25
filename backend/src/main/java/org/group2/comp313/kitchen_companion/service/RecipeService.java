@@ -13,6 +13,7 @@ import org.group2.comp313.kitchen_companion.dto.ai.*;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeDto;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryCardWithCategory;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryForCards;
+import org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryForCardsWithScore;
 import org.group2.comp313.kitchen_companion.mapper.RecipeMapper;
 import org.group2.comp313.kitchen_companion.repository.RecipeRepository;
 import org.group2.comp313.kitchen_companion.repository.SavedRecipeRepository;
@@ -301,7 +302,7 @@ public class RecipeService extends BaseService {
      * Retrieves Top 10 recipes based on user interaction algorithm
      * @return List RecipeSummaryCards
      */
-    public List<RecipeSummaryForCards> getTop10RecommendedRecipes() {
+    public List<RecipeSummaryForCardsWithScore> getTop10RecommendedRecipes() {
         Pageable pageable = PageRequest.of(0, 10);
         return recipeRepository.findTop10RecipesByInteractionScore(pageable);
     }
