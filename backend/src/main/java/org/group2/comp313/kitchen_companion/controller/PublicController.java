@@ -10,6 +10,7 @@ import org.group2.comp313.kitchen_companion.dto.UserInteractionDto;
 import org.group2.comp313.kitchen_companion.dto.rating.RecipeRatingDto;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryCardWithCategory;
 import org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryForCards;
+import org.group2.comp313.kitchen_companion.dto.recipe.RecipeSummaryForCardsWithScore;
 import org.group2.comp313.kitchen_companion.service.RatingsService;
 import org.group2.comp313.kitchen_companion.service.RecipeService;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
@@ -103,7 +104,7 @@ public class PublicController extends BaseController {
     }
 
     @GetMapping("/top-recipe")
-    public ResponseEntity<ApiResult<List<RecipeSummaryForCards>>> getTop10RecipeBasedOnUserInteraction() {
+    public ResponseEntity<ApiResult<List<RecipeSummaryForCardsWithScore>>> getTop10RecipeBasedOnUserInteraction() {
 
         try {
             return ResponseEntity.ok(new ApiResult<>("", recipeService.getTop10RecommendedRecipes()));
