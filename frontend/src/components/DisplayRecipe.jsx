@@ -10,6 +10,7 @@ import {
 } from "@/api/recipe";
 import { toast } from "sonner";
 import RatingAPILayer from "@/rating_component/react-rating";
+
 const DisplayRecipe = ({
   recipe,
   ratingCurrent,
@@ -18,16 +19,22 @@ const DisplayRecipe = ({
   categories = [],
 }) => {
   const router = useRouter();
+
+  // State hooks
   const [rating, setRating] = useState(ratingCurrent);
   const [saved, setSaved] = useState(recipe.isFavorite);
+
+  // Handler to update rating
   const handleRatingChange = async (e) => {
     const res = await sendRating(recipe.id, e);
-    if (res?.status === 200 || 201) {
+    // Check for either status 200 or 201
+    if (res?.status === 200 || res?.status === 201) {
       toast("Rating added successfully!");
-      console.log(res.data.result);
       setRating({ ...res.data.result, user: rating.user });
     }
   };
+
+  // Handler to save/unsave recipe
   const handleSaveClick = async () => {
     if (saved) {
       const res = await unsaveRecipe(recipe.id);
@@ -37,39 +44,42 @@ const DisplayRecipe = ({
       }
     } else {
       const res = await saveRecipe(recipe.id);
-      if (res?.status === 200 || 201) {
+      if (res?.status === 200 || res?.status === 201) {
         setSaved(!saved);
         toast("Recipe saved successfully");
       }
     }
   };
+
+  // Render content
   return (
     <div>
-      {" "}
       <div className="container mx-auto px-4 max-w-4xl">
+        {/* Recipe Header */}
         <div className="mb-4 text-center">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">
             {recipe?.title}
           </h1>
           <p className="text-gray-600">{recipe?.summary}</p>
         </div>
+
+        {/* Update Button */}
         {updateButton && (
           <div
-            className="flex cursor-pointer w-[200px] text-center p-2  mb-4 font-semibold text-gray-600 border border-gray-200 rounded-lg hover:shadow-md transition-shadow"
-            onClick={() => {
-              router.push(`/recipe/update/${recipe?.id}`);
-            }}
+            className="flex cursor-pointer w-[200px] text-center p-2 mb-4 font-semibold text-gray-600 border border-gray-200 rounded-lg hover:shadow-md transition-shadow"
+            onClick={() => router.push(`/recipe/update/${recipe?.id}`)}
           >
             <Edit size={16} className="mr-2" /> Update this Recipe
           </div>
         )}
+
+        {/* Save Button for new recipes */}
         {saveButton && (
           <div
-            className="flex cursor-pointer w-[200px] text-center p-2  mb-4 font-semibold text-gray-600 border border-gray-200 rounded-lg hover:shadow-md transition-shadow"
+            className="flex cursor-pointer w-[200px] text-center p-2 mb-4 font-semibold text-gray-600 border border-gray-200 rounded-lg hover:shadow-md transition-shadow"
             onClick={async () => {
               const res = await createRecipe(recipe);
-              console.log(res);
-              if (res?.status === 200 || 201) {
+              if (res?.status === 200 || res?.status === 201) {
                 toast("Recipe added successfully!");
                 setTimeout(() => {
                   router.replace(`/recipe/${res.data.result.id}`);
@@ -80,7 +90,8 @@ const DisplayRecipe = ({
             <SaveIcon size={16} className="mr-2" /> Save this Recipe
           </div>
         )}
-        {/* Recipe Image */}
+
+        {/* Recipe Image & Save Icon */}
         <div className="relative w-full h-[300px] md:h-[400px] rounded-lg overflow-hidden mb-8">
           {!saveButton && !updateButton && rating?.user && (
             <div className="absolute top-5 right-5 z-10">
@@ -106,6 +117,8 @@ const DisplayRecipe = ({
             priority
           />
         </div>
+
+        {/* Recipe Categories */}
         {saveButton ? (
           <div className="flex flex-wrap gap-2 mb-2">
             {recipe?.categoryIds?.map((catId, index) => {
@@ -115,6 +128,7 @@ const DisplayRecipe = ({
                 <div
                   key={index}
                   className="flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full cursor-pointer"
+                  // Note: setFormData is not defined in this component
                   onClick={() =>
                     setFormData((prev) => ({
                       ...prev,
@@ -134,20 +148,19 @@ const DisplayRecipe = ({
             <div className="flex flex-wrap gap-2 mb-2 w-2/3">
               {recipe.categories
                 ?.sort((a, b) => a.id - b.id)
-                .map((cat) => {
-                  return (
-                    <div
-                      key={cat.id}
-                      className="flex items-center gap-1 px-3 py-1 bg-green-200 text-gray-800 rounded-full cursor-pointer"
-                    >
-                      <span>{cat.label}</span>
-                    </div>
-                  );
-                })}
+                .map((cat) => (
+                  <div
+                    key={cat.id}
+                    className="flex items-center gap-1 px-3 py-1 bg-green-200 text-gray-800 rounded-full cursor-pointer"
+                  >
+                    <span>{cat.label}</span>
+                  </div>
+                ))}
             </div>
+            {/* Rating Section */}
             {rating && (
               <div className="flex flex-col ml-auto w-1/3 items-end">
-                <div className="flex  ">
+                <div className="flex">
                   <RatingAPILayer
                     initialRating={rating?.ratingValue}
                     onChange={handleRatingChange}
@@ -159,11 +172,11 @@ const DisplayRecipe = ({
                       <ChefHatIcon className="text-gray-300 font-semibold" />,
                     ]}
                     fullSymbol={[
-                      <ChefHatIcon className="text-gray-600   font-semibold" />,
-                      <ChefHatIcon className="text-red-600  ont-semibold" />,
-                      <ChefHatIcon className="text-orange-400   0 font-semibold" />,
-                      <ChefHatIcon className="text-yellow-300   0 font-semibold" />,
-                      <ChefHatIcon className="text-green-600   font-semibold" />,
+                      <ChefHatIcon className="text-gray-600 font-semibold" />,
+                      <ChefHatIcon className="text-red-600 font-semibold" />,
+                      <ChefHatIcon className="text-orange-400 font-semibold" />,
+                      <ChefHatIcon className="text-yellow-300 font-semibold" />,
+                      <ChefHatIcon className="text-green-600 font-semibold" />,
                     ]}
                     fractions={4}
                     readonly={
@@ -172,8 +185,7 @@ const DisplayRecipe = ({
                       rating.user === null
                     }
                   />
-                  <p className="font-semibold text-lg  text-right">
-                    {" "}
+                  <p className="font-semibold text-lg text-right">
                     {rating?.ratingValue} ({rating?.numberOfRatings})
                   </p>
                 </div>
@@ -186,8 +198,9 @@ const DisplayRecipe = ({
             )}
           </div>
         )}
+
         {/* Recipe Meta Information */}
-        <div className="my-4  border-b border-gray-200">
+        <div className="my-4 border-b border-gray-200">
           <div className="flex justify-between text-sm text-gray-600">
             <p className="flex items-center">
               <span className="font-medium mr-2">Author:</span>{" "}
@@ -199,9 +212,10 @@ const DisplayRecipe = ({
             </p>
           </div>
         </div>
+
         {/* Recipe Details */}
         <div className="bg-white p-6 rounded-lg shadow-md">
-          {/* Ingredients */}
+          {/* Ingredients Section */}
           <div className="mb-6">
             <h2 className="text-2xl font-semibold text-gray-800 mb-3">
               Ingredients
@@ -217,8 +231,8 @@ const DisplayRecipe = ({
                     <ul className="list-disc list-inside text-gray-700">
                       {ingredientGroup.ingredients
                         .sort((a, b) => a.ingredientOrder - b.ingredientOrder)
-                        .map((ingredient, index) => (
-                          <li key={index}>{ingredient.label}</li>
+                        .map((ingredient, idx) => (
+                          <li key={idx}>{ingredient.label}</li>
                         ))}
                     </ul>
                   </li>
@@ -226,7 +240,7 @@ const DisplayRecipe = ({
             </ol>
           </div>
 
-          {/* Instructions */}
+          {/* Instructions Section */}
           <div>
             <h2 className="text-2xl font-semibold text-gray-800 mb-3">
               Instructions
@@ -240,8 +254,8 @@ const DisplayRecipe = ({
                     <ol className="list-decimal list-inside text-gray-700">
                       {stepGroup.steps
                         .sort((a, b) => a.stepOrder - b.stepOrder)
-                        .map((step, index) => (
-                          <li key={index}>{step.description || step.label}</li>
+                        .map((step, idx) => (
+                          <li key={idx}>{step.description || step.label}</li>
                         ))}
                     </ol>
                   </li>
@@ -249,7 +263,8 @@ const DisplayRecipe = ({
             </ol>
           </div>
         </div>
-        {/* Recipe Info */}
+
+        {/* Recipe Information */}
         <div className="bg-white p-8 rounded-xl shadow-lg my-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">
             Recipe Information
@@ -286,7 +301,7 @@ const DisplayRecipe = ({
           </div>
         </div>
 
-        {/* Nutrition Information */}
+        {/* Nutrition Facts */}
         <div className="bg-white p-8 rounded-xl shadow-lg my-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">
             Nutrition Facts
@@ -308,7 +323,7 @@ const DisplayRecipe = ({
               <p className="text-gray-600 text-sm uppercase tracking-wide">
                 Sugars
               </p>
-              <p className="font-semibold  text-lg mt-1">{recipe?.sugarsG}g</p>
+              <p className="font-semibold text-lg mt-1">{recipe?.sugarsG}g</p>
             </div>
             <div className="text-center p-4 border bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
               <p className="text-gray-600 text-sm uppercase tracking-wide">

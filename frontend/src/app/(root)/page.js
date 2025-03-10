@@ -1,4 +1,12 @@
 "use client";
+
+/**
+ * Home Component
+ *
+ * This component renders the homepage with hero, features, AI highlights, and CTAs.
+ * It utilizes Next.js' client-side rendering, custom hooks, and the AuthContext.
+ */
+
 import React from "react";
 import { useAuth } from "../../context/AuthContext";
 import { redirect } from "next/navigation";
@@ -10,29 +18,39 @@ import {
   Sparkles,
   Star,
 } from "lucide-react";
+
+/**
+ * A reusable feature card component.
+ * @param {React.ElementType} icon - Lucide icon component.
+ * @param {string} title - Title of the feature.
+ * @param {string} description - Description of the feature.
+ */
+const FeatureCard = ({ icon: Icon, title, description }) => {
+  return (
+    <div className="glass-card p-6 rounded-lg transition-all duration-300 hover:shadow-xl">
+      <div className="w-12 h-12 mb-4 bg-primary/10 rounded-full flex items-center justify-center">
+        <Icon className="w-6 h-6 text-primary" />
+      </div>
+      <h3 className="text-xl font-semibold mb-2">{title}</h3>
+      <p className="text-muted-foreground">{description}</p>
+    </div>
+  );
+};
+
 const Home = () => {
+  // Hooks
   const { user, loading, login } = useAuth();
 
+  // If there's a saved URL, redirect to it after login
   if (user && localStorage.getItem("lastUrl")) {
     const redirectUrl = localStorage.getItem("lastUrl");
     localStorage.removeItem("lastUrl");
     console.log("Redirecting to:", redirectUrl);
     redirect(redirectUrl);
   }
-  const FeatureCard = ({ icon: Icon, title, description }) => {
-    return (
-      <div className="glass-card p-6 rounded-lg transition-all duration-300 hover:shadow-xl">
-        <div className="w-12 h-12 mb-4 bg-primary/10 rounded-full flex items-center justify-center">
-          <Icon className="w-6 h-6 text-primary" />
-        </div>
-        <h3 className="text-xl font-semibold mb-2">{title}</h3>
-        <p className="text-muted-foreground">{description}</p>
-      </div>
-    );
-  };
 
   return (
-    <div className="bg-white ">
+    <div className="bg-white">
       <div className="min-h-screen">
         {/* Hero Section */}
         <section className="hero-gradient min-h-[100vh] px-4 py-20 flex items-center justify-center">
@@ -113,57 +131,55 @@ const Home = () => {
         >
           <div className="container max-w-6xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              <div className="order-2 lg:order-1">
-                <div className="space-y-6">
-                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/20 rounded-full">
-                    <Sparkles className="w-5 h-5 text-primary" />
-                    <span className="text-primary font-medium">
-                      AI-Powered Cooking
-                    </span>
-                  </div>
-                  <h2 className="text-3xl md:text-4xl font-bold">
-                    Let AI Transform Your
-                    <span className="text-primary block mt-2">
-                      Cooking Experience
-                    </span>
-                  </h2>
-                  <div className="space-y-4 text-lg text-muted-foreground">
-                    <p>
-                      Get personalized recipe suggestions based on your
-                      preferences, dietary restrictions, and available
-                      ingredients.
-                    </p>
-                    <ul className="space-y-3">
-                      <li className="flex items-start gap-3">
-                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center mt-1">
-                          <span className="text-primary text-sm">✓</span>
-                        </div>
-                        <span>Intelligent recipe recommendations</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center mt-1">
-                          <span className="text-primary text-sm">✓</span>
-                        </div>
-                        <span>Automatic ingredient substitutions</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center mt-1">
-                          <span className="text-primary text-sm">✓</span>
-                        </div>
-                        <span>Smart meal planning assistance</span>
-                      </li>
-                    </ul>
-                  </div>
-                  <Button
-                    size="lg"
-                    className="text-lg"
-                    onClick={() => {
-                      redirect("/ai-rcmd");
-                    }}
-                  >
-                    Try AI Recipe Generator
-                  </Button>
+              <div className="order-2 lg:order-1 space-y-6">
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/20 rounded-full">
+                  <Sparkles className="w-5 h-5 text-primary" />
+                  <span className="text-primary font-medium">
+                    AI-Powered Cooking
+                  </span>
                 </div>
+                <h2 className="text-3xl md:text-4xl font-bold">
+                  Let AI Transform Your
+                  <span className="text-primary block mt-2">
+                    Cooking Experience
+                  </span>
+                </h2>
+                <div className="space-y-4 text-lg text-muted-foreground">
+                  <p>
+                    Get personalized recipe suggestions based on your
+                    preferences, dietary restrictions, and available
+                    ingredients.
+                  </p>
+                  <ul className="space-y-3">
+                    <li className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center mt-1">
+                        <span className="text-primary text-sm">✓</span>
+                      </div>
+                      <span>Intelligent recipe recommendations</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center mt-1">
+                        <span className="text-primary text-sm">✓</span>
+                      </div>
+                      <span>Automatic ingredient substitutions</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center mt-1">
+                        <span className="text-primary text-sm">✓</span>
+                      </div>
+                      <span>Smart meal planning assistance</span>
+                    </li>
+                  </ul>
+                </div>
+                <Button
+                  size="lg"
+                  className="text-lg"
+                  onClick={() => {
+                    redirect("/ai-rcmd");
+                  }}
+                >
+                  Try AI Recipe Generator
+                </Button>
               </div>
               <div className="order-1 lg:order-2">
                 <div className="glass-card p-8 rounded-2xl space-y-6">
@@ -219,6 +235,8 @@ const Home = () => {
           </div>
         </section>
       </div>
+
+      {/* Scroll-to-top button */}
       <ArrowBigUp
         size={50}
         className="fixed bottom-10 right-5 md:right-10 2xl:right-[100px] p-2 bg-white text-gray-600 rounded-full cursor-pointer z-20"

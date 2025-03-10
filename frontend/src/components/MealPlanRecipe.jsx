@@ -10,13 +10,17 @@ import {
 import { useRouter } from "next/navigation";
 
 const MealPlanRecipe = ({ recipe }) => {
+  // State for expand/collapse
   const [expanded, setExpanded] = useState(false);
   const contentRef = useRef(null);
   const router = useRouter();
+
+  // Toggle expand state
   const toggleExpand = () => {
     setExpanded(!expanded);
   };
 
+  // Scroll to the recipe card once expanded
   useEffect(() => {
     if (expanded && contentRef.current) {
       contentRef.current.scrollIntoView({
@@ -33,23 +37,21 @@ const MealPlanRecipe = ({ recipe }) => {
       }`}
       ref={contentRef}
     >
+      {/* Recipe image and header with toggle button */}
       <div className="relative">
         <div
           className="overflow-hidden transition-all duration-500 ease-in-out"
-          style={{
-            height: expanded ? "220px" : "100px",
-          }}
+          style={{ height: expanded ? "220px" : "100px" }}
         >
           <img
             src={recipe?.imageUrl}
             alt={recipe?.title}
             className="w-full h-full object-cover transition-transform duration-700 ease-out"
-            style={{
-              transform: expanded ? "scale(1.05)" : "scale(1)",
-            }}
+            style={{ transform: expanded ? "scale(1.05)" : "scale(1)" }}
           />
         </div>
 
+        {/* Gradient overlay */}
         <div
           className={`absolute inset-0 bg-gradient-to-t ${
             expanded
@@ -58,14 +60,15 @@ const MealPlanRecipe = ({ recipe }) => {
           } transition-opacity duration-500`}
         ></div>
 
+        {/* Recipe title, toggle button, and categories */}
         <div className="absolute bottom-0 left-0 p-2 sm:p-4 w-full">
           <div className="flex items-start justify-between">
             <h2 className="text-white font-semibold text-lg sm:text-xl tracking-tight leading-tight pr-2 line-clamp-2">
               {recipe.title}
             </h2>
             <button
-              className="p-1 rounded-full bg-white/90 hover:bg-white transition-colors duration-200 flex-shrink-0"
               onClick={toggleExpand}
+              className="p-1 rounded-full bg-white/90 hover:bg-white transition-colors duration-200 flex-shrink-0"
               aria-label={expanded ? "Collapse recipe" : "Expand recipe"}
             >
               {expanded ? (
@@ -75,14 +78,13 @@ const MealPlanRecipe = ({ recipe }) => {
               )}
             </button>
           </div>
-
           <div className="flex flex-wrap gap-1 mt-1 sm:mt-2 max-h-[28px] min-[400px]:max-h-[60px] overflow-hidden">
-            {recipe?.categories?.map((cat, i) => (
+            {recipe?.categories?.map((cat, index) => (
               <span
-                key={i}
-                className="inline-block mb-1 line-clamp-1 min-[400px]:line-clamp-none "
+                key={index}
+                className="inline-block mb-1 line-clamp-1 min-[400px]:line-clamp-none"
               >
-                <span className="text-blue-600 border rounded-full px-2 bg-blue-100 text-xs ">
+                <span className="text-blue-600 border rounded-full px-2 bg-blue-100 text-xs">
                   {cat.label}
                 </span>
               </span>
@@ -91,14 +93,17 @@ const MealPlanRecipe = ({ recipe }) => {
         </div>
       </div>
 
+      {/* Expanded content with recipe details */}
       <div
         className={expanded ? "recipe-card-expanded" : "recipe-card-collapsed"}
       >
         <div className="p-3 sm:p-4">
+          {/* Recipe summary */}
           <p className="mb-3 sm:mb-4 line-clamp-1 text-sm sm:text-base">
             {recipe.summary}
           </p>
 
+          {/* Recipe details: prep time, cook time, servings, calories */}
           <div className="grid grid-cols-2 sm:flex sm:justify-between gap-2 items-center mb-3 sm:mb-4 text-xs sm:text-sm">
             <div className="flex items-center">
               <Clock className="h-4 w-4 mr-1" />
@@ -120,6 +125,7 @@ const MealPlanRecipe = ({ recipe }) => {
 
           <div className="recipe-divider"></div>
 
+          {/* Ingredients section */}
           <div>
             <h3 className="font-medium mb-2 text-sm sm:text-base">
               Ingredients
@@ -127,16 +133,16 @@ const MealPlanRecipe = ({ recipe }) => {
             <ol className="list list-inside text-gray-700 text-sm sm:text-base">
               {recipe?.ingredientGroups
                 .sort((a, b) => a.ingredientGroupOrder - b.ingredientGroupOrder)
-                .map((ingredientGroup, index) => (
-                  <li key={index} className="mb-3 sm:mb-4">
+                .map((group, groupIndex) => (
+                  <li key={groupIndex} className="mb-3 sm:mb-4">
                     <h3 className="font-semibold text-base sm:text-lg">
-                      {ingredientGroup.label}
+                      {group.label}
                     </h3>
                     <ul className="list-disc list-inside text-gray-700 pl-1 sm:pl-2">
-                      {ingredientGroup.ingredients
+                      {group.ingredients
                         .sort((a, b) => a.ingredientOrder - b.ingredientOrder)
-                        .map((ingredient, index) => (
-                          <li key={index}>{ingredient.label}</li>
+                        .map((ingredient, ingredientIndex) => (
+                          <li key={ingredientIndex}>{ingredient.label}</li>
                         ))}
                     </ul>
                   </li>
@@ -146,6 +152,7 @@ const MealPlanRecipe = ({ recipe }) => {
 
           <div className="recipe-divider"></div>
 
+          {/* Instructions section */}
           <div>
             <h3 className="font-medium mb-2 text-sm sm:text-base">
               Instructions
@@ -153,16 +160,18 @@ const MealPlanRecipe = ({ recipe }) => {
             <ol className="list list-inside text-gray-700 space-y-1 sm:space-y-2 text-sm sm:text-base">
               {recipe?.stepGroups
                 .sort((a, b) => a.stepGroupOrder - b.stepGroupOrder)
-                .map((stepGroup, index) => (
-                  <li key={index} className="mb-3 sm:mb-4">
+                .map((group, groupIndex) => (
+                  <li key={groupIndex} className="mb-3 sm:mb-4">
                     <h3 className="font-semibold text-base sm:text-lg">
-                      {stepGroup.label}
+                      {group.label}
                     </h3>
                     <ol className="list-decimal list-inside text-gray-700 pl-1 sm:pl-2">
-                      {stepGroup.steps
+                      {group.steps
                         .sort((a, b) => a.stepOrder - b.stepOrder)
-                        .map((step, index) => (
-                          <li key={index}>{step.description || step.label}</li>
+                        .map((step, stepIndex) => (
+                          <li key={stepIndex}>
+                            {step.description || step.label}
+                          </li>
                         ))}
                     </ol>
                   </li>
@@ -170,14 +179,15 @@ const MealPlanRecipe = ({ recipe }) => {
             </ol>
           </div>
         </div>
+
+        {/* Navigation button to recipe details */}
         <div className="flex justify-end p-3 sm:p-4">
           <div
-            onClick={() => {
-              router.push(`/recipe/${recipe.id}`);
-            }}
-            className="cursor-pointer  flex border-t justify-around items-center rounded-full  w-[150px] hover:bg-gray-100"
+            onClick={() => router.push(`/recipe/${recipe.id}`)}
+            className="cursor-pointer flex border-t justify-around items-center rounded-full w-[150px] hover:bg-gray-100"
           >
-            <span>Go to details</span> <ArrowRight size={20} className="" />
+            <span>Go to details</span>
+            <ArrowRight size={20} />
           </div>
         </div>
       </div>

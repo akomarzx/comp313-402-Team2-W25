@@ -15,6 +15,10 @@ import { useAuth } from "@/context/AuthContext";
 import { useState } from "react";
 import Image from "next/image";
 
+/**
+ * RecipeForm: A form component for creating new recipes.
+ * Organizes ingredient and step groups, handles image upload, and submits data.
+ */
 const RecipeForm = () => {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -33,32 +37,29 @@ const RecipeForm = () => {
     categoryIds: [],
     imageUrl: "",
   });
-
   const [isCreating, setIsCreating] = useState(false);
   const [imgFile, setImgFile] = useState(null);
   const [imageSrc, setImageSrc] = useState(null);
-
   const { user, loading, categories } = useAuth();
-  if (loading) return <Loader2Icon className="animate-spin m-auto" />;
-  if (!user) {
-    redirect("/");
-  }
 
+  // Redirect if not logged in
+  if (loading) return <Loader2Icon className="animate-spin m-auto" />;
+  if (!user) redirect("/");
+
+  // Update form fields
   const handleChange = (e) => {
     const { id, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [id]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
+  // Handle file upload
   const handleFileChange = (e) => {
-    console.log(e.target.files[0]);
-    setImgFile(() => e.target.files[0]);
+    setImgFile(e.target.files[0]);
     const url = window.URL.createObjectURL(e.target.files[0]);
     setImageSrc(url);
   };
 
+  // Add a new group (ingredient/step)
   const addGroup = (field) => {
     setFormData((prev) => ({
       ...prev,
@@ -71,6 +72,7 @@ const RecipeForm = () => {
     }));
   };
 
+  // Update group fields or subfields
   const handleGroupChange = (e, groupIndex, field, subIndex = null) => {
     const value = e.target.value;
     setFormData((prev) => {
@@ -80,35 +82,26 @@ const RecipeForm = () => {
           ...updatedGroups[groupIndex],
           [e.target.name]: value,
         };
+      } else if (field === "stepGroups") {
+        updatedGroups[groupIndex].steps[subIndex] = value;
       } else {
-        if (field === "stepGroups") {
-          updatedGroups[groupIndex].steps[subIndex] = value;
-        } else {
-          updatedGroups[groupIndex].ingredients[subIndex] = value;
-        }
+        updatedGroups[groupIndex].ingredients[subIndex] = value;
       }
       return { ...prev, [field]: updatedGroups };
     });
   };
 
+  // Add an ingredient or step to a group
   const addSubField = (groupIndex, field) => {
     setFormData((prev) => {
       const updatedGroups = [...prev[field]];
-      if (field === "ingredientGroups") {
-        updatedGroups[groupIndex] = {
-          ...updatedGroups[groupIndex],
-          ingredients: [...updatedGroups[groupIndex].ingredients, ""],
-        };
-      } else {
-        updatedGroups[groupIndex] = {
-          ...updatedGroups[groupIndex],
-          steps: [...updatedGroups[groupIndex].steps, ""],
-        };
-      }
+      const key = field === "ingredientGroups" ? "ingredients" : "steps";
+      updatedGroups[groupIndex][key].push("");
       return { ...prev, [field]: updatedGroups };
     });
   };
 
+  // Remove entire group
   const removeGroup = (groupIndex, field) => {
     setFormData((prev) => {
       const updatedGroups = [...prev[field]];
@@ -117,23 +110,20 @@ const RecipeForm = () => {
     });
   };
 
+  // Remove a single ingredient or step
   const removeSubField = (groupIndex, subIndex, field) => {
     setFormData((prev) => {
       const updatedGroups = [...prev[field]];
-      if (field === "ingredientGroups") {
-        updatedGroups[groupIndex].ingredients.splice(subIndex, 1);
-      } else {
-        updatedGroups[groupIndex].steps.splice(subIndex, 1);
-      }
+      const key = field === "ingredientGroups" ? "ingredients" : "steps";
+      updatedGroups[groupIndex][key].splice(subIndex, 1);
       return { ...prev, [field]: updatedGroups };
     });
   };
 
+  // Handle form submission
   const handleSubmit = async (e) => {
-    setIsCreating(true);
     e.preventDefault();
-    console.log(formData);
-
+    setIsCreating(true);
     const newFormData = {
       title: formData.title,
       summary: formData.summary,
@@ -149,73 +139,49 @@ const RecipeForm = () => {
       fatG: formData.fat,
       categoryIds: formData.categoryIds || [1],
       imageUrl: "x",
-      ingredientGroups: formData.ingredientGroups.map((group, idx) => {
-        return {
-          label: group.label,
-          ingredientGroupOrder: idx + 1,
-          ingredients: group.ingredients.map((ingredient, subIdx) => {
-            return {
-              label: ingredient,
-              ingredientOrder: subIdx + 1,
-            };
-          }),
-        };
-      }),
-      stepGroups: formData.stepGroups.map((group, idx) => {
-        return {
-          label: group.label,
-          stepGroupOrder: idx + 1,
-          steps: group.steps.map((step, subIdx) => {
-            return {
-              label: step,
-              stepOrder: subIdx + 1,
-            };
-          }),
-        };
-      }),
+      ingredientGroups: formData.ingredientGroups.map((group, idx) => ({
+        label: group.label,
+        ingredientGroupOrder: idx + 1,
+        ingredients: group.ingredients.map((ing, subIdx) => ({
+          label: ing,
+          ingredientOrder: subIdx + 1,
+        })),
+      })),
+      stepGroups: formData.stepGroups.map((group, idx) => ({
+        label: group.label,
+        stepGroupOrder: idx + 1,
+        steps: group.steps.map((step, subIdx) => ({
+          label: step,
+          stepOrder: subIdx + 1,
+        })),
+      })),
     };
-    if (newFormData.ingredientGroups?.length < 1) {
+
+    // Basic validations
+    if (!newFormData.ingredientGroups?.length) {
       toast("Please add at least one ingredient group.");
       setIsCreating(false);
       return;
     }
-    if (newFormData.stepGroups?.length < 1) {
+    if (!newFormData.stepGroups?.length) {
       toast("Please add at least one step group.");
       setIsCreating(false);
       return;
     }
-    newFormData.ingredientGroups?.map((group) => {
-      if (group.ingredients.length < 1) {
-        toast("Please add at least one ingredient.");
-        setIsCreating(false);
-        return;
-      }
-    });
-    newFormData.stepGroups?.map((group) => {
-      if (group.steps.length < 1) {
-        toast("Please add at least one step.");
-        setIsCreating(false);
-        return;
-      }
-    });
 
     try {
       const imgRes = await uploadImg({ file: imgFile });
-      console.log(imgRes);
       if (imgRes.status === 200) {
         newFormData.imageUrl = imgRes.data;
         newFormData.thumbnailUrl = imgRes.data;
       }
       const res = await createRecipe(newFormData);
-      console.log(res);
       if (res?.status === 200 || 201) {
         toast("Recipe created successfully!");
         setTimeout(() => {
           router.replace(`/recipe/${res.data.result.id}`);
         }, 1500);
       }
-
-      // console.log(newFormData);
     } catch (error) {
       toast("Error creating recipe. Please try again.");
       console.error("Error:", error);
@@ -226,7 +192,6 @@ const RecipeForm = () => {
 
   return (
     <>
-      {/* not letting user touch while creating overlay */}
       {isCreating && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <LoaderIcon size={50} className="animate-spin m-auto" />
@@ -239,6 +204,7 @@ const RecipeForm = () => {
         <h2 className="text-2xl font-bold text-gray-800 my-6 text-center">
           Create Recipe
         </h2>
+        {/* Title */}
         <div className="mb-6">
           <label
             className="block text-gray-700 text-sm font-bold mb-2"
@@ -256,6 +222,7 @@ const RecipeForm = () => {
             required
           />
         </div>
+        {/* Summary */}
         <div className="mb-6">
           <label
             className="block text-gray-700 text-sm font-bold mb-2"
@@ -273,6 +240,7 @@ const RecipeForm = () => {
             required
           />
         </div>
+        {/* Categories */}
         <div className="mb-6">
           <div className="mb-6">
             <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -281,22 +249,20 @@ const RecipeForm = () => {
             <select
               multiple
               value={formData.categoryIds}
-              onChange={(e) => {
-                e.preventDefault();
-              }}
+              onChange={(e) => e.preventDefault()}
               className="w-full p-2 border rounded-lg"
             >
               {categories?.data.map((cat) => (
                 <option
                   key={cat.id}
                   value={cat.id}
-                  onClick={() => {
+                  onClick={() =>
                     !formData.categoryIds?.includes(cat.id) &&
-                      setFormData((prev) => ({
-                        ...prev,
-                        categoryIds: [...prev.categoryIds, cat.id],
-                      }));
-                  }}
+                    setFormData((prev) => ({
+                      ...prev,
+                      categoryIds: [...prev.categoryIds, cat.id],
+                    }))
+                  }
                 >
                   {cat.label}
                 </option>
@@ -327,13 +293,13 @@ const RecipeForm = () => {
             })}
           </div>
         </div>
-        {/* Image Upload */}
+        {/* Image */}
         <div className="mb-6">
           {imageSrc && (
             <div className="relative w-full h-[300px] md:h-[400px] rounded-lg overflow-hidden mb-8">
               <Image
                 src={imageSrc}
-                alt={formData?.title || "image"}
+                alt={formData.title || "image"}
                 layout="fill"
                 objectFit="cover"
                 className="rounded-lg"
@@ -351,10 +317,10 @@ const RecipeForm = () => {
             required
           />
         </div>
-        {/* Times and Servings */}
+        {/* Prep/Cook/Servings/Yield */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          {["prepTime", "cookTime", "servings", "yield"].map((field, idx) => (
-            <div key={idx}>
+          {["prepTime", "cookTime", "servings", "yield"].map((field) => (
+            <div key={field}>
               <label className="block text-gray-700 text-sm font-bold mb-2">
                 {field === "prepTime"
                   ? "Prep Time (mins)"
@@ -376,13 +342,13 @@ const RecipeForm = () => {
             </div>
           ))}
         </div>
-        {/* Nutrition Info */}
+        {/* Nutrition */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          {["calories", "carbs", "sugars", "fat"].map((field, idx) => (
-            <div key={idx}>
+          {["calories", "carbs", "sugars", "fat"].map((field) => (
+            <div key={field}>
               <label className="block text-gray-700 text-sm font-bold mb-2">
                 {field.charAt(0).toUpperCase() + field.slice(1)}{" "}
-                {field === "calories" ? "" : "(g)"}
+                {field !== "calories" ? "(g)" : ""}
               </label>
               <input
                 type="number"
@@ -441,10 +407,9 @@ const RecipeForm = () => {
                 </div>
               ))}
               <div className="flex justify-between">
-                {" "}
                 <button
                   type="button"
-                  className=" text-gray-600 px-4 py-2 rounded flex border-2 hover:shadow-sm"
+                  className="text-gray-600 px-4 py-2 rounded flex border-2 hover:shadow-sm"
                   onClick={() => addSubField(groupIndex, "ingredientGroups")}
                 >
                   <CirclePlus size={20} />
@@ -467,7 +432,7 @@ const RecipeForm = () => {
           ))}
           <button
             type="button"
-            className=" text-green-700 hover:text-green-500 font-semibold p-2 rounded border-2 flex"
+            className="text-green-700 hover:text-green-500 font-semibold p-2 rounded border-2 flex"
             onClick={() => addGroup("ingredientGroups")}
           >
             <CopyPlus size={20} />
@@ -513,7 +478,7 @@ const RecipeForm = () => {
               <div className="flex justify-between">
                 <button
                   type="button"
-                  className=" text-gray-600 px-4 py-2 rounded flex border-2 hover:shadow-sm"
+                  className="text-gray-600 px-4 py-2 rounded flex border-2 hover:shadow-sm"
                   onClick={() => addSubField(groupIndex, "stepGroups")}
                 >
                   <CirclePlus size={20} />
@@ -536,13 +501,14 @@ const RecipeForm = () => {
           ))}
           <button
             type="button"
-            className=" text-green-700 hover:text-green-500 border-2 font-semibold p-2 rounded flex"
+            className="text-green-700 hover:text-green-500 border-2 font-semibold p-2 rounded flex"
             onClick={() => addGroup("stepGroups")}
           >
             <CopyPlus size={20} />
             <span className="px-2">Add Step Group</span>
           </button>
         </div>
+        {/* Submit */}
         <button
           type="submit"
           className="w-1/2 bg-green-600 hover:bg-green-500 text-white py-2 px-4 rounded-lg font-semibold transition-colors"

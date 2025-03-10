@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -11,34 +13,31 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import IngredientInput from "@/components/IngredientInput";
-import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
 import {
   ChefHat,
   Sparkles,
   UtensilsCrossed,
   Apple,
   Calendar,
-  LoaderIcon,
 } from "lucide-react";
+import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
 
-import { Input } from "@/components/ui/input";
-
-const AIReccommend = () => {
+const AIRecommend = () => {
+  // State definitions
   const [ingredients, setIngredients] = useState([]);
   const [dietary, setDietary] = useState("none");
   const [allergies, setAllergies] = useState([]);
-  const [mealPlanDays, setMealPlanDays] = useState("7");
   const [mealPlanGoal, setMealPlanGoal] = useState("");
   const [caloriesGoal, setCaloriesGoal] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { user, login, loading } = useAuth();
+  const { user, login } = useAuth();
 
+  // Validate and generate meal plan request
   const handleGenerateMealPlan = async () => {
+    // Validate daily calorie goal
     if (caloriesGoal) {
       if (caloriesGoal < 1000) {
         toast.error("Daily calorie goal must be at least 1000");
@@ -50,13 +49,15 @@ const AIReccommend = () => {
       }
     }
     setIsLoading(true);
+
     const requestBody = {
       dietary,
       allergies,
-      mealPlanDays,
       mealPlanGoal,
       caloriesGoal,
     };
+
+    // User not logged in? prompt for login and redirect
     if (!user) {
       toast.error("Please login to generate meal plan");
       setIsLoading(false);
@@ -67,38 +68,44 @@ const AIReccommend = () => {
           )}`
         );
       }, 1500);
-    } else {
-      try {
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-        router.push(
-          `/ai-rcmd/meal-plan?data=${encodeURIComponent(
-            JSON.stringify(requestBody)
-          )}`
-        );
-      } catch (error) {
-        console.log(error);
-        toast.error("Failed to generate meal plan");
-      } finally {
-        setIsLoading(false);
-      }
-    }
-  };
-  const handleGenerateRecipes = async () => {
-    if (ingredients.length < 3) {
-      toast.error("Please add at least three ingredient");
       return;
     }
 
+    try {
+      // Simulate processing delay
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      router.push(
+        `/ai-rcmd/meal-plan?data=${encodeURIComponent(
+          JSON.stringify(requestBody)
+        )}`
+      );
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to generate meal plan");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Validate and generate recipe request
+  const handleGenerateRecipes = async () => {
+    // Validate minimum ingredients requirement
+    if (ingredients.length < 3) {
+      toast.error("Please add at least three ingredients");
+      return;
+    }
     setIsLoading(true);
+
     const requestBody = {
       ingredients,
       dietary,
       allergies,
     };
+
+    // User not logged in? prompt for login and redirect
     if (!user) {
       toast.error("Please login to generate recipes");
       setIsLoading(false);
-
       setTimeout(() => {
         login(
           `/ai-rcmd/recipe?data=${encodeURIComponent(
@@ -106,41 +113,52 @@ const AIReccommend = () => {
           )}`
         );
       }, 1500);
-    } else {
-      try {
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-        router.push(
-          `/ai-rcmd/recipe?data=${encodeURIComponent(
-            JSON.stringify(requestBody)
-          )}`
-        );
-      } catch (error) {
-        console.log(error);
-        toast.error("Failed to generate recipes");
-      } finally {
-        setIsLoading(false);
-      }
+      return;
+    }
+
+    try {
+      // Simulate processing delay
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      router.push(
+        `/ai-rcmd/recipe?data=${encodeURIComponent(
+          JSON.stringify(requestBody)
+        )}`
+      );
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to generate recipes");
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  // Toggle allergy status in array
+  const handleCheckboxChange = (allergy, checked) => {
+    if (checked) {
+      setAllergies((prev) => [...prev, allergy]);
+    } else {
+      setAllergies((prev) => prev.filter((a) => a !== allergy));
+    }
+  };
+
   return (
     <div className="min-h-screen fade-in">
+      {/* Main Container */}
       <div className="container max-w-4xl mx-auto px-4 py-12 md:py-20">
+        {/* Hero Section */}
         <div className="text-center space-y-6 mb-16">
           <div className="relative inline-flex">
             <div className="relative bg-white shadow-xl rounded-full p-6">
               <ChefHat className="w-12 h-12 text-green-600" />
             </div>
           </div>
-
           <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-green-600 to-blue-300 text-transparent bg-clip-text tracking-tight">
             AI Recipe Recommendation
           </h1>
-
           <p className="text-gray-600 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
             Transform your ingredients into culinary masterpieces with our
             AI-powered recipe generator
           </p>
-
           <div className="flex items-center justify-center gap-8 text-gray-600">
             <div className="flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-green-500" />
@@ -156,8 +174,11 @@ const AIReccommend = () => {
             </div>
           </div>
         </div>
+
+        {/* Card Container */}
         <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 space-y-8 border border-purple-100">
           <Tabs defaultValue="recipes" className="w-full">
+            {/* Tabs List */}
             <TabsList className="grid w-full grid-cols-2 mb-8">
               <TabsTrigger value="recipes" className="text-base">
                 Single Recipe
@@ -167,7 +188,9 @@ const AIReccommend = () => {
               </TabsTrigger>
             </TabsList>
 
+            {/* Recipes Tab Content */}
             <TabsContent value="recipes" className="space-y-8">
+              {/* Ingredients Section */}
               <div className="space-y-4">
                 <label className="block text-lg font-semibold text-gray-800">
                   What ingredients do you have?
@@ -178,6 +201,7 @@ const AIReccommend = () => {
                 />
               </div>
 
+              {/* Dietary Preferences */}
               <div className="space-y-4">
                 <label className="block text-lg font-semibold text-gray-800">
                   Dietary Preferences
@@ -196,6 +220,7 @@ const AIReccommend = () => {
                 </Select>
               </div>
 
+              {/* Allergies & Restrictions */}
               <div className="space-y-4">
                 <label className="block text-lg font-semibold text-gray-800">
                   Allergies & Restrictions
@@ -210,15 +235,9 @@ const AIReccommend = () => {
                         <Checkbox
                           id={allergy}
                           checked={allergies.includes(allergy)}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setAllergies([...allergies, allergy]);
-                            } else {
-                              setAllergies(
-                                allergies.filter((a) => a !== allergy)
-                              );
-                            }
-                          }}
+                          onCheckedChange={(checked) =>
+                            handleCheckboxChange(allergy, checked)
+                          }
                           className="border-2 border-purple-200 data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600"
                         />
                         <label
@@ -233,14 +252,15 @@ const AIReccommend = () => {
                 </div>
               </div>
 
+              {/* Generate Recipe Button */}
               <Button
-                className="w-full bg-gradient-to-r from-green-600 to-blue-300  hover:to-yellow-200 text-white py-6 text-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl rounded-xl"
+                className="w-full bg-gradient-to-r from-green-600 to-blue-300 hover:to-yellow-200 text-white py-6 text-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl rounded-xl"
                 onClick={handleGenerateRecipes}
                 disabled={isLoading}
               >
                 {isLoading ? (
                   <div className="flex items-center gap-2">
-                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
                     <span>Creating your recipes...</span>
                   </div>
                 ) : (
@@ -249,7 +269,9 @@ const AIReccommend = () => {
               </Button>
             </TabsContent>
 
+            {/* Meal Plan Tab Content */}
             <TabsContent value="mealplan" className="space-y-8">
+              {/* Meal Plan Description */}
               <div className="space-y-4">
                 {/* <label className="block text-lg font-semibold text-gray-800">
                   Meal Plan Duration
@@ -270,6 +292,7 @@ const AIReccommend = () => {
                 </p>
               </div>
 
+              {/* Goal / Purpose Selection */}
               <div className="space-y-4">
                 <label className="block text-lg font-semibold text-gray-800">
                   Goal / Purpose
@@ -288,6 +311,7 @@ const AIReccommend = () => {
                 </Select>
               </div>
 
+              {/* Daily Calorie Goal Input */}
               <div className="space-y-4">
                 <label className="block text-lg font-semibold text-gray-800">
                   Daily Calorie Goal
@@ -303,6 +327,7 @@ const AIReccommend = () => {
                 />
               </div>
 
+              {/* Dietary Preferences for Meal Plan */}
               <div className="space-y-4">
                 <label className="block text-lg font-semibold text-gray-800">
                   Dietary Preferences
@@ -321,6 +346,7 @@ const AIReccommend = () => {
                 </Select>
               </div>
 
+              {/* Allergies & Restrictions for Meal Plan */}
               <div className="space-y-4">
                 <label className="block text-lg font-semibold text-gray-800">
                   Allergies & Restrictions
@@ -335,15 +361,9 @@ const AIReccommend = () => {
                         <Checkbox
                           id={`mealplan-${allergy}`}
                           checked={allergies.includes(allergy)}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setAllergies([...allergies, allergy]);
-                            } else {
-                              setAllergies(
-                                allergies.filter((a) => a !== allergy)
-                              );
-                            }
-                          }}
+                          onCheckedChange={(checked) =>
+                            handleCheckboxChange(allergy, checked)
+                          }
                           className="border-2 border-purple-200 data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600"
                         />
                         <label
@@ -358,14 +378,15 @@ const AIReccommend = () => {
                 </div>
               </div>
 
+              {/* Generate Meal Plan Button */}
               <Button
-                className="w-full bg-gradient-to-r from-green-600 to-blue-300  hover:to-yellow-200 text-white py-6 text-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl rounded-xl"
+                className="w-full bg-gradient-to-r from-green-600 to-blue-300 hover:to-yellow-200 text-white py-6 text-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl rounded-xl"
                 onClick={handleGenerateMealPlan}
                 disabled={isLoading}
               >
                 {isLoading ? (
                   <div className="flex items-center gap-2">
-                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
                     <span>Creating your meal plan...</span>
                   </div>
                 ) : (
@@ -382,4 +403,5 @@ const AIReccommend = () => {
     </div>
   );
 };
-export default AIReccommend;
+
+export default AIRecommend;
