@@ -3,28 +3,43 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Plus, X } from "lucide-react";
 
+/**
+ * IngredientInput Component
+ *
+ * Renders an input field to add ingredients. Displays added ingredients with an option to remove them.
+ *
+ * Props:
+ * - ingredients (array): Current list of ingredients.
+ * - setIngredients (function): State setter to update the ingredient list.
+ */
 const IngredientInput = ({ ingredients, setIngredients }) => {
+  // Local state for the current ingredient input
   const [currentIngredient, setCurrentIngredient] = React.useState("");
 
+  // Add current ingredient to the list if it's not empty
   const handleAddIngredient = () => {
-    if (currentIngredient.trim()) {
-      setIngredients([...ingredients, currentIngredient.trim()]);
+    const trimmedIngredient = currentIngredient.trim();
+    if (trimmedIngredient) {
+      setIngredients([...ingredients, trimmedIngredient]);
       setCurrentIngredient("");
     }
   };
 
+  // Listen for Enter key press to add ingredient
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       handleAddIngredient();
     }
   };
 
+  // Remove ingredient at provided index
   const removeIngredient = (index) => {
     setIngredients(ingredients.filter((_, i) => i !== index));
   };
 
   return (
     <div className="space-y-4">
+      {/* Input and Add Button */}
       <div className="flex gap-2">
         <Input
           type="text"
@@ -42,6 +57,8 @@ const IngredientInput = ({ ingredients, setIngredients }) => {
           <Plus className="h-4 w-4 text-purple-600" />
         </Button>
       </div>
+
+      {/* Display Added Ingredients */}
       <div className="flex flex-wrap gap-2">
         {ingredients.map((ingredient, index) => (
           <span

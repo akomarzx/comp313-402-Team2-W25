@@ -20,24 +20,28 @@ import { ArrowBigUp, Search } from "lucide-react";
 import CategoriesFilter from "@/components/CategoriesFilter";
 
 const RecipePage = () => {
+  // Authentication & context data
   const { user, logout, loading, categories, topRecipes } = useAuth();
+
+  // URL search params
   const searchParams = useSearchParams();
   const displayType = searchParams.get("displayType") || "default";
   let page = searchParams.get("page") || 1;
   const sortParam = searchParams.get("sort") || "default";
   const searchKeyParam = searchParams.get("search") || "";
   const categoryKeyParam = searchParams.get("category") || "";
+
+  // Validate page param
   if (typeof page !== "number") {
     try {
       page = parseInt(page);
-      if (isNaN(page)) {
-        redirect("/recipes");
-      }
+      if (isNaN(page)) redirect("/recipes");
     } catch (error) {
-      console.error("Error parsing page:", error);
       redirect("/recipes");
     }
   }
+
+  // Internal states
   const [isSearching, setIsSearching] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [recipeCardData, setRecipeCardData] = useState([]);
@@ -47,8 +51,10 @@ const RecipePage = () => {
   const [searchCategory, setSearchCategory] = useState(categoryKeyParam);
   const router = useRouter();
 
+  // Helper array for pagination items
   let pages = [1, 2, 3];
 
+  // Fetch recipes from API
   const fetchRecipes = async () => {
     try {
       setIsLoading(true);
@@ -59,81 +65,83 @@ const RecipePage = () => {
         [sortParam?.split("-")],
         searchCategory
       );
+
+      // Handle authorization
       if (fetchData === 401) {
         logout();
         toast("Session expired. Please login again.");
-        setTimeout(() => {
-          router.push("/");
-        }, 2000);
+        setTimeout(() => router.push("/"), 2000);
         return;
       }
+
+      // Update UI states
       setRecipeCardData(fetchData?.content);
       setTotalPages(fetchData?.page?.totalPages);
-      console.log(fetchData);
     } catch (error) {
       console.error("Error fetching recipes:", error);
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Fetch recipes on parameter changes
   useEffect(() => {
-    console.log(topRecipes);
     fetchRecipes();
-    console.log(totalPages);
   }, [currentPage, searchKey, sortParam, searchCategory]);
 
+  // Update currentPage if page param changes
   useEffect(() => {
-    if (page !== currentPage) {
-      setCurrentPage(page);
-    }
+    if (page !== currentPage) setCurrentPage(page);
   }, [page]);
 
+  // Handle search by "Enter" key
   const handleSearch = (e) => {
-    if (e?.key === "Enter" && e?.target?.value.length < 3) {
-      toast("Search key must be at least 3 characters long.");
-    } else if (e?.key === "Enter" && e?.target?.value) {
-      setSearchKey(e.target.value);
-      router.push(`/recipes?search=${e.target.value}&page=1&category=`);
-      setCurrentPage(1);
-      setSearchCategory("");
+    if (e?.key === "Enter") {
+      if (e?.target?.value.length < 3) {
+        toast("Search key must be at least 3 characters long.");
+      } else {
+        setSearchKey(e.target.value);
+        router.push(`/recipes?search=${e.target.value}&page=1&category=`);
+        setCurrentPage(1);
+        setSearchCategory("");
+      }
     }
   };
 
+  // Handle search button click
   const handleSearchClick = () => {
     const searchBox = document.querySelector("input[name=searchBox]");
     if (searchBox?.value?.length < 3) {
       toast("Search key must be at least 3 characters long.");
-    } else if (searchBox?.value) {
+    } else {
       setSearchKey(searchBox.value);
       router.push(`/recipes?search=${searchBox.value}&page=1&category=`);
       setCurrentPage(1);
       setSearchCategory("");
     }
   };
+
+  // Build pagination pages
   if (currentPage === 1) {
-    if (totalPages > 3) {
-      pages = [1, 2, 3];
-    } else if (totalPages === 2) {
-      pages = [1, 2];
-    } else {
-      pages = [1];
-    }
+    if (totalPages > 3) pages = [1, 2, 3];
+    else if (totalPages === 2) pages = [1, 2];
+    else pages = [1];
   } else if (currentPage === totalPages) {
-    if (totalPages > 3) {
-      pages = [totalPages - 2, totalPages - 1, totalPages];
-    } else if (totalPages === 2) {
-      pages = [1, 2];
-    } else {
-      pages = [1];
-    }
+    if (totalPages > 3) pages = [totalPages - 2, totalPages - 1, totalPages];
+    else if (totalPages === 2) pages = [1, 2];
+    else pages = [1];
   } else {
     pages = [currentPage - 1, currentPage, currentPage + 1];
   }
+
   return (
     <div className="py-10 px max-w-[80%] mx-auto bg-white min-h-lvh transition-all duration-300">
       <div className="fade-in">
+        {/* Top recipes carousel */}
         <RecipeCarousel data={topRecipes?.data.slice(0, 10)} />
       </div>
+
+      {/* Search box */}
       <div className="mx-auto max-w-[600px] mb-5">
         <h3 className="font-semibold text-normal p-4 mt-6">
           What are you craving for today?
@@ -143,7 +151,7 @@ const RecipePage = () => {
             type="text"
             placeholder="Search recipes..."
             name="searchBox"
-            className="border p-2 w-full rounded-full "
+            className="border p-2 w-full rounded-full"
             onKeyDownCapture={handleSearch}
             disabled={isLoading}
           />
@@ -157,7 +165,9 @@ const RecipePage = () => {
         </div>
       </div>
 
-      <div className="border-t-2 flex-col lg:flex-row flex w-full ">
+      {/* Main content area */}
+      <div className="border-t-2 flex-col lg:flex-row flex w-full">
+        {/* Categories filter */}
         {!loading && recipeCardData && (
           <CategoriesFilter
             categories={categories?.data}
@@ -167,6 +177,8 @@ const RecipePage = () => {
             searchKey={searchKey}
           />
         )}
+
+        {/* Recipes results */}
         <div className="w-full">
           <RecipesResult
             isSearching={isSearching}
@@ -179,6 +191,7 @@ const RecipePage = () => {
             selectedCategory={[categoryKeyParam] || []}
           />
 
+          {/* Pagination */}
           {!isLoading && totalPages > 1 && currentPage <= totalPages && (
             <Pagination>
               <PaginationContent className="gap-0 border mt-8 rounded-lg divide-x overflow-hidden">
@@ -194,21 +207,16 @@ const RecipePage = () => {
                           categoryKeyParam || ""
                         }`
                       );
-                      setCurrentPage((prev) => {
-                        if (prev > 1) {
-                          return prev - 1;
-                        }
-                        return prev;
-                      });
+                      setCurrentPage((prev) => (prev > 1 ? prev - 1 : prev));
                     }}
                     className="rounded-none cursor-pointer"
                   />
                 </PaginationItem>
-                {pages.map((page) => {
-                  const isActive = page === currentPage;
 
+                {pages.map((pageNum) => {
+                  const isActive = pageNum === currentPage;
                   return (
-                    <PaginationItem key={page}>
+                    <PaginationItem key={pageNum}>
                       <PaginationLink
                         href=""
                         className={cn(
@@ -223,19 +231,20 @@ const RecipePage = () => {
                         isActive={isActive}
                         onClick={(e) => {
                           router.push(
-                            `/recipes?page=${page}&sort=${sortParam}&search=${searchKey}&category=${
+                            `/recipes?page=${pageNum}&sort=${sortParam}&search=${searchKey}&category=${
                               categoryKeyParam || ""
                             }`
                           );
                           e.preventDefault();
-                          setCurrentPage(page);
+                          setCurrentPage(pageNum);
                         }}
                       >
-                        {page}
+                        {pageNum}
                       </PaginationLink>
                     </PaginationItem>
                   );
                 })}
+
                 <PaginationItem>
                   <PaginationNext
                     href=""
@@ -250,12 +259,9 @@ const RecipePage = () => {
                           categoryKeyParam || ""
                         }`
                       );
-                      setCurrentPage((prev) => {
-                        if (prev < totalPages) {
-                          return prev + 1;
-                        }
-                        return prev;
-                      });
+                      setCurrentPage((prev) =>
+                        prev < totalPages ? prev + 1 : prev
+                      );
                     }}
                     className="rounded-none cursor-pointer"
                   />
@@ -263,12 +269,12 @@ const RecipePage = () => {
               </PaginationContent>
             </Pagination>
           )}
+
+          {/* Scroll to top arrow */}
           <ArrowBigUp
             size={50}
             className="fixed bottom-10 right-5 md:right-10 2xl:right-[100px] p-2 bg-white text-gray-600 rounded-full cursor-pointer z-20"
-            onClick={() => {
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }}
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           />
         </div>
       </div>

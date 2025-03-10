@@ -1,281 +1,351 @@
 import axios from "axios";
 const recipeUrl = process.env.NEXT_PUBLIC_RECIPE_API;
+
+/**
+ * Fetch a single recipe by ID.
+ * @param {string} recipeId - The unique recipe identifier.
+ * @returns {object|number} The recipe data or an HTTP status code.
+ */
 export async function getRecipeById(recipeId) {
   try {
-    const recipe = await axios.get(
+    const response = await axios.get(
       `${recipeUrl}/kc/v1/public/recipe/${recipeId}`,
       {
         withCredentials: true,
       }
     );
-    return recipe.data.result;
+    return response.data.result;
   } catch (error) {
     if (error.response) {
-      console.log("Error fetching recipe:", error.response.data);
+      console.error("Error fetching recipe:", error.response.data);
       if (error.response.status === 401) {
         return error.response.status;
       }
     } else {
-      console.log("Error fetching recipe:", error);
+      console.error("Error fetching recipe:", error);
     }
   }
 }
 
+/**
+ * Fetch multiple recipes with pagination, filtering, and sorting.
+ * @param {number} page - Current page index (starting at 1).
+ * @param {number} size - Number of items per page.
+ * @param {string} search - Search query.
+ * @param {Array} sort - Sorting parameters.
+ * @param {string} category - Recipe category filter.
+ * @returns {object} The resulting recipes data.
+ */
 export async function getRecipes(page, size, search = "", sort = [], category) {
   try {
-    if (page < 0) {
-      page = 0;
-    } else {
-      page -= 1;
-    }
+    page = page < 1 ? 0 : page - 1;
     const url = `${recipeUrl}/kc/v1/public/recipe?size=${size}&page=${page}&search=${search}&sort=${sort}&category=${category}`;
-    console.log(url);
-    const recipes = await axios.get(url, {
-      withCredentials: true,
-    });
-    return recipes.data.result;
+    const response = await axios.get(url, { withCredentials: true });
+    return response.data.result;
   } catch (error) {
     if (error.response) {
-      console.log("Error fetching recipes:", error.response.data);
+      console.error("Error fetching recipes:", error.response.data);
       if (error.response.status === 401) {
         return error.response.status;
       }
     } else {
-      console.log("Error fetching recipes:", error);
+      console.error("Error fetching recipes:", error);
     }
   }
 }
 
+/**
+ * Create a new recipe.
+ * @param {object} data - The recipe data to create.
+ * @returns {object} The server response.
+ */
 export async function createRecipe(data) {
-  console.log(data);
   try {
-    const recipeResponse = await axios.post(`${recipeUrl}/kc/v1/recipe`, data, {
+    const response = await axios.post(`${recipeUrl}/kc/v1/recipe`, data, {
       withCredentials: true,
     });
-    return recipeResponse;
+    return response;
   } catch (error) {
-    console.log("Error creating recipe:", error);
+    console.error("Error creating recipe:", error);
   }
 }
 
+/**
+ * Generate a recipe via AI service.
+ * @param {object} data - The data needed to generate a recipe.
+ * @returns {object} The server response.
+ */
 export async function generateRecipe(data) {
-  console.log(data);
   try {
-    const recipeResponse = await axios.post(
+    const response = await axios.post(
       `${recipeUrl}/kc/v1/recipe/ai-recipe-recommend`,
       data,
       {
         withCredentials: true,
       }
     );
-    return recipeResponse;
+    return response;
   } catch (error) {
-    console.log("Error generating recipe:", error);
+    console.error("Error generating recipe:", error);
   }
 }
 
+/**
+ * Generate a meal plan via AI service.
+ * @param {object} data - The data required for meal plan generation.
+ * @returns {object} The server response.
+ */
 export async function generateMealPlan(data) {
-  console.log(data);
   try {
-    const mealPlanResponse = await axios.post(
+    const response = await axios.post(
       `${recipeUrl}/kc/v1/meal-plan/ai-recommend`,
       data,
       {
         withCredentials: true,
       }
     );
-    return mealPlanResponse;
+    return response;
   } catch (error) {
-    console.log("Error generating meal plan:", error);
+    console.error("Error generating meal plan:", error);
   }
 }
 
+/**
+ * Upload an image to the server.
+ * @param {FormData} data - Form data containing the image file.
+ * @returns {object} The server response.
+ */
 export async function uploadImg(data) {
   try {
-    const imgResponse = await axios.post(
+    const response = await axios.post(
       `${recipeUrl}/kc/v1/recipe/img-upload`,
       data,
       {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+        headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       }
     );
-    return imgResponse;
+    return response;
   } catch (error) {
-    console.log("Error uploading image:", error);
+    console.error("Error uploading image:", error);
   }
 }
 
+/**
+ * Fetch the user's recipes.
+ * @param {number} page - Current page index.
+ * @returns {object} The user's recipes data.
+ */
 export async function getMyRecipes(page) {
   try {
-    console.log(page);
-    const recipes = await axios.get(
-      `${recipeUrl}/kc/v1/recipe/my-recipe?size=${12}&page=${page}`,
+    const response = await axios.get(
+      `${recipeUrl}/kc/v1/recipe/my-recipe?size=12&page=${page}`,
       {
         withCredentials: true,
       }
     );
-    console.log(recipes.data.result);
-    return recipes.data.result;
+    return response.data.result;
   } catch (error) {
-    console.log("Error fetching my recipes:", error);
+    console.error("Error fetching my recipes:", error);
   }
 }
 
+/**
+ * Fetch the user's saved recipes.
+ * @param {number} page - Current page index.
+ * @returns {object} Saved recipes data.
+ */
 export async function getSavedRecipes(page) {
   try {
-    console.log(page);
-    const recipes = await axios.get(
-      `${recipeUrl}/kc/v1/recipe/saved?size=${12}&page=${page}`,
+    const response = await axios.get(
+      `${recipeUrl}/kc/v1/recipe/saved?size=12&page=${page}`,
       {
         withCredentials: true,
       }
     );
-    console.log(recipes);
-    return recipes.data.result;
+    return response.data.result;
   } catch (error) {
-    console.log("Error fetching saved recipes:", error);
+    console.error("Error fetching saved recipes:", error);
   }
 }
 
+/**
+ * Fetch meal plans for the current user.
+ * @param {number} page - Current page index.
+ * @returns {object} The user's meal plans data.
+ */
 export async function getMealPlans(page) {
   try {
-    console.log(page);
-    const mealPlans = await axios.get(
-      `${recipeUrl}/kc/v1/meal-plan/my-meal-plans?size=${12}&page=${page}`,
+    const response = await axios.get(
+      `${recipeUrl}/kc/v1/meal-plan/my-meal-plans?size=12&page=${page}`,
       {
         withCredentials: true,
       }
     );
-    console.log(mealPlans);
-    return mealPlans.data.result;
+    return response.data.result;
   } catch (error) {
-    console.log("Error fetching saved recipes:", error);
+    console.error("Error fetching saved recipes:", error);
   }
 }
 
+/**
+ * Fetch a meal plan by ID.
+ * @param {string} mealPlanId - The unique meal plan identifier.
+ * @returns {object} The meal plan data.
+ */
 export async function getMealPlanById(mealPlanId) {
   try {
-    const mealPlan = await axios.get(
+    const response = await axios.get(
       `${recipeUrl}/kc/v1/meal-plan/${mealPlanId}`,
       {
         withCredentials: true,
       }
     );
-    return mealPlan.data.result;
+    return response.data.result;
   } catch (error) {
-    console.log("Error fetching meal plan:", error);
+    console.error("Error fetching meal plan:", error);
   }
 }
 
+/**
+ * Save a recipe.
+ * @param {string} recipeId - The recipe identifier.
+ * @returns {object} The server response.
+ */
 export async function saveRecipe(recipeId) {
   try {
-    const recipeResponse = await axios.post(
+    const response = await axios.post(
       `${recipeUrl}/kc/v1/recipe/save`,
-      { recipeId: recipeId },
-      {
-        withCredentials: true,
-      }
+      { recipeId },
+      { withCredentials: true }
     );
-    return recipeResponse;
+    return response;
   } catch (error) {
-    console.log("Error saving recipe:", error);
+    console.error("Error saving recipe:", error);
   }
 }
 
+/**
+ * Remove a saved recipe.
+ * @param {string} recipeId - The recipe identifier.
+ * @returns {object} The server response.
+ */
 export async function unsaveRecipe(recipeId) {
   try {
-    const recipeResponse = await axios.delete(
+    const response = await axios.delete(
       `${recipeUrl}/kc/v1/recipe/save/${recipeId}`,
       {
         withCredentials: true,
       }
     );
-    return recipeResponse;
+    return response;
   } catch (error) {
-    console.log("Error unsaving recipe:", error);
+    console.error("Error unsaving recipe:", error);
   }
 }
 
+/**
+ * Update a recipe by ID.
+ * @param {string} recipeId - The recipe identifier.
+ * @param {object} data - Updated recipe data.
+ * @returns {object} The server response.
+ */
 export async function updateRecipe(recipeId, data) {
   try {
-    const recipeResponse = await axios.put(
+    const response = await axios.put(
       `${recipeUrl}/kc/v1/recipe/${recipeId}`,
       data,
       {
         withCredentials: true,
       }
     );
-    return recipeResponse;
+    return response;
   } catch (error) {
-    console.log("Error updating recipe:", error);
+    console.error("Error updating recipe:", error);
   }
 }
 
+/**
+ * Update an ingredient group for a recipe.
+ * @param {string} recipeId - The recipe identifier.
+ * @param {string} ingredientGroupId - The ingredient group identifier.
+ * @param {object} data - Updated ingredient group data.
+ * @returns {object} The server response.
+ */
 export async function updateIngredientGroup(recipeId, ingredientGroupId, data) {
   try {
-    const recipeResponse = await axios.patch(
+    const response = await axios.patch(
       `${recipeUrl}/kc/v1/recipe/${recipeId}/ingredient-group/${ingredientGroupId}`,
       data,
-      {
-        withCredentials: true,
-      }
+      { withCredentials: true }
     );
-    return recipeResponse;
+    return response;
   } catch (error) {
-    console.log("Error updating ingredients group:", error);
+    console.error("Error updating ingredients group:", error);
   }
 }
 
+/**
+ * Update a step group for a recipe.
+ * @param {string} recipeId - The recipe identifier.
+ * @param {string} stepGroupId - The step group identifier.
+ * @param {object} data - Updated step group data.
+ * @returns {object} The server response.
+ */
 export async function updateStepGroup(recipeId, stepGroupId, data) {
   try {
-    const recipeResponse = await axios.patch(
+    const response = await axios.patch(
       `${recipeUrl}/kc/v1/recipe/${recipeId}/step-group/${stepGroupId}`,
       data,
-      {
-        withCredentials: true,
-      }
+      { withCredentials: true }
     );
-    return recipeResponse;
+    return response;
   } catch (error) {
-    console.log("Error updating step group:", error);
+    console.error("Error updating step group:", error);
   }
 }
 
+/**
+ * Fetch a rating for a recipe.
+ * @param {string} recipeId - The recipe identifier.
+ * @param {boolean} isUser - Indicates if the request is for the current user's rating.
+ * @returns {object} The rating data.
+ */
 export async function getRatingById(recipeId, isUser) {
   try {
     if (isUser) {
-      const rating = await axios.get(
+      const response = await axios.get(
         `${recipeUrl}/kc/v1/rating/my-rating/recipe/${recipeId}`,
         {
           withCredentials: true,
         }
       );
-      console.log(rating.data.result);
-      return rating.data.result;
+      return response.data.result;
     }
-    const rating = await axios.get(
+    const response = await axios.get(
       `${recipeUrl}/kc/v1/public/rating/recipe/${recipeId}`
     );
-    return rating.data.result;
+    return response.data.result;
   } catch (error) {
-    console.log("Error fetching rating:", error);
+    console.error("Error fetching rating:", error);
   }
 }
 
+/**
+ * Send or update a rating for a recipe.
+ * @param {string} recipeId - The recipe identifier.
+ * @param {number} data - The rating value.
+ * @returns {object} The server response.
+ */
 export async function sendRating(recipeId, data) {
   try {
-    const ratingResponse = await axios.put(
+    const response = await axios.put(
       `${recipeUrl}/kc/v1/rating/${recipeId}`,
       { ratingValue: data },
-      {
-        withCredentials: true,
-      }
+      { withCredentials: true }
     );
-    return ratingResponse;
+    return response;
   } catch (error) {
-    console.log("Error sending rating:", error);
+    console.error("Error sending rating:", error);
   }
 }

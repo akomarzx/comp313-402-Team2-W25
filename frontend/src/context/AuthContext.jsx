@@ -1,31 +1,36 @@
 "use client";
-// context/AuthContext.js
+
 import { createContext, useContext, useState, useEffect } from "react";
-import { redirect, useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import axios from "axios";
 
-// Create Auth Context
+// Create authentication context
 const AuthContext = createContext();
 const bffUrl = process.env.NEXT_PUBLIC_NODE_API;
 
-// Auth Provider Component
+// AuthProvider component: provides authentication state and actions to its children
 export const AuthProvider = ({ children }) => {
+  // State for user authentication and loading status
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Cached data for categories and top recipes, with last update timestamp
   const [categories, setCategories] = useState(null);
   const [topRecipes, setTopRecipes] = useState(null);
-  // Function to log in
+
+  // Initiate login by redirecting to the backend login endpoint
   const login = async (currentUrl = "") => {
     try {
       localStorage.setItem("lastUrl", currentUrl);
       window.location.assign(`${bffUrl}/login`);
 
       setLoading(true);
+      // Wait for redirection and then fetch session after a delay
       setTimeout(async () => {
         await fetchSession();
         setLoading(false);
       }, 5000);
+
       if (user) {
         redirect("/");
       }
@@ -34,39 +39,32 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Function to log out
+  // Log out the user via backend endpoint and clear user state
   const logout = async () => {
     try {
-      const res = await axios.get(`${bffUrl}/logout`, {
-        withCredentials: true,
-      });
+      await axios.get(`${bffUrl}/logout`, { withCredentials: true });
       setUser(null);
     } catch (error) {
       console.error("Error logging out:", error);
     }
   };
 
+  // Retrieve current session and update user state
   const fetchSession = async () => {
     try {
       setLoading(true);
       const response = await axios.get(`${bffUrl}/session`, {
         withCredentials: true,
       });
-      if (response.data.authenticated) {
-        // console.log("User is authenticated:", response.data.user);
-        setUser(response.data.user);
-      } else {
-        // console.log("User is not authenticated");
-        setUser(null);
-      }
+      setUser(response.data.authenticated ? response.data.user : null);
     } catch (error) {
-      // console.log("Error fetching session:", error);
       setUser(null);
     } finally {
       setLoading(false);
     }
   };
 
+  // Fetch categories from the backend and cache the result with a timestamp
   const fetchCategories = async () => {
     try {
       const response = await axios.get(
@@ -77,59 +75,56 @@ export const AuthProvider = ({ children }) => {
           data: response.data.result,
           lastUpdated: Date.now(),
         });
-        // console.log("Categories fetched:", response.data.result);
       }
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
   };
 
+  // Fetch top recipes from the backend and cache the result with a timestamp
   const fetchTopRecipes = async () => {
     try {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_RECIPE_API}/kc/v1/public/top-recipe`
       );
       if (response.data) {
-        setTopRecipes({ data: response.data?.result, lastUpdated: Date.now() });
+        setTopRecipes({
+          data: response.data.result,
+          lastUpdated: Date.now(),
+        });
         console.log("Top recipes fetched:", response.data.result);
       }
     } catch (error) {
       console.error("Error fetching top recipes:", error);
     }
   };
-  // Check if user is logged in on initial load
+
+  // On initial component load, fetch session, categories, and top recipes
   useEffect(() => {
     if (!user) fetchSession();
+
+    // Fetch categories if not present or if cache is older than 1 day
     if (!categories) {
       fetchCategories();
     } else {
-      try {
-        const threeDays = 24 * 60 * 60 * 1000;
-        if (Date.now() - categories.lastUpdated > threeDays) {
-          fetchCategories();
-        }
-      } catch (error) {
-        console.log("Failed to parse categories:", error);
+      const oneDay = 24 * 60 * 60 * 1000;
+      if (Date.now() - categories.lastUpdated > oneDay) {
         fetchCategories();
       }
     }
 
+    // Fetch top recipes if not present or if cache is older than 7 days
     if (!topRecipes) {
       fetchTopRecipes();
     } else {
-      try {
-        const sevenDays = 7 * 24 * 60 * 60 * 1000;
-        if (Date.now() - topRecipes.lastUpdated > sevenDays) {
-          fetchTopRecipes();
-        }
-      } catch (error) {
-        console.log("Failed to parse top recipes:", error);
+      const sevenDays = 7 * 24 * 60 * 60 * 1000;
+      if (Date.now() - topRecipes.lastUpdated > sevenDays) {
         fetchTopRecipes();
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Provide the authentication state and actions
   return (
     <AuthContext.Provider
       value={{
@@ -147,5 +142,5 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Custom Hook to Access AuthContext
+// Custom hook to access AuthContext
 export const useAuth = () => useContext(AuthContext);

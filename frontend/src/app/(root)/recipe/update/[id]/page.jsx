@@ -1,20 +1,27 @@
 "use client";
+
+/* Imports */
 import { Loader2Icon, LoaderIcon } from "lucide-react";
 import { updateRecipe, getRecipeById, uploadImg } from "@/api/recipe";
-import { useRouter, useParams, redirect } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 
+/* Component for updating an existing recipe */
 const UpdateRecipe = () => {
+  /* Hooks and states */
   const router = useRouter();
   const { id } = useParams();
+  const { user, loading, fetchSession, categories } = useAuth();
+  const [hasFetched, setHasFetched] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [hasFetched, setHasFetched] = useState(false);
   const [imgFile, setImgFile] = useState(null);
   const [imageSrc, setImageSrc] = useState(null);
+
+  /* Form data state */
   const [formData, setFormData] = useState({
     title: "",
     summary: "",
@@ -54,29 +61,28 @@ const UpdateRecipe = () => {
     ],
   });
 
-  const { user, loading, fetchSession, categories } = useAuth();
-
+  /* Fetch session on mount */
   useEffect(() => {
     fetchSession();
-  }, []);
+  }, [fetchSession]);
 
+  /* Fetch the recipe data if user and id exist */
   useEffect(() => {
     if (user && id && !hasFetched) {
       fetchRecipe();
       setHasFetched(true);
     }
-  }, [user, id]);
+  }, [user, id, hasFetched]);
 
+  /* Fetch the recipe from the server */
   const fetchRecipe = async () => {
     try {
       const recipe = await getRecipeById(id);
-
       if (recipe?.createdBy !== user?.email) {
         toast.error("You are not authorized to update this recipe");
         setTimeout(() => router.replace(`/recipe/${id}`), 1500);
         return;
       }
-
       setFormData({
         ...recipe,
         carbs: recipe.carbsG,
@@ -114,64 +120,44 @@ const UpdateRecipe = () => {
     }
   };
 
+  /* Handle basic input changes */
   const handleChange = (e) => {
     const { id, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [id]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
+  /* Handle file input changes */
   const handleFileChange = (e) => {
-    console.log(e.target.files[0]);
-    setImgFile(() => e.target.files[0]);
-    const url = window.URL.createObjectURL(e.target.files[0]);
-    setImageSrc(url);
+    if (!e.target.files[0]) return;
+    setImgFile(e.target.files[0]);
+    setImageSrc(window.URL.createObjectURL(e.target.files[0]));
   };
 
+  /* Handle changes in ingredient or step groups */
   const handleGroupChange = (e, groupIndex, field, subIndex = null) => {
     const value = e.target.value;
+    const updatedGroups = [...formData[field]];
 
     if (field === "ingredientGroups") {
       if (subIndex !== null) {
-        const updatedGroups = [...formData[field]];
         updatedGroups[groupIndex].ingredients[subIndex].label = value;
-        setFormData((prev) => ({
-          ...prev,
-          [field]: updatedGroups,
-        }));
       } else {
-        const updatedGroups = [...formData[field]];
         updatedGroups[groupIndex].label = value;
-        setFormData((prev) => ({
-          ...prev,
-          [field]: updatedGroups,
-        }));
       }
     } else {
       if (subIndex !== null) {
-        const updatedGroups = [...formData[field]];
         updatedGroups[groupIndex].steps[subIndex].label = value;
-        setFormData((prev) => ({
-          ...prev,
-          [field]: updatedGroups,
-        }));
       } else {
-        const updatedGroups = [...formData[field]];
         updatedGroups[groupIndex].label = value;
-        setFormData((prev) => ({
-          ...prev,
-          [field]: updatedGroups,
-        }));
       }
     }
+    setFormData((prev) => ({ ...prev, [field]: updatedGroups }));
   };
 
-  // Similar handlers for removing groups and items...
-
+  /* Handle form submission and update */
   const handleSubmit = async (e) => {
-    setIsUpdating(true);
     e.preventDefault();
+    setIsUpdating(true);
 
     const updatedFormData = {
       ...formData,
@@ -180,7 +166,6 @@ const UpdateRecipe = () => {
       fatG: formData.fat,
       prepTimeUnitCd: 100,
       cookTimeUnitCd: 100,
-      categoryIds: formData.categoryIds,
       ingredientGroups: formData.ingredientGroups.map((group) => ({
         ...group,
         ingredients: group.ingredients.map((ingredient, index) => ({
@@ -199,11 +184,9 @@ const UpdateRecipe = () => {
       })),
     };
 
-    console.log(updatedFormData);
     try {
       if (imgFile) {
         const imgRes = await uploadImg({ file: imgFile });
-        console.log(imgRes);
         if (imgRes.status === 200) {
           updatedFormData.imageUrl = imgRes.data;
           updatedFormData.thumbnailUrl = imgRes.data;
@@ -223,15 +206,18 @@ const UpdateRecipe = () => {
     }
   };
 
+  /* Loading state */
   if (loading || isLoading) {
     return <Loader2Icon className="animate-spin m-auto" />;
   }
 
+  /* Redirect if not authenticated */
   if (!loading && !user) {
     router.replace("/");
     return null;
   }
 
+  /* Render form for updating the recipe */
   return (
     <div className="max-w-4xl mx-auto p-6">
       {isUpdating && (
@@ -246,6 +232,8 @@ const UpdateRecipe = () => {
         <h2 className="text-2xl font-bold text-gray-800 my-6 text-center">
           Update Recipe
         </h2>
+
+        {/* Title */}
         <div className="mb-6">
           <label
             className="block text-gray-700 text-sm font-bold mb-2"
@@ -263,6 +251,8 @@ const UpdateRecipe = () => {
             required
           />
         </div>
+
+        {/* Summary */}
         <div className="mb-6">
           <label
             className="block text-gray-700 text-sm font-bold mb-2"
@@ -280,7 +270,8 @@ const UpdateRecipe = () => {
             required
           />
         </div>
-        {/* Image Upload */}
+
+        {/* Image */}
         <div className="mb-6">
           <div className="relative w-full h-[300px] md:h-[400px] rounded-lg overflow-hidden mb-8">
             <Image
@@ -298,7 +289,6 @@ const UpdateRecipe = () => {
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Recipe Image
           </label>
-
           <input
             type="file"
             accept="image/*"
@@ -306,36 +296,37 @@ const UpdateRecipe = () => {
             onChange={handleFileChange}
           />
         </div>
+
+        {/* Categories */}
         <div className="mb-6">
-          <div className="mb-6">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Categories
-            </label>
-            <select
-              multiple
-              value={formData.categoryIds}
-              onChange={(e) => {
-                e.preventDefault();
-              }}
-              className="w-full p-2 border rounded-lg"
-            >
-              {categories?.data.map((cat) => (
-                <option
-                  key={cat.id}
-                  value={cat.id}
-                  onClick={() => {
-                    !formData.categoryIds?.includes(cat.id) &&
-                      setFormData((prev) => ({
-                        ...prev,
-                        categoryIds: [...prev.categoryIds, cat.id],
-                      }));
-                  }}
-                >
-                  {cat.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          <label className="block text-gray-700 text-sm font-bold mb-2">
+            Categories
+          </label>
+          <select
+            multiple
+            value={formData.categoryIds}
+            onChange={(e) => {
+              e.preventDefault();
+            }}
+            className="w-full p-2 border rounded-lg"
+          >
+            {categories?.data.map((cat) => (
+              <option
+                key={cat.id}
+                value={cat.id}
+                onClick={() => {
+                  if (!formData.categoryIds.includes(cat.id)) {
+                    setFormData((prev) => ({
+                      ...prev,
+                      categoryIds: [...prev.categoryIds, cat.id],
+                    }));
+                  }
+                }}
+              >
+                {cat.label}
+              </option>
+            ))}
+          </select>
           <div className="flex flex-wrap gap-2 mt-2">
             {formData.categoryIds?.map((catId, index) => {
               const category = categories?.data.find((cat) => cat.id === catId);
@@ -360,6 +351,7 @@ const UpdateRecipe = () => {
             })}
           </div>
         </div>
+
         {/* Times and Servings */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           {["prepTime", "cookTime", "servings", "yield"].map((field, idx) => (
@@ -384,6 +376,7 @@ const UpdateRecipe = () => {
             </div>
           ))}
         </div>
+
         {/* Nutrition Info */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           {["calories", "carbs", "sugars", "fat"].map((field, idx) => (
@@ -403,6 +396,7 @@ const UpdateRecipe = () => {
             </div>
           ))}
         </div>
+
         {/* Ingredient Groups */}
         <div className="mb-6">
           <h3 className="text-lg font-semibold">Ingredient Groups</h3>
@@ -445,6 +439,7 @@ const UpdateRecipe = () => {
               </div>
             ))}
         </div>
+
         {/* Step Groups */}
         <div className="mb-6">
           <h3 className="text-lg font-semibold">Step Groups</h3>
@@ -475,6 +470,8 @@ const UpdateRecipe = () => {
             </div>
           ))}
         </div>
+
+        {/* Submit Button */}
         <button
           type="submit"
           className="w-1/2 bg-green-600 hover:bg-green-500 text-white py-2 px-4 rounded-lg font-semibold transition-colors"
