@@ -364,9 +364,6 @@ export async function getRatingById(recipeId, isUser) {
     return response.data.result;
   } catch (error) {
     console.error("Error fetching rating:", error);
-    if (error.status === 401) {
-      window.location.href = "/";
-    }
   }
 }
 

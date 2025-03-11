@@ -81,7 +81,9 @@ const Navbar = () => {
                 if (e.relatedTarget?.id === "logout") {
                   await logout();
                 } else {
-                  setIsProfileDropdownOpen(false);
+                  setTimeout(() => {
+                    setIsProfileDropdownOpen(false);
+                  }, 50);
                 }
               }}
             >
