@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import {
   Book,
@@ -23,7 +23,7 @@ const Navbar = () => {
   // Get authentication context and current path
   const { user, logout, login, loading } = useAuth();
   const currentPath = usePathname();
-
+  const router = useRouter();
   // Toggle the mobile menu
   const toggleMenu = () => setIsOpen(!isOpen);
 
@@ -80,10 +80,13 @@ const Navbar = () => {
                 // If focus moves to logout button, handle logout, otherwise hide dropdown
                 if (e.relatedTarget?.id === "logout") {
                   await logout();
-                } else {
+                } else if (e.relatedTarget?.id === "profile") {
+                  console.log(e.relatedTarget?.id);
                   setTimeout(() => {
                     setIsProfileDropdownOpen(false);
-                  }, 50);
+                  }, 200);
+                } else {
+                  setIsProfileDropdownOpen(false);
                 }
               }}
             >
@@ -110,15 +113,16 @@ const Navbar = () => {
 
               {isProfileDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg">
-                  <Link
-                    href="/profile"
-                    className="block px-4 py-2 hover:bg-gray-100 text-slate-600"
+                  <button
+                    id="profile"
+                    onClick={() => router.push("/profile")}
+                    className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-slate-600"
                   >
                     <div className="flex gap-2 items-center">
                       <UserRound size={22} />
                       <span>MY PROFILE</span>
                     </div>
-                  </Link>
+                  </button>
                   <button
                     id="logout"
                     onClick={async () => await logout()}
