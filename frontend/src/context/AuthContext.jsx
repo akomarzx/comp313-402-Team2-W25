@@ -64,6 +64,9 @@ export const AuthProvider = ({ children }) => {
       sessionStorage.clear();
       localStorage.clear();
       console.error("Error fetching session:", error);
+      if (error.status === 401) {
+        window.location.href = "/";
+      }
     } finally {
       setLoading(false);
     }
