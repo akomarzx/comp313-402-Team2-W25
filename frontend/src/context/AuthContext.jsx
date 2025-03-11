@@ -58,7 +58,12 @@ export const AuthProvider = ({ children }) => {
       });
       setUser(response.data.authenticated ? response.data.user : null);
     } catch (error) {
+      //clean session, cache, and user state
       setUser(null);
+      logout();
+      sessionStorage.clear();
+      localStorage.clear();
+      console.error("Error fetching session:", error);
     } finally {
       setLoading(false);
     }

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
@@ -34,6 +34,13 @@ const Navbar = () => {
       ? `text-green-600 ${baseClasses}`
       : `text-slate-600 ${baseClasses}`;
   };
+
+  useEffect(() => {
+    // Close mobile menu when user logs in
+    if (!loading && user) {
+      setIsOpen(false);
+    }
+  }, [loading, user]);
 
   return (
     <nav className="w-full border-b bg-white">
