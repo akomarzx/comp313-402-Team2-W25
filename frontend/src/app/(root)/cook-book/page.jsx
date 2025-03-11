@@ -76,13 +76,13 @@ const MyCookBook = () => {
 
   // On mount
   useEffect(() => {
+    if (!user) router.push("/");
     firstFetch();
     secondFetch();
     thirdFetch();
   }, []);
 
   if (loading) return <LoaderIcon className="animate-spin m-auto" />;
-  if (!user) router.push("/");
 
   return (
     <div className="min-h-screen py-10 px-6 max-w-[1200px] mx-auto bg-white">

@@ -67,6 +67,9 @@ export async function createRecipe(data) {
     return response;
   } catch (error) {
     console.error("Error creating recipe:", error);
+    if (error.status === 401) {
+      window.location.href = "/";
+    }
   }
 }
 
@@ -87,6 +90,9 @@ export async function generateRecipe(data) {
     return response;
   } catch (error) {
     console.error("Error generating recipe:", error);
+    if (error.status === 401) {
+      window.location.href = "/";
+    }
   }
 }
 
@@ -107,6 +113,9 @@ export async function generateMealPlan(data) {
     return response;
   } catch (error) {
     console.error("Error generating meal plan:", error);
+    if (error.status === 401) {
+      window.location.href = "/";
+    }
   }
 }
 
@@ -128,6 +137,9 @@ export async function uploadImg(data) {
     return response;
   } catch (error) {
     console.error("Error uploading image:", error);
+    if (error.status === 401) {
+      window.location.href = "/";
+    }
   }
 }
 
@@ -147,6 +159,9 @@ export async function getMyRecipes(page) {
     return response.data.result;
   } catch (error) {
     console.error("Error fetching my recipes:", error);
+    if (error.status === 401) {
+      window.location.href = "/";
+    }
   }
 }
 
@@ -166,6 +181,9 @@ export async function getSavedRecipes(page) {
     return response.data.result;
   } catch (error) {
     console.error("Error fetching saved recipes:", error);
+    if (error.status === 401) {
+      window.location.href = "/";
+    }
   }
 }
 
@@ -185,6 +203,9 @@ export async function getMealPlans(page) {
     return response.data.result;
   } catch (error) {
     console.error("Error fetching saved recipes:", error);
+    if (error.status === 401) {
+      window.location.href = "/";
+    }
   }
 }
 
@@ -204,6 +225,9 @@ export async function getMealPlanById(mealPlanId) {
     return response.data.result;
   } catch (error) {
     console.error("Error fetching meal plan:", error);
+    if (error.status === 401) {
+      window.location.href = "/";
+    }
   }
 }
 
@@ -241,6 +265,9 @@ export async function unsaveRecipe(recipeId) {
     return response;
   } catch (error) {
     console.error("Error unsaving recipe:", error);
+    if (error.status === 401) {
+      window.location.href = "/";
+    }
   }
 }
 
@@ -262,6 +289,9 @@ export async function updateRecipe(recipeId, data) {
     return response;
   } catch (error) {
     console.error("Error updating recipe:", error);
+    if (error.status === 401) {
+      window.location.href = "/";
+    }
   }
 }
 
@@ -282,6 +312,9 @@ export async function updateIngredientGroup(recipeId, ingredientGroupId, data) {
     return response;
   } catch (error) {
     console.error("Error updating ingredients group:", error);
+    if (error.status === 401) {
+      window.location.href = "/";
+    }
   }
 }
 
@@ -302,6 +335,9 @@ export async function updateStepGroup(recipeId, stepGroupId, data) {
     return response;
   } catch (error) {
     console.error("Error updating step group:", error);
+    if (error.status === 401) {
+      window.location.href = "/";
+    }
   }
 }
 
@@ -328,6 +364,9 @@ export async function getRatingById(recipeId, isUser) {
     return response.data.result;
   } catch (error) {
     console.error("Error fetching rating:", error);
+    if (error.status === 401) {
+      window.location.href = "/";
+    }
   }
 }
 
@@ -347,5 +386,8 @@ export async function sendRating(recipeId, data) {
     return response;
   } catch (error) {
     console.error("Error sending rating:", error);
+    if (error.status === 401) {
+      window.location.href = "/";
+    }
   }
 }
