@@ -80,14 +80,15 @@ const Navbar = () => {
                 // If focus moves to logout button, handle logout, otherwise hide dropdown
                 if (e.relatedTarget?.id === "logout") {
                   await logout();
-                } else {
+                } else if (e.relatedTarget?.id !== "profile") {
                   setTimeout(() => {
                     setIsProfileDropdownOpen(false);
-                  }, 50);
+                  }, 200);
                 }
               }}
             >
               <button
+                id="profile"
                 onClick={() => setIsProfileDropdownOpen((prev) => !prev)}
                 className="flex items-center gap-2 hover:text-green-600 focus:outline-none"
               >
