@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { BarLoader } from "react-spinners";
 import RecipeCard from "@/components/RecipeCard";
-import { Circle, Grid, List, RefreshCwIcon } from "lucide-react";
+import {
+  Circle,
+  Grid,
+  List,
+  RefreshCwIcon,
+  SlidersHorizontal,
+} from "lucide-react";
 import RecipeRow from "./RecipeRow";
 import {
   Select,
@@ -66,98 +72,118 @@ const RecipesResult = ({
   };
 
   return (
-    <div className="w-full max-w-[1600px] mx-auto">
+    <div className="w-full max-w-6xl mx-auto">
       {/* Section header and controls for version 1 */}
       {version === 1 && (
         <>
-          <h2 className="font-bold text-2xl text-center mt-10">All Recipes</h2>
+          <h2 className="font-bold text-2xl text-gray-800 mb-6 mt-10">
+            {searchKey ? `Search Results for "${searchKey}"` : "All Recipes"}
+            {selectedCategory[0] && (
+              <span className="ml-2 text-lg font-normal text-gray-500">
+                in {selectedCategory[0]}
+              </span>
+            )}
+          </h2>
 
           {/* No recipes found message */}
           {recipeCardData.length === 0 && !isLoading ? (
-            <div className="mx-auto text-center mt-20">
-              <p className="mb-10">No recipes found...</p>
+            <div className="mx-auto text-center mt-12 py-16 bg-gray-50 rounded-lg">
+              <p className="text-gray-500 mb-4">No recipes found...</p>
+              <button
+                className="text-blue-600 hover:text-blue-800 font-medium flex items-center gap-2 mx-auto"
+                onClick={() => window.location.assign("/recipes?page=1")}
+              >
+                <RefreshCwIcon size={16} />
+                <span>Reset Filters</span>
+              </button>
             </div>
           ) : (
-            <div className="flex flex-col min-[450px]:flex-row justify-between items-center my-2 w-[90%] mx-auto">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-y-4 mb-8">
               {/* Sorting dropdown */}
-              <div className="w-[80%] my-4 flex justify-end min-[450px]:justify-start">
-                <Select
-                  value={sort}
-                  onValueChange={handleSortChange}
-                  closeOnSelect
-                >
-                  <SelectTrigger className="w-[200px]">
-                    <SelectValue placeholder="Sort by..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="default">
-                      <span className="flex items-center">
-                        <Circle className="mr-2 h-2 w-2 fill-current" />
-                        Default Order
-                      </span>
-                    </SelectItem>
-                    <SelectItem value="title-asc">
-                      <span className="flex items-center">
-                        <Circle className="mr-2 h-2 w-2 fill-current" />
-                        Title (A-Z)
-                      </span>
-                    </SelectItem>
-                    <SelectItem value="title-desc">
-                      <span className="flex items-center">
-                        <Circle className="mr-2 h-2 w-2 fill-current" />
-                        Title (Z-A)
-                      </span>
-                    </SelectItem>
-                    <SelectItem value="rating-asc">
-                      <span className="flex items-center">
-                        <Circle className="mr-2 h-2 w-2 fill-current" />
-                        Rating (Low to High)
-                      </span>
-                    </SelectItem>
-                    <SelectItem value="rating-desc">
-                      <span className="flex items-center">
-                        <Circle className="mr-2 h-2 w-2 fill-current" />
-                        Rating (High to Low)
-                      </span>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="w-full md:w-auto flex items-center gap-2">
+                <div className="bg-white shadow-sm border border-gray-200 rounded-lg px-2 py-1 flex items-center">
+                  <SlidersHorizontal size={16} className="text-gray-500 mr-2" />
+                  <Select
+                    value={sort}
+                    onValueChange={handleSortChange}
+                    closeOnSelect
+                  >
+                    <SelectTrigger className="border-0 shadow-none p-1 min-h-0 h-auto text-sm font-medium focus:ring-0">
+                      <SelectValue placeholder="Sort by..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="default">
+                        <span className="flex items-center">
+                          <Circle className="mr-2 h-2 w-2 fill-current" />
+                          Default Order
+                        </span>
+                      </SelectItem>
+                      <SelectItem value="title-asc">
+                        <span className="flex items-center">
+                          <Circle className="mr-2 h-2 w-2 fill-current" />
+                          Title (A-Z)
+                        </span>
+                      </SelectItem>
+                      <SelectItem value="title-desc">
+                        <span className="flex items-center">
+                          <Circle className="mr-2 h-2 w-2 fill-current" />
+                          Title (Z-A)
+                        </span>
+                      </SelectItem>
+                      <SelectItem value="rating-asc">
+                        <span className="flex items-center">
+                          <Circle className="mr-2 h-2 w-2 fill-current" />
+                          Rating (Low to High)
+                        </span>
+                      </SelectItem>
+                      <SelectItem value="rating-desc">
+                        <span className="flex items-center">
+                          <Circle className="mr-2 h-2 w-2 fill-current" />
+                          Rating (High to Low)
+                        </span>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 {/* Refresh button */}
                 <button
-                  className="px-2 py-2 md:px-4 border rounded ml-2"
+                  className="p-2 rounded-lg border border-gray-200 bg-white shadow-sm hover:bg-gray-50 transition-colors"
                   onClick={() => window.location.assign("/recipes?page=1")}
+                  title="Reset filters"
                 >
-                  <RefreshCwIcon size={20} />
+                  <RefreshCwIcon size={16} className="text-gray-600" />
                 </button>
               </div>
 
               {/* View mode toggle buttons */}
-              <div className="w-[80%] flex justify-end">
+              <div className="flex items-center bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
                 <button
-                  className={`px-2 py-2 md:px-4 border rounded mr-2 ${
+                  className={`p-2 flex items-center justify-center transition-colors ${
                     viewMode !== "list"
-                      ? "bg-gray-500 text-white"
-                      : "bg-white text-gray-500"
+                      ? "bg-blue-50 text-blue-600"
+                      : "bg-white text-gray-500 hover:bg-gray-50"
                   }`}
                   onClick={() => {
                     setViewMode("grid");
                     sessionStorage.setItem("view", "grid");
                   }}
                 >
-                  <Grid size={20} />
+                  <Grid size={16} />
                 </button>
+                <div className="w-px h-6 bg-gray-200"></div>
                 <button
-                  className={`px-2 py-2 md:px-4 border rounded ${
+                  className={`p-2 flex items-center justify-center transition-colors ${
                     viewMode === "list"
-                      ? "bg-gray-500 text-white"
-                      : "bg-white text-gray-500"
+                      ? "bg-blue-50 text-blue-600"
+                      : "bg-white text-gray-500 hover:bg-gray-50"
                   }`}
                   onClick={() => {
                     setViewMode("list");
                     sessionStorage.setItem("view", "list");
                   }}
                 >
-                  <List size={20} />
+                  <List size={16} />
                 </button>
               </div>
             </div>
@@ -169,7 +195,7 @@ const RecipesResult = ({
       {!isSearching && !isLoading ? (
         <>
           {viewMode === "list" && version === 1 ? (
-            <div className="mx-auto w-[90%]">
+            <div className="mx-auto">
               {recipeCardData.map((recipe, index) => (
                 <RecipeRow key={index} recipe={recipe} user={user} />
               ))}
@@ -178,9 +204,9 @@ const RecipesResult = ({
             <div
               className={`grid grid-cols-1 ${
                 version === 2
-                  ? "md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4"
-                  : "md:grid-cols-2 min-[1250px]:grid-cols-3 2xl:grid-cols-3 min-[1650px]:grid-cols-4"
-              } gap-6 xl:px-4 py-4 mx-auto max-w-[1600px]`}
+                  ? "sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4"
+                  : "sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4"
+              } gap-6 py-4 mx-auto`}
             >
               {recipeCardData.map((recipe, index) => (
                 <RecipeCard
@@ -195,8 +221,9 @@ const RecipesResult = ({
         </>
       ) : (
         // Loading spinner
-        <div className="mx-auto text-center my-40 w-full">
-          <BarLoader className="mx-auto" />
+        <div className="flex flex-col items-center justify-center py-20">
+          <BarLoader color="#3b82f6" />
+          <p className="mt-4 text-gray-500 text-sm">Loading recipes...</p>
         </div>
       )}
     </div>

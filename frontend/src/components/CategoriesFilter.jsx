@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "./ui/button";
-import { X } from "lucide-react";
+import { X, Filter, Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 /**
@@ -36,13 +36,6 @@ const CategoriesFilter = ({
    * Only one category can be selected at a time.
    */
   const handleCategoryChange = (e) => {
-    // if (e.target.checked) {
-    //   setSelectedCategories([...selectedCategories, e.target.value]);
-    // } else {
-    //   setSelectedCategories(
-    //     selectedCategories.filter((category) => category !== e.target.value)
-    //   );
-    // }
     if (e.target.checked) {
       setSelectedCategories([e.target.value]);
     } else {
@@ -73,119 +66,179 @@ const CategoriesFilter = ({
     router.push(url);
   };
 
+  /**
+   * Handle clearing all filters
+   */
+  const handleClearFilters = () => {
+    setSelectedCategories([]);
+    setSearchCategory("");
+    setCurrentPage(1);
+    router.push(`/recipes?page=1${searchKey ? `&search=${searchKey}` : ""}`);
+  };
+
   return (
     <>
       {/* Mobile view: Filter button */}
       <div className="lg:hidden fixed bottom-10 left-4 z-10">
         <Button
-          className="rounded-full shadow-lg"
+          className="rounded-full shadow-lg flex items-center gap-2 bg-white text-gray-800 hover:bg-gray-100 border border-gray-200"
           onClick={() => setIsFilterOpen(!isFilterOpen)}
         >
-          {isFilterOpen ? "Close" : "Filters"}
+          <Filter size={16} />
+          <span>{isFilterOpen ? "Close" : "Filters"}</span>
+          {selectedCategories.length > 0 && (
+            <span className="bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              {selectedCategories.length}
+            </span>
+          )}
         </Button>
       </div>
 
       {/* Desktop view: Sidebar filter */}
-      <div className="hidden lg:block pt-20 w-[320px] p-4 bg-white min-h-full border-r-2">
+      <div className="hidden lg:block pt-20 w-[280px] p-4 bg-white min-h-full border-r">
         <div className="sticky top-20">
-          <div className="text-lg font-bold">
-            Categories
-            {/* Uncomment below block to add "Clear" functionality */}
-            {/*
+          {/* Header with title and clear button */}
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-lg font-bold text-gray-800">Categories</h3>
             {selectedCategories.length > 0 && (
-              <span
-                className="text-sm font-normal underline cursor-pointer"
-                onClick={() => setSelectedCategories([])}
+              <button
+                className="text-sm text-blue-600 hover:text-blue-800 hover:underline font-medium"
+                onClick={handleClearFilters}
               >
-                (Clear)
-              </span>
+                Clear
+              </button>
             )}
-            */}
           </div>
-          <div className="mt-4">
+
+          {/* Categories list */}
+          <div className="space-y-1 mb-8">
             {categories?.map((category, index) => (
-              <div key={index} className="flex my-2">
+              <div
+                key={index}
+                className={`flex items-center py-2 px-3 rounded-lg transition-colors ${
+                  selectedCategories.includes(category.label)
+                    ? "bg-blue-50"
+                    : "hover:bg-gray-100"
+                }`}
+              >
                 <input
-                  id={category.label}
+                  id={`desktop-${category.label}`}
                   type="checkbox"
                   value={category.label}
                   checked={selectedCategories.includes(category.label)}
-                  className="text-sm text-center"
                   onChange={handleCategoryChange}
+                  className="sr-only"
                 />
                 <label
-                  htmlFor={category.label}
-                  className="pl-3 text-left hover:font-semibold cursor-pointer"
+                  htmlFor={`desktop-${category.label}`}
+                  className={`flex flex-1 items-center cursor-pointer ${
+                    selectedCategories.includes(category.label)
+                      ? "font-medium text-blue-600"
+                      : "text-gray-700"
+                  }`}
                 >
+                  <div
+                    className={`w-4 h-4 rounded flex items-center justify-center mr-3 ${
+                      selectedCategories.includes(category.label)
+                        ? "bg-blue-500 text-white"
+                        : "border border-gray-300"
+                    }`}
+                  >
+                    {selectedCategories.includes(category.label) && (
+                      <Check size={12} strokeWidth={3} />
+                    )}
+                  </div>
                   {category.label}
                 </label>
               </div>
             ))}
-            <div className="text-center">
-              <Button className="rounded-lg w-20 h-10" onClick={handleApply}>
-                Apply
-              </Button>
-            </div>
+          </div>
+
+          {/* Apply button */}
+          <div className="flex justify-center">
+            <Button
+              className="w-full rounded-lg"
+              disabled={
+                selectedCategories.length === 0 && selectedCategory.length === 0
+              }
+              onClick={handleApply}
+            >
+              Apply Filters
+            </Button>
           </div>
         </div>
       </div>
 
       {/* Mobile view: Overlay filter modal */}
       {isFilterOpen && (
-        <div className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-50">
-          <div className="fixed bottom-10 left-0 right-0 bg-white rounded-t-xl p-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center border-b pb-2">
-              <div className="text-lg font-bold">
-                Categories
-                {/* Uncomment below block to add "Clear" functionality */}
-                {/*
-                {selectedCategories.length > 0 && (
-                  <span
-                    className="text-sm font-normal underline cursor-pointer"
-                    onClick={() => setSelectedCategories([])}
-                  >
-                    (Clear)
-                  </span>
-                )}
-                */}
-              </div>
+        <div className="lg:hidden fixed inset-0 bg-black bg-opacity-60 z-50 backdrop-blur-sm transition-opacity">
+          <div className="fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-lg max-h-[80vh] overflow-y-auto transition-transform">
+            {/* Header */}
+            <div className="flex justify-between items-center border-b p-4 sticky top-0 bg-white z-10">
+              <h3 className="text-lg font-bold text-gray-800">Categories</h3>
               <button
                 onClick={() => setIsFilterOpen(false)}
-                className="text-xl"
+                className="p-2 rounded-full hover:bg-gray-100"
               >
-                <X />
+                <X size={18} />
               </button>
             </div>
-            <div className="mt-4 grid grid-cols-2 gap-2">
+
+            {/* Categories grid */}
+            <div className="p-4 grid grid-cols-2 gap-2">
               {categories?.map((category, index) => (
-                <div key={index} className="flex items-center mb-2">
+                <div
+                  key={index}
+                  className={`flex items-center p-2 rounded-lg border ${
+                    selectedCategories.includes(category.label)
+                      ? "border-blue-500 bg-blue-50"
+                      : "border-gray-200 hover:border-blue-200"
+                  }`}
+                >
                   <input
                     id={`mobile-${category.label}`}
                     type="checkbox"
                     value={category.label}
                     checked={selectedCategories.includes(category.label)}
-                    className="text-sm"
                     onChange={handleCategoryChange}
+                    className="sr-only"
                   />
                   <label
                     htmlFor={`mobile-${category.label}`}
-                    className="pl-2 text-left hover:font-semibold cursor-pointer text-sm"
+                    className={`flex flex-1 items-center cursor-pointer ${
+                      selectedCategories.includes(category.label)
+                        ? "font-medium text-blue-600"
+                        : ""
+                    }`}
                   >
-                    {category.label}
+                    <div
+                      className={`w-4 h-4 rounded flex items-center justify-center mr-2 ${
+                        selectedCategories.includes(category.label)
+                          ? "bg-blue-500 text-white"
+                          : "border border-gray-300"
+                      }`}
+                    >
+                      {selectedCategories.includes(category.label) && (
+                        <Check size={10} strokeWidth={3} />
+                      )}
+                    </div>
+                    <span className="text-sm">{category.label}</span>
                   </label>
                 </div>
               ))}
             </div>
-            <div className="mt-4 flex justify-between">
+
+            {/* Action buttons */}
+            <div className="p-4 flex gap-2 border-t sticky bottom-0 bg-white">
               <Button
                 variant="outline"
-                className="w-[48%]"
-                onClick={() => setIsFilterOpen(false)}
+                className="flex-1"
+                onClick={handleClearFilters}
               >
-                Cancel
+                Clear
               </Button>
               <Button
-                className="w-[48%]"
+                className="flex-1"
                 onClick={(e) => {
                   handleApply(e);
                   setIsFilterOpen(false);

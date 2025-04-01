@@ -10,7 +10,7 @@ export default function RootLayout({ children }) {
       <Navbar />
 
       {/* Main content area */}
-      <main className="mx-auto hero-gradient min-h-screen">
+      <main className="mx-auto hero-gradient min-h-screen bg-gray-50">
         <TooltipProvider>
           <Toaster />
           <Sonner />

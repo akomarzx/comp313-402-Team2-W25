@@ -28,6 +28,7 @@ const IngredientInput = ({ ingredients, setIngredients }) => {
   // Listen for Enter key press to add ingredient
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
+      e.preventDefault();
       handleAddIngredient();
     }
   };
@@ -38,43 +39,49 @@ const IngredientInput = ({ ingredients, setIngredients }) => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* Input and Add Button */}
-      <div className="flex gap-2">
+      <div className="flex">
         <Input
           type="text"
           placeholder="Type an ingredient and press Enter..."
           value={currentIngredient}
           onChange={(e) => setCurrentIngredient(e.target.value)}
-          onKeyPress={handleKeyPress}
-          className="flex-1 border-2 border-purple-100 focus:border-purple-300 focus:ring-purple-200"
+          onKeyDown={handleKeyPress}
+          className="flex-1 border border-gray-200 rounded-r-none focus-visible:ring-1 focus-visible:ring-blue-500"
         />
         <Button
           onClick={handleAddIngredient}
-          variant="outline"
-          className="px-3 border-2 border-purple-100 hover:bg-purple-50 hover:border-purple-200"
+          type="button"
+          className="rounded-l-none bg-blue-50 hover:bg-blue-100 text-blue-600 border border-gray-200 border-l-0"
         >
-          <Plus className="h-4 w-4 text-purple-600" />
+          <Plus className="h-4 w-4" />
         </Button>
       </div>
 
       {/* Display Added Ingredients */}
       <div className="flex flex-wrap gap-2">
-        {ingredients.map((ingredient, index) => (
-          <span
-            key={index}
-            className="inline-flex items-center gap-1.5 bg-purple-50 text-purple-800 px-4 py-1.5 rounded-full text-sm font-medium group hover:bg-purple-100 transition-colors"
-          >
-            {ingredient}
-            <button
-              onClick={() => removeIngredient(index)}
-              className="hover:text-pink-600 transition-colors"
-              aria-label="Remove ingredient"
+        {ingredients.length === 0 ? (
+          <div className="text-xs text-gray-500 py-1">
+            No ingredients added yet
+          </div>
+        ) : (
+          ingredients.map((ingredient, index) => (
+            <span
+              key={index}
+              className="inline-flex items-center gap-1 bg-gray-50 text-gray-800 px-2 py-1 rounded text-xs"
             >
-              <X className="h-3.5 w-3.5" />
-            </button>
-          </span>
-        ))}
+              {ingredient}
+              <button
+                onClick={() => removeIngredient(index)}
+                className="text-gray-400 hover:text-red-500 transition-colors"
+                aria-label="Remove ingredient"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          ))
+        )}
       </div>
     </div>
   );

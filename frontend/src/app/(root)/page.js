@@ -50,7 +50,7 @@ const Home = () => {
   }
 
   return (
-    <div className="bg-white">
+    <div className="bg-gray-50">
       <div className="min-h-screen">
         {/* Hero Section */}
         <section className="hero-gradient min-h-[100vh] px-4 py-20 flex items-center justify-center">

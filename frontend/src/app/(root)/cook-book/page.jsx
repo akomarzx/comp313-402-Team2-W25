@@ -2,7 +2,15 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import { LoaderIcon, MinusCircle, PlusCircle } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  LoaderIcon,
+  PlusCircle,
+  BookOpen,
+  Heart,
+  Utensils,
+} from "lucide-react";
 import { getMealPlans, getMyRecipes, getSavedRecipes } from "@/api/recipe";
 import RecipesResult from "@/components/RecipesResult";
 import MyMealPlanList from "@/components/MyMealPlanList";
@@ -28,7 +36,7 @@ const MyCookBook = () => {
   const [isLoading3, setIsLoading3] = useState(true);
 
   // Collapse states
-  const [isMyRecipeCollapse, setIsMyRecipeCollapse] = useState(true);
+  const [isMyRecipeCollapse, setIsMyRecipeCollapse] = useState(false);
   const [isFavoriteCollapse, setIsFavoriteCollapse] = useState(true);
   const [isMealPlanCollapse, setIsMealPlanCollapse] = useState(true);
 
@@ -82,143 +90,198 @@ const MyCookBook = () => {
     thirdFetch();
   }, []);
 
-  if (loading) return <LoaderIcon className="animate-spin m-auto" />;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <LoaderIcon className="animate-spin h-8 w-8 text-blue-500" />
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen py-10 px-6 max-w-[1200px] mx-auto bg-white">
-      <h2 className="mx-2 font-bold text-2xl">MY COOK BOOK</h2>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-6xl mx-auto px-4 py-10">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-2xl font-bold text-gray-800">My Cookbook</h1>
+          <button
+            onClick={() => router.replace("/cook-book/create")}
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+          >
+            <PlusCircle size={18} />
+            <span>Create Recipe</span>
+          </button>
+        </div>
 
-      {/* New recipe */}
-      <div className="text-right">
-        <button
-          onClick={() => router.replace("/cook-book/create")}
-          className="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 mx-2 rounded"
-        >
-          New Recipe
-        </button>
-      </div>
-
-      {/* My recipes */}
-      <div>
-        <fieldset
-          className={`${
-            isMyRecipeCollapse ? "h-[50px]" : "h-[800px]"
-          } overflow-y-auto transition-all duration-300 ease-in-out border mx-2 my-5 border-gray-200 rounded-lg p-4`}
-        >
-          <legend
-            className="cursor-pointer"
+        {/* My recipes */}
+        <div className="mb-6 bg-white border border-gray-100 rounded-lg overflow-hidden">
+          <button
+            className="w-full flex justify-between items-center p-4 font-medium text-left text-gray-800 hover:bg-gray-50 transition-colors focus:outline-none"
             onClick={() => setIsMyRecipeCollapse((prev) => !prev)}
           >
-            <h2 className="flex font-semibold">
-              <span>MY RECIPES</span>
-              {isMyRecipeCollapse ? (
-                <PlusCircle className="my-auto ml-2" size={18} />
-              ) : (
-                <MinusCircle className="my-auto ml-2" size={18} />
+            <div className="flex items-center gap-2">
+              <Utensils size={18} className="text-blue-600" />
+              <span>My Recipes</span>
+              {myRecipes.length > 0 && (
+                <span className="ml-2 bg-gray-100 text-gray-600 text-xs font-medium px-2 py-0.5 rounded-full">
+                  {myRecipes.length}
+                </span>
               )}
-            </h2>
-          </legend>
-          {isLoading && <LoaderIcon className="animate-spin m-auto" />}
+            </div>
+            {isMyRecipeCollapse ? (
+              <ChevronRight size={18} className="text-gray-500" />
+            ) : (
+              <ChevronDown size={18} className="text-gray-500" />
+            )}
+          </button>
+
           <div
-            className={`transition-all duration-300 mx-auto max-w-[1200px] ${
-              isMyRecipeCollapse && "invisible"
+            className={`transition-all duration-300 overflow-hidden ${
+              isMyRecipeCollapse
+                ? "max-h-0"
+                : "max-h-[2000px] border-t border-gray-100"
             }`}
           >
-            <RecipesResult recipeCardData={myRecipes} version={2} />
-            <div className="text-center mt-4">
-              {myRecipes?.length >= 12 && (
-                <button
-                  onClick={fetchMyRecipes}
-                  className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded"
-                >
-                  Load More Recipes
-                </button>
+            <div className="p-4">
+              {isLoading ? (
+                <div className="flex justify-center py-10">
+                  <LoaderIcon className="animate-spin h-6 w-6 text-blue-500" />
+                </div>
+              ) : myRecipes.length === 0 ? (
+                <div className="text-center py-10 text-gray-500">
+                  <p>You haven't created any recipes yet.</p>
+                </div>
+              ) : (
+                <>
+                  <RecipesResult recipeCardData={myRecipes} version={2} />
+                  {myRecipes?.length >= 12 && (
+                    <div className="text-center mt-6">
+                      <button
+                        onClick={fetchMyRecipes}
+                        className="bg-white text-blue-600 hover:bg-blue-50 border border-blue-200 font-medium py-2 px-4 rounded-lg transition-colors"
+                      >
+                        Load More
+                      </button>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>
-        </fieldset>
-      </div>
+        </div>
 
-      {/* Favorite recipes */}
-      <div>
-        <fieldset
-          className={`${
-            isFavoriteCollapse ? "h-[50px]" : "h-[800px]"
-          }  overflow-y-auto transition-all duration-300 ease-in-out border mx-2 my-5 border-gray-200 rounded-lg p-4`}
-        >
-          <legend
-            className="cursor-pointer"
+        {/* Favorite recipes */}
+        <div className="mb-6 bg-white border border-gray-100 rounded-lg overflow-hidden">
+          <button
+            className="w-full flex justify-between items-center p-4 font-medium text-left text-gray-800 hover:bg-gray-50 transition-colors focus:outline-none"
             onClick={() => setIsFavoriteCollapse((prev) => !prev)}
           >
-            <h2 className="flex font-semibold">
-              <span>MY FAVORITE RECIPES</span>
-              {isFavoriteCollapse ? (
-                <PlusCircle className="my-auto ml-2" size={18} />
-              ) : (
-                <MinusCircle className="my-auto ml-2" size={18} />
-              )}
-            </h2>
-          </legend>
-          {isLoading2 && <LoaderIcon className="animate-spin m-auto" />}
-          <div
-            className={`transition-all duration-300 mx-auto max-w-[1200px]  ${
-              isFavoriteCollapse && "invisible"
-            }`}
-          >
-            <RecipesResult recipeCardData={savedRecipes} version={2} />
-            <div className="text-center mt-4">
-              {savedRecipes?.length >= 12 && (
-                <button
-                  onClick={fetchSavedRecipes}
-                  className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded"
-                >
-                  Load More Recipes
-                </button>
+            <div className="flex items-center gap-2">
+              <Heart size={18} className="text-red-500" />
+              <span>Favorite Recipes</span>
+              {savedRecipes.length > 0 && (
+                <span className="ml-2 bg-gray-100 text-gray-600 text-xs font-medium px-2 py-0.5 rounded-full">
+                  {savedRecipes.length}
+                </span>
               )}
             </div>
-          </div>
-        </fieldset>
-      </div>
+            {isFavoriteCollapse ? (
+              <ChevronRight size={18} className="text-gray-500" />
+            ) : (
+              <ChevronDown size={18} className="text-gray-500" />
+            )}
+          </button>
 
-      {/* Meal plans */}
-      <div>
-        <fieldset
-          className={`${
-            isMealPlanCollapse ? "h-[50px]" : "h-[800px]"
-          } overflow-y-auto transition-all duration-300 ease-in-out border mx-2 my-5 border-gray-200 rounded-lg p-4`}
-        >
-          <legend
-            onClick={() => setIsMealPlanCollapse((prev) => !prev)}
-            className="flex font-semibold cursor-pointer"
-          >
-            <h2 className="flex font-semibold">
-              <span>MY MEAL PLANS</span>
-              {isMealPlanCollapse ? (
-                <PlusCircle className="my-auto ml-2" size={18} />
-              ) : (
-                <MinusCircle className="my-auto ml-2" size={18} />
-              )}
-            </h2>
-          </legend>
-          {isLoading3 && <LoaderIcon className="animate-spin m-auto" />}
           <div
-            className={`transition-all duration-300 mx-auto max-w-[1200px]  ${
-              isMealPlanCollapse && "invisible"
+            className={`transition-all duration-300 overflow-hidden ${
+              isFavoriteCollapse
+                ? "max-h-0"
+                : "max-h-[2000px] border-t border-gray-100"
             }`}
           >
-            <MyMealPlanList list={mealPlans} />
-            <div className="text-center mt-4">
-              {mealPlans?.length >= 12 && (
-                <button
-                  onClick={fetchMealPlans}
-                  className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded"
-                >
-                  Load Meal Plans
-                </button>
+            <div className="p-4">
+              {isLoading2 ? (
+                <div className="flex justify-center py-10">
+                  <LoaderIcon className="animate-spin h-6 w-6 text-blue-500" />
+                </div>
+              ) : savedRecipes.length === 0 ? (
+                <div className="text-center py-10 text-gray-500">
+                  <p>You haven't saved any favorite recipes yet.</p>
+                </div>
+              ) : (
+                <>
+                  <RecipesResult recipeCardData={savedRecipes} version={2} />
+                  {savedRecipes?.length >= 12 && (
+                    <div className="text-center mt-6">
+                      <button
+                        onClick={fetchSavedRecipes}
+                        className="bg-white text-blue-600 hover:bg-blue-50 border border-blue-200 font-medium py-2 px-4 rounded-lg transition-colors"
+                      >
+                        Load More
+                      </button>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>
-        </fieldset>
+        </div>
+
+        {/* Meal plans */}
+        <div className="mb-6 bg-white border border-gray-100 rounded-lg overflow-hidden">
+          <button
+            className="w-full flex justify-between items-center p-4 font-medium text-left text-gray-800 hover:bg-gray-50 transition-colors focus:outline-none"
+            onClick={() => setIsMealPlanCollapse((prev) => !prev)}
+          >
+            <div className="flex items-center gap-2">
+              <BookOpen size={18} className="text-green-600" />
+              <span>Meal Plans</span>
+              {mealPlans.length > 0 && (
+                <span className="ml-2 bg-gray-100 text-gray-600 text-xs font-medium px-2 py-0.5 rounded-full">
+                  {mealPlans.length}
+                </span>
+              )}
+            </div>
+            {isMealPlanCollapse ? (
+              <ChevronRight size={18} className="text-gray-500" />
+            ) : (
+              <ChevronDown size={18} className="text-gray-500" />
+            )}
+          </button>
+
+          <div
+            className={`transition-all duration-300 overflow-hidden ${
+              isMealPlanCollapse
+                ? "max-h-0"
+                : "max-h-[2000px] border-t border-gray-100"
+            }`}
+          >
+            <div className="p-4">
+              {isLoading3 ? (
+                <div className="flex justify-center py-10">
+                  <LoaderIcon className="animate-spin h-6 w-6 text-blue-500" />
+                </div>
+              ) : mealPlans.length === 0 ? (
+                <div className="text-center py-10 text-gray-500">
+                  <p>You haven't created any meal plans yet.</p>
+                </div>
+              ) : (
+                <>
+                  <MyMealPlanList list={mealPlans} />
+                  {mealPlans?.length >= 12 && (
+                    <div className="text-center mt-6">
+                      <button
+                        onClick={fetchMealPlans}
+                        className="bg-white text-blue-600 hover:bg-blue-50 border border-blue-200 font-medium py-2 px-4 rounded-lg transition-colors"
+                      >
+                        Load More
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

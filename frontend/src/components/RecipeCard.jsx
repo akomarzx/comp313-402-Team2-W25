@@ -1,6 +1,6 @@
 import Image from "next/image";
 import React, { useState } from "react";
-import { ChefHatIcon, HeartIcon } from "lucide-react";
+import { ChefHatIcon, HeartIcon, Clock, Users } from "lucide-react";
 import { toast } from "sonner";
 import { saveRecipe, unsaveRecipe } from "@/api/recipe";
 import { useRouter } from "next/navigation";
@@ -18,10 +18,8 @@ const RecipeCard = ({ data, version = 1, user = {} }) => {
 
   // Set card sizing based on the component version
   const cardStyle =
-    version === 2
-      ? "w-[190px] min-h-[220px] p-2"
-      : "w-[250px] min-h-[300px] p-4";
-  const imageStyle = version === 2 ? "h-[150px]" : "h-[200px]";
+    version === 2 ? "w-[190px] min-h-[220px]" : "w-full min-h-[300px]";
+  const imageStyle = version === 2 ? "h-[150px]" : "h-[180px]";
 
   // Local state for toggling saved status
   const [saved, setSaved] = useState(data?.isFavorite);
@@ -29,7 +27,8 @@ const RecipeCard = ({ data, version = 1, user = {} }) => {
   /**
    * Handle click event for saving or unsaving a recipe.
    */
-  const handleSaveClick = async () => {
+  const handleSaveClick = async (e) => {
+    e.stopPropagation();
     if (!saved) {
       // Save recipe
       const res = await saveRecipe(data.id);
@@ -49,26 +48,11 @@ const RecipeCard = ({ data, version = 1, user = {} }) => {
 
   return (
     <div
-      className={`slide-up relative hover:scale-[101%] border ${cardStyle} max-h-[400px] bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-700 mx-auto`}
+      className="group relative bg-white border border-gray-100 hover:border-gray-200 rounded-lg overflow-hidden cursor-pointer"
+      onClick={() => router.push(`/recipe/${data?.id}`)}
     >
-      {/* Favorite icon: visible only when user is provided and on version 1 */}
-      {user && version !== 2 && (
-        <div className="absolute top-5 right-5 z-10">
-          <HeartIcon
-            size={25}
-            className={`${
-              saved ? "fill-red-500" : ""
-            } text-red-500 hover:scale-110`}
-            onClick={handleSaveClick}
-          />
-        </div>
-      )}
-
-      {/* Recipe image with click action to navigate to recipe detail */}
-      <div
-        className={`relative w-full ${imageStyle} rounded-md overflow-hidden`}
-        onClick={() => router.push(`/recipe/${data?.id}`)}
-      >
+      {/* Recipe image */}
+      <div className={`relative w-full ${imageStyle} overflow-hidden`}>
         <Image
           unoptimized
           src={
@@ -78,58 +62,62 @@ const RecipeCard = ({ data, version = 1, user = {} }) => {
           alt={data?.title}
           fill
           sizes="100%"
-          className="rounded-t-lg"
+          className="object-cover transition-all duration-500 group-hover:scale-105"
           priority
         />
+
+        {/* Favorite button overlay */}
+        {user && version !== 2 && (
+          <button
+            className="absolute top-2 right-2 z-10 bg-white p-1.5 rounded-full hover:bg-gray-50"
+            onClick={handleSaveClick}
+          >
+            <HeartIcon
+              size={18}
+              className={`${saved ? "fill-red-500" : ""} text-red-500`}
+            />
+          </button>
+        )}
       </div>
 
-      <div className="pt-4">
+      {/* Recipe content */}
+      <div className="p-3">
         {/* Recipe title */}
-        <h3
-          className={`${
-            version === 2 ? "font-bold line-clamp-2" : "font-semibold truncate"
-          } font-bold text-gray-800`}
-        >
+        <h3 className="font-medium text-base line-clamp-2 mb-1 text-gray-800">
           {data?.title}
         </h3>
 
-        {/* Additional recipe details for version 1 */}
+        {/* Recipe metadata */}
         {version === 1 && (
-          <div className="flex mt-2 w-full justify-between">
-            {/* Recipe categories */}
-            <p className="text-sm line-clamp-1">
-              {data?.category?.split(",").map((cat, i) => (
-                <span key={i}>
-                  <span className="text-blue-600 border rounded-full px-2 bg-blue-100">
-                    {cat}
-                  </span>
-                  &nbsp;
-                </span>
-              ))}
-            </p>
+          <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
+            {/* Categories */}
+            {data?.category && (
+              <div className="flex gap-1 flex-wrap">
+                <span>{data?.category?.split(",")[0]?.trim()}</span>
+                {data?.category?.split(",").length > 1 && (
+                  <span>+{data?.category?.split(",").length - 1}</span>
+                )}
+              </div>
+            )}
 
             {/* Recipe rating */}
-            <p className="text-sm text-gray-600 flex items-right font-semibold">
-              {data?.ratingValue !== null && data?.ratingCount > 0 && (
-                <span className="flex items-center">
-                  <ChefHatIcon
-                    size={20}
-                    className={
-                      data?.ratingValue >= 4
-                        ? "text-green-600"
-                        : data?.ratingValue >= 3
-                        ? "text-yellow-400"
-                        : data?.ratingValue >= 2
-                        ? "text-orange-400"
-                        : data?.ratingValue >= 1
-                        ? "text-red-400"
-                        : "text-gray-400"
-                    }
-                  />
-                  {data?.ratingValue}({data?.ratingCount})
+            {data?.ratingValue !== null && data?.ratingCount > 0 && (
+              <div className="flex items-center">
+                <ChefHatIcon
+                  size={14}
+                  className={`mr-0.5 ${
+                    data?.ratingValue >= 4
+                      ? "text-green-600"
+                      : data?.ratingValue >= 3
+                      ? "text-yellow-500"
+                      : "text-gray-400"
+                  }`}
+                />
+                <span>
+                  {data?.ratingValue} ({data?.ratingCount})
                 </span>
-              )}
-            </p>
+              </div>
+            )}
           </div>
         )}
       </div>
