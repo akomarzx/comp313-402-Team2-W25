@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ChefHatIcon, HeartIcon } from "lucide-react";
+import { ChefHatIcon, HeartIcon, Clock, Users } from "lucide-react";
 import { toast } from "sonner";
 import { saveRecipe, unsaveRecipe } from "@/api/recipe";
 
@@ -20,7 +20,10 @@ const RecipeRow = ({ recipe, user }) => {
   /**
    * Toggle saved/unsaved recipe.
    */
-  const handleSaveClick = async () => {
+  const handleSaveClick = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
     if (!saved) {
       const res = await saveRecipe(recipe.id);
       if (res?.status === 200 || res?.status === 201) {
@@ -37,83 +40,109 @@ const RecipeRow = ({ recipe, user }) => {
   };
 
   return (
-    <div className="relative slide-up">
-      {user && (
-        <div className="absolute top-5 right-4 z-10">
-          <HeartIcon
-            size={25}
-            className={`text-red-500 hover:scale-110 ${
-              saved ? "fill-red-500" : ""
-            }`}
+    <Link
+      href={`/recipe/${recipe?.id}`}
+      className="block transform transition-all duration-300 hover:-translate-y-1"
+    >
+      <div className="group relative slide-up bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden mb-6">
+        {/* Favorite button */}
+        {user && (
+          <button
             onClick={handleSaveClick}
-          />
-        </div>
-      )}
-
-      <Link href={`/recipe/${recipe?.id}`}>
-        <div
-          key={recipe.id}
-          className="flex flex-col sm:flex-row relative items-center gap-6 my-8 border-x-[1px] bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-4 cursor-pointer"
-        >
-          {/* Recipe Thumbnail */}
-          <div className="w-48 h-32 flex-shrink-0 mx-auto">
-            <Image
-              unoptimized
-              src={recipe.thumbnailUrl || "/placeholder.svg"}
-              alt={recipe.title}
-              width={192}
-              height={128}
-              className="w-full h-full object-cover rounded-md"
+            className="absolute top-3 right-3 z-10 bg-white/80 p-1.5 rounded-full shadow-sm opacity-80 hover:opacity-100 transition-opacity"
+          >
+            <HeartIcon
+              size={20}
+              className={`text-red-500 transition-all ${
+                saved ? "fill-red-500" : ""
+              }`}
             />
+          </button>
+        )}
+
+        <div className="flex flex-col sm:flex-row items-center p-4">
+          {/* Recipe Thumbnail */}
+          <div className="w-full sm:w-48 h-48 sm:h-32 rounded-xl overflow-hidden flex-shrink-0 mb-4 sm:mb-0">
+            <div className="relative w-full h-full">
+              <Image
+                unoptimized
+                src={recipe.thumbnailUrl || "/placeholder.svg"}
+                alt={recipe.title}
+                fill
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+            </div>
           </div>
 
           {/* Recipe Details */}
-          <div className="flex-grow">
-            <h3 className="font-serif text-xl font-semibold mb-2 w-[90%]">
+          <div className="flex-grow sm:ml-6 w-full">
+            <h3 className="text-xl font-semibold mb-2 line-clamp-1 text-gray-800">
               {recipe?.title}
             </h3>
+
             <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-              {recipe?.description}
+              {recipe?.description ||
+                "A delicious recipe that's quick and easy to prepare."}
             </p>
-            <div className="flex w-full space-between gap-4 text-sm text-gray-500">
+
+            <div className="flex flex-wrap gap-y-3 items-center justify-between">
               {/* Recipe Categories */}
-              <p className="text-sm line-clamp-1 w-1/2">
-                {recipe?.category?.split(",").map((cat, i) => (
-                  <span key={i}>
-                    <span className="text-blue-600 border rounded-full px-2 bg-blue-100">
+              <div className="flex flex-wrap gap-1 max-w-full overflow-hidden">
+                {recipe?.category
+                  ?.split(",")
+                  .slice(0, 3)
+                  .map((cat, i) => (
+                    <span
+                      key={i}
+                      className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full"
+                    >
                       {cat.trim()}
                     </span>
-                    &nbsp;
+                  ))}
+                {recipe?.category?.split(",").length > 3 && (
+                  <span className="text-xs font-medium text-gray-500 px-1">
+                    +{recipe?.category?.split(",").length - 3}
                   </span>
-                ))}
-              </p>
-              {/* Recipe Rating */}
-              <p className="text-sm text-gray-600 font-semibold w-1/2 text-right">
+                )}
+              </div>
+
+              {/* Mock recipe info and Rating */}
+              <div className="flex items-center gap-3">
+                <div className="flex items-center text-gray-500 text-xs">
+                  <Clock size={14} className="mr-1" />
+                  <span>{recipe?.cookTime || "30 min"}</span>
+                </div>
+
                 {recipe?.ratingValue !== null && recipe?.ratingCount > 0 && (
-                  <span className="flex items-center justify-end">
+                  <div className="flex items-center bg-gray-50 py-1 px-2 rounded-full">
                     <ChefHatIcon
-                      size={20}
-                      className={
+                      size={16}
+                      className={`mr-1 ${
                         recipe?.ratingValue >= 4
                           ? "text-green-600"
                           : recipe?.ratingValue >= 3
-                          ? "text-yellow-400"
+                          ? "text-yellow-500"
                           : recipe?.ratingValue >= 2
-                          ? "text-orange-400"
+                          ? "text-orange-500"
                           : recipe?.ratingValue >= 1
-                          ? "text-red-400"
+                          ? "text-red-500"
                           : "text-gray-400"
-                      }
+                      }`}
                     />
-                    {recipe?.ratingValue}({recipe?.ratingCount})
-                  </span>
+                    <span className="text-xs font-medium">
+                      {recipe?.ratingValue}
+                      <span className="text-gray-500 ml-0.5">
+                        ({recipe?.ratingCount})
+                      </span>
+                    </span>
+                  </div>
                 )}
-              </p>
+              </div>
             </div>
           </div>
         </div>
-      </Link>
-    </div>
+      </div>
+    </Link>
   );
 };
 

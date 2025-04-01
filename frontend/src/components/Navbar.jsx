@@ -13,7 +13,18 @@ import {
   LogOut,
   UserRound,
   WandSparkles,
+  Menu,
+  X,
+  ChevronDown,
 } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
 
 const Navbar = () => {
   // Local state for mobile menu and profile dropdown
@@ -24,15 +35,19 @@ const Navbar = () => {
   const { user, logout, login, loading } = useAuth();
   const currentPath = usePathname();
   const router = useRouter();
+
   // Toggle the mobile menu
   const toggleMenu = () => setIsOpen(!isOpen);
 
   // Determine active link styles
   const getLinkClasses = (path, mobile = false) => {
-    const baseClasses = mobile ? "flex gap-1" : "flex gap-2";
+    const baseClasses = mobile
+      ? "flex items-center gap-2 py-2 px-3 rounded-md transition-colors duration-200"
+      : "flex items-center gap-2 px-3 py-2 rounded-md transition-colors duration-200";
+
     return currentPath === path
-      ? `text-green-600 ${baseClasses}`
-      : `text-slate-600 ${baseClasses}`;
+      ? `${baseClasses} bg-primary/10 text-primary font-medium`
+      : `${baseClasses} text-slate-600 hover:bg-slate-100 hover:text-primary`;
   };
 
   useEffect(() => {
@@ -43,248 +58,257 @@ const Navbar = () => {
   }, [loading, user]);
 
   return (
-    <nav className="w-full border-b bg-white">
-      <div className="container flex justify-between items-center h-[8vh] mx-auto min-w-[80%] px-4">
+    <nav className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur-sm shadow-sm">
+      <div className="container flex justify-between items-center h-16 mx-auto px-4">
         {/* Logo */}
-        <div className="text-xl font-bold text-green-600">
+        <div className="text-xl font-bold text-primary">
           <Link href="/" className="flex items-center gap-2">
-            <ChefHat size={25} />
-            <span>Kitchen Companion</span>
+            <ChefHat size={25} className="text-primary" />
+            <span className="hidden sm:inline">Kitchen Companion</span>
           </Link>
         </div>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex gap-10 text-slate-600 font-bold font-sans">
+        <div className="hidden md:flex items-center gap-2 text-slate-600 font-medium">
           <Link href="/recipes" className={getLinkClasses("/recipes")}>
-            <Home size={22} />
-            <span>HOME</span>
+            <Home size={18} />
+            <span>Home</span>
           </Link>
 
           {user && !loading && (
             <Link href="/cook-book" className={getLinkClasses("/cook-book")}>
-              <Book size={22} />
-              <span>MY COOK BOOK</span>
+              <Book size={18} />
+              <span>My Cookbook</span>
             </Link>
           )}
 
           <Link href="/ai-rcmd" className={getLinkClasses("/ai-rcmd")}>
-            <WandSparkles size={22} />
+            <WandSparkles size={18} />
             <span>AI</span>
           </Link>
 
           {/* Profile Dropdown for logged in user */}
           {user ? (
-            <div
-              className="relative"
-              onBlur={async (e) => {
-                // If focus moves to logout button, handle logout, otherwise hide dropdown
-                if (e.relatedTarget?.id === "logout") {
-                  await logout();
-                } else if (e.relatedTarget?.id === "profile") {
-                  console.log(e.relatedTarget?.id);
-                  setTimeout(() => {
-                    setIsProfileDropdownOpen(false);
-                  }, 200);
-                } else {
-                  setIsProfileDropdownOpen(false);
-                }
-              }}
-            >
-              <button
+            <div className="relative ml-2">
+              <Button
+                variant="ghost"
                 onClick={() => setIsProfileDropdownOpen((prev) => !prev)}
-                className="flex items-center gap-2 hover:text-green-600 focus:outline-none"
+                className="flex items-center gap-2 hover:bg-slate-100"
               >
-                <span>PROFILE</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
+                <span>Profile</span>
+                <ChevronDown
+                  size={16}
+                  className={`transition-transform duration-200 ${
+                    isProfileDropdownOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </Button>
 
-              {isProfileDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg">
-                  <button
-                    id="profile"
-                    onClick={() => router.push("/profile")}
-                    className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-slate-600"
+              <AnimatePresence>
+                {isProfileDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg overflow-hidden"
+                    onBlur={(e) => {
+                      if (e.relatedTarget?.id === "logout") {
+                        logout();
+                      } else if (e.relatedTarget?.id !== "profile") {
+                        setIsProfileDropdownOpen(false);
+                      }
+                    }}
                   >
-                    <div className="flex gap-2 items-center">
-                      <UserRound size={22} />
-                      <span>MY PROFILE</span>
-                    </div>
-                  </button>
-                  <button
-                    id="logout"
-                    onClick={async () => await logout()}
-                    className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-slate-600"
-                  >
-                    <div className="flex gap-2 items-center">
-                      <LogOut size={22} />
-                      <span>LOG OUT</span>
-                    </div>
-                  </button>
-                </div>
-              )}
+                    <Button
+                      id="profile"
+                      variant="ghost"
+                      onClick={() => {
+                        router.push("/profile");
+                        setTimeout(() => {
+                          setIsProfileDropdownOpen(false);
+                        }, 200);
+                      }}
+                      className="flex w-full justify-start items-center gap-2 px-4 py-2 hover:bg-slate-50 text-slate-600"
+                    >
+                      <UserRound size={18} />
+                      <span>My Profile</span>
+                    </Button>
+                    <Button
+                      id="logout"
+                      variant="ghost"
+                      onClick={async () => await logout()}
+                      className="flex w-full justify-start items-center gap-2 px-4 py-2 hover:bg-slate-50 text-slate-600"
+                    >
+                      <LogOut size={18} />
+                      <span>Log Out</span>
+                    </Button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           ) : (
             /* Login Button for guest user */
-            <div className="flex min-w-[69px]">
-              <Link
-                href="/"
-                onClick={async (e) => {
-                  e.preventDefault();
-                  await login();
-                  setIsOpen(false);
-                }}
-                className="flex gap-2 hover:text-green-600"
-              >
-                <LogIn size={22} />
-                <span>LOGIN</span>
-              </Link>
-              {loading && (
-                <div className="flex items-center justify-center z-50">
-                  <LoaderIcon size={20} className="animate-spin m-auto" />
-                </div>
-              )}
-            </div>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    onClick={async (e) => {
+                      e.preventDefault();
+                      await login();
+                    }}
+                    className="flex items-center gap-2 ml-2"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <LoaderIcon size={18} className="animate-spin" />
+                    ) : (
+                      <LogIn size={18} />
+                    )}
+                    <span>Login</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Sign in to access all features</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
         </div>
 
         {/* Mobile Menu Button */}
         <div className="md:hidden">
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={toggleMenu}
-            className="text-slate-600 focus:outline-none"
+            className="p-2"
+            aria-label="Toggle menu"
           >
             {isOpen ? (
-              // Close icon
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
+              <X size={24} className="text-slate-600" />
             ) : (
-              // Menu icon
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h16m-7 6h7"
-                />
-              </svg>
+              <Menu size={24} className="text-slate-600" />
             )}
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Mobile Navigation */}
-      {isOpen && (
-        <div className="md:hidden bg-white border-t">
-          <div className="flex flex-col gap-4 py-4 px-4 text-slate-600 font-bold font-sans">
-            <Link
-              href="/recipes"
-              className={getLinkClasses("/recipes", true)}
-              onClick={() => setIsOpen(false)}
-            >
-              <Home size={22} />
-              <span>Home</span>
-            </Link>
-
-            {user && (
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="md:hidden bg-white border-t overflow-hidden"
+          >
+            <div className="flex flex-col p-4 space-y-2">
               <Link
-                href="/cook-book"
-                className={getLinkClasses("/cook-book", true)}
+                href="/recipes"
+                className={getLinkClasses("/recipes", true)}
                 onClick={() => setIsOpen(false)}
               >
-                <Book size={22} />
-                <span>My Cook Book</span>
+                <Home size={18} />
+                <span>Home</span>
               </Link>
-            )}
 
-            <Link
-              href="/ai-rcmd"
-              className={getLinkClasses("/ai-rcmd", true)}
-              onClick={() => setIsOpen(false)}
-            >
-              <WandSparkles size={22} />
-              <span>AI</span>
-            </Link>
-
-            {/* Mobile Profile Dropdown */}
-            {user ? (
-              <div>
-                <button
-                  onClick={() => setIsProfileDropdownOpen((prev) => !prev)}
-                  className="block w-full text-left py-2 hover:text-green-600 focus:outline-none"
+              {user && (
+                <Link
+                  href="/cook-book"
+                  className={getLinkClasses("/cook-book", true)}
+                  onClick={() => setIsOpen(false)}
                 >
-                  Profile
-                </button>
-                {isProfileDropdownOpen && (
-                  <div className="ml-4 border-l pl-4 flex flex-col gap-2">
-                    <Link
-                      href="/profile"
-                      onClick={() => setIsOpen(false)}
-                      className="flex gap-1 hover:text-green-600"
-                    >
-                      <UserRound size={22} />
-                      <span>My Profile</span>
-                    </Link>
-                    <button
-                      onClick={() => {
-                        logout();
-                        setIsOpen(false);
-                      }}
-                      className="flex gap-1 hover:text-green-600 text-left"
-                    >
-                      <LogOut size={22} />
-                      <span>Logout</span>
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : (
+                  <Book size={18} />
+                  <span>My Cookbook</span>
+                </Link>
+              )}
+
               <Link
-                href="/"
-                onClick={async (e) => {
-                  e.preventDefault();
-                  await login();
-                  setIsOpen(false);
-                }}
-                className="flex gap-1 hover:text-green-600"
+                href="/ai-rcmd"
+                className={getLinkClasses("/ai-rcmd", true)}
+                onClick={() => setIsOpen(false)}
               >
-                <LogIn size={22} />
-                <span>Login</span>
+                <WandSparkles size={18} />
+                <span>AI</span>
               </Link>
-            )}
-          </div>
-        </div>
-      )}
+
+              {/* Mobile Profile Options */}
+              {user ? (
+                <div className="pt-2 border-t mt-2">
+                  <Button
+                    variant="ghost"
+                    onClick={() => setIsProfileDropdownOpen((prev) => !prev)}
+                    className="flex w-full justify-between items-center px-3 py-2 rounded-md"
+                  >
+                    <span className="font-medium">Profile</span>
+                    <ChevronDown
+                      size={16}
+                      className={`transition-transform duration-200 ${
+                        isProfileDropdownOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </Button>
+
+                  <AnimatePresence>
+                    {isProfileDropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="ml-4 pl-4 border-l border-slate-200 flex flex-col gap-2 mt-2"
+                      >
+                        <Button
+                          variant="ghost"
+                          onClick={() => {
+                            router.push("/profile");
+                            setIsOpen(false);
+                          }}
+                          className="flex justify-start items-center gap-2 px-3 py-2 rounded-md"
+                        >
+                          <UserRound size={18} />
+                          <span>My Profile</span>
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          onClick={() => {
+                            logout();
+                            setIsOpen(false);
+                          }}
+                          className="flex justify-start items-center gap-2 px-3 py-2 rounded-md"
+                        >
+                          <LogOut size={18} />
+                          <span>Logout</span>
+                        </Button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ) : (
+                <Button
+                  variant="outline"
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    await login();
+                    setIsOpen(false);
+                  }}
+                  className="flex items-center justify-center gap-2 mt-2"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <LoaderIcon size={18} className="animate-spin" />
+                  ) : (
+                    <LogIn size={18} />
+                  )}
+                  <span>Login</span>
+                </Button>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 };
