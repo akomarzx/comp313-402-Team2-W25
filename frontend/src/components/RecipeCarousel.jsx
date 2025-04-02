@@ -39,7 +39,7 @@ const RecipeCarousel = ({ data }) => {
 
       {/* Carousel Container */}
       <Carousel
-        opts={{ 
+        opts={{
           align: "start",
           loop: true,
         }}
@@ -48,12 +48,12 @@ const RecipeCarousel = ({ data }) => {
         <CarouselContent className="-ml-2 md:-ml-4">
           {/* Iterate over data to create carousel items */}
           {data?.map((item, index) => (
-            <CarouselItem 
-              key={index} 
+            <CarouselItem
+              key={index}
               className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3 2xl:basis-1/4"
             >
               <div className="h-full">
-                <Card 
+                <Card
                   className="border-none shadow-sm hover:shadow-md transition-all duration-300 h-full bg-transparent overflow-hidden rounded-xl"
                   onClick={() => router.push(`/recipe/${item.id}`)}
                 >
@@ -80,7 +80,7 @@ const RecipeCarousel = ({ data }) => {
                             {item?.category && (
                               <div className="flex mt-2 gap-1">
                                 <span className="text-xs font-medium text-white bg-white/20 px-2 py-0.5 rounded-full backdrop-blur-sm">
-                                  {item?.category?.split(',')[0]?.trim()}
+                                  {item?.category?.split(",")[0]?.trim()}
                                 </span>
                               </div>
                             )}
@@ -102,14 +102,10 @@ const RecipeCarousel = ({ data }) => {
         </CarouselContent>
 
         {/* Carousel Navigation */}
-        <CarouselPrevious 
-          className="hidden sm:flex -left-4 md:-left-6 shadow-md border-none bg-white/80 hover:bg-white"
-        >
+        <CarouselPrevious className="hidden sm:flex -left-4 md:-left-6 shadow-md border-none bg-white/80 hover:bg-white">
           <ChevronLeft className="w-5 h-5 text-gray-700" />
         </CarouselPrevious>
-        <CarouselNext 
-          className="hidden sm:flex -right-4 md:-right-6 shadow-md border-none bg-white/80 hover:bg-white"
-        >
+        <CarouselNext className="hidden sm:flex -right-4 md:-right-6 shadow-md border-none bg-white/80 hover:bg-white">
           <ChevronRight className="w-5 h-5 text-gray-700" />
         </CarouselNext>
       </Carousel>
@@ -117,9 +113,7 @@ const RecipeCarousel = ({ data }) => {
       {/* Indicator dots for smaller screens */}
       <div className="flex justify-center mt-4 sm:hidden">
         {data.slice(0, Math.min(5, data.length)).map((_, index) => (
-          <div
-            key={index}
-            className="w-2 h-2 rounded-full bg-gray-300 mx-1" />
+          <div key={index} className="w-2 h-2 rounded-full bg-gray-300 mx-1" />
         ))}
       </div>
     </div>
