@@ -30,6 +30,11 @@ const MyCookBook = () => {
   const [savedRecipePage, setSavedRecipePage] = useState(1);
   const [mealPlanPage, setMealPlanPage] = useState(1);
 
+  // Total count
+  const [totalCount, setTotalCount] = useState(0);
+  const [totalCount2, setTotalCount2] = useState(0);
+  const [totalCount3, setTotalCount3] = useState(0);
+
   // Loading states
   const [isLoading, setIsLoading] = useState(true);
   const [isLoading2, setIsLoading2] = useState(true);
@@ -43,6 +48,7 @@ const MyCookBook = () => {
   // Fetch user-created recipes (paginated)
   const fetchMyRecipes = async () => {
     const data = await getMyRecipes(recipePage);
+    console.log(totalCount);
     setMyRecipes((prev) => [...prev, ...data.content]);
     setRecipePage((prev) => prev + 1);
   };
@@ -64,6 +70,7 @@ const MyCookBook = () => {
   // Initial fetch for recipes
   async function firstFetch() {
     const data = await getMyRecipes(0);
+    setTotalCount(data.page.totalElements);
     setMyRecipes(data.content);
     setIsLoading(false);
   }
@@ -71,6 +78,7 @@ const MyCookBook = () => {
   // Initial fetch for favorite recipes
   async function secondFetch() {
     const data2 = await getSavedRecipes(0);
+    setTotalCount2(data2.page.totalElements);
     setSavedRecipes(data2?.content);
     setIsLoading2(false);
   }
@@ -78,13 +86,14 @@ const MyCookBook = () => {
   // Initial fetch for meal plans
   async function thirdFetch() {
     const data3 = await getMealPlans(0);
+    setTotalCount3(data3.page.totalElements);
     setMealPlans(data3?.content);
     setIsLoading3(false);
   }
 
   // On mount
   useEffect(() => {
-    if (!user) router.push("/");
+    if (!user && !loading) router.push("/");
     firstFetch();
     secondFetch();
     thirdFetch();
@@ -118,12 +127,12 @@ const MyCookBook = () => {
             className="w-full flex justify-between items-center p-4 font-medium text-left text-gray-800 hover:bg-gray-50 transition-colors focus:outline-none"
             onClick={() => setIsMyRecipeCollapse((prev) => !prev)}
           >
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 over">
               <Utensils size={18} className="text-blue-600" />
               <span>My Recipes</span>
-              {myRecipes.length > 0 && (
+              {myRecipes.length > 0 && totalCount > 0 && (
                 <span className="ml-2 bg-gray-100 text-gray-600 text-xs font-medium px-2 py-0.5 rounded-full">
-                  {myRecipes.length}
+                  {myRecipes.length} of {totalCount}
                 </span>
               )}
             </div>
@@ -135,10 +144,10 @@ const MyCookBook = () => {
           </button>
 
           <div
-            className={`transition-all duration-300 overflow-hidden ${
+            className={`transition-all duration-300 overflow-scroll ${
               isMyRecipeCollapse
                 ? "max-h-0"
-                : "max-h-[2000px] border-t border-gray-100"
+                : "max-h-[1000px] border-t border-gray-100 "
             }`}
           >
             <div className="p-4">
@@ -153,7 +162,7 @@ const MyCookBook = () => {
               ) : (
                 <>
                   <RecipesResult recipeCardData={myRecipes} version={2} />
-                  {myRecipes?.length >= 12 && (
+                  {myRecipes?.length < totalCount && (
                     <div className="text-center mt-6">
                       <button
                         onClick={fetchMyRecipes}
@@ -178,9 +187,9 @@ const MyCookBook = () => {
             <div className="flex items-center gap-2">
               <Heart size={18} className="text-red-500" />
               <span>Favorite Recipes</span>
-              {savedRecipes.length > 0 && (
+              {savedRecipes.length > 0 && totalCount2 > 0 && (
                 <span className="ml-2 bg-gray-100 text-gray-600 text-xs font-medium px-2 py-0.5 rounded-full">
-                  {savedRecipes.length}
+                  {savedRecipes.length} of {totalCount2}
                 </span>
               )}
             </div>
@@ -192,7 +201,7 @@ const MyCookBook = () => {
           </button>
 
           <div
-            className={`transition-all duration-300 overflow-hidden ${
+            className={`transition-all duration-300 overflow-scroll ${
               isFavoriteCollapse
                 ? "max-h-0"
                 : "max-h-[2000px] border-t border-gray-100"
@@ -210,7 +219,7 @@ const MyCookBook = () => {
               ) : (
                 <>
                   <RecipesResult recipeCardData={savedRecipes} version={2} />
-                  {savedRecipes?.length >= 12 && (
+                  {savedRecipes?.length < totalCount2 && (
                     <div className="text-center mt-6">
                       <button
                         onClick={fetchSavedRecipes}
@@ -235,9 +244,9 @@ const MyCookBook = () => {
             <div className="flex items-center gap-2">
               <BookOpen size={18} className="text-green-600" />
               <span>Meal Plans</span>
-              {mealPlans.length > 0 && (
+              {mealPlans.length > 0 && totalCount3 > 0 && (
                 <span className="ml-2 bg-gray-100 text-gray-600 text-xs font-medium px-2 py-0.5 rounded-full">
-                  {mealPlans.length}
+                  {mealPlans.length} of {totalCount3}
                 </span>
               )}
             </div>
@@ -249,7 +258,7 @@ const MyCookBook = () => {
           </button>
 
           <div
-            className={`transition-all duration-300 overflow-hidden ${
+            className={`transition-all duration-300 overflow-scroll ${
               isMealPlanCollapse
                 ? "max-h-0"
                 : "max-h-[2000px] border-t border-gray-100"
@@ -267,7 +276,7 @@ const MyCookBook = () => {
               ) : (
                 <>
                   <MyMealPlanList list={mealPlans} />
-                  {mealPlans?.length >= 12 && (
+                  {mealPlans?.length < totalCount3 && (
                     <div className="text-center mt-6">
                       <button
                         onClick={fetchMealPlans}
