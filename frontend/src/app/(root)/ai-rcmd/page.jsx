@@ -43,6 +43,10 @@ const AIRecommend = () => {
 
   // Validate and generate meal plan request
   const handleGenerateMealPlan = async () => {
+    if (mealPlanGoal === "") {
+      toast.error("Please select a meal plan goal");
+      return;
+    }
     // Validate daily calorie goal
     if (caloriesGoal) {
       if (caloriesGoal < 1000) {
@@ -231,7 +235,7 @@ const AIRecommend = () => {
               <div className="space-y-6">
                 {/* Ingredients Section */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <label className=" text-sm font-medium text-gray-700 flex items-center gap-2">
                     <Database className="w-3.5 h-3.5 text-emerald-500" />
                     What ingredients do you have?
                   </label>
@@ -246,7 +250,7 @@ const AIRecommend = () => {
 
                 {/* Dietary Preferences */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <label className=" text-sm font-medium text-gray-700 flex items-center gap-2">
                     <Apple className="w-3.5 h-3.5 text-emerald-500" />
                     Dietary Preferences
                   </label>
@@ -266,7 +270,7 @@ const AIRecommend = () => {
 
                 {/* Allergies & Restrictions */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <label className=" text-sm font-medium text-gray-700 flex items-center gap-2">
                     <UtensilsCrossed className="w-3.5 h-3.5 text-emerald-500" />
                     Allergies & Restrictions
                   </label>
@@ -336,7 +340,7 @@ const AIRecommend = () => {
 
                 {/* Goal / Purpose Selection */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <label className=" text-sm font-medium text-gray-700 flex items-center gap-2">
                     <Zap className="w-3.5 h-3.5 text-emerald-500" />
                     Goal / Purpose
                   </label>
@@ -358,7 +362,7 @@ const AIRecommend = () => {
 
                 {/* Daily Calorie Goal Input */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <label className=" text-sm font-medium text-gray-700 flex items-center gap-2">
                     <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
                     Daily Calorie Goal
                   </label>
@@ -378,7 +382,7 @@ const AIRecommend = () => {
 
                 {/* Dietary Preferences for Meal Plan */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <label className=" text-sm font-medium text-gray-700 flex items-center gap-2">
                     <Apple className="w-3.5 h-3.5 text-emerald-500" />
                     Dietary Preferences
                   </label>
@@ -398,7 +402,7 @@ const AIRecommend = () => {
 
                 {/* Allergies & Restrictions for Meal Plan */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <label className=" text-sm font-medium text-gray-700 flex items-center gap-2">
                     <UtensilsCrossed className="w-3.5 h-3.5 text-emerald-500" />
                     Allergies & Restrictions
                   </label>

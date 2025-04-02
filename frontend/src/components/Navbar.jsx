@@ -93,6 +93,13 @@ const Navbar = () => {
               <Button
                 variant="ghost"
                 onClick={() => setIsProfileDropdownOpen((prev) => !prev)}
+                onBlur={(e) => {
+                  if (e.relatedTarget?.id === "logout") {
+                    logout();
+                  } else if (e.relatedTarget?.id !== "profile") {
+                    setIsProfileDropdownOpen(false);
+                  }
+                }}
                 className="flex items-center gap-2 hover:bg-slate-100"
               >
                 <span>Profile</span>

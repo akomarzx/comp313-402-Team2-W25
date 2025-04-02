@@ -64,7 +64,7 @@ const UpdateRecipe = () => {
   /* Fetch session on mount */
   useEffect(() => {
     fetchSession();
-  }, [fetchSession]);
+  }, []);
 
   /* Fetch the recipe data if user and id exist */
   useEffect(() => {
@@ -76,6 +76,7 @@ const UpdateRecipe = () => {
 
   /* Fetch the recipe from the server */
   const fetchRecipe = async () => {
+    console.log("run");
     try {
       const recipe = await getRecipeById(id);
       if (recipe?.createdBy !== user?.email) {
